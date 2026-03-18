@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Devotionals — The Winepress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wine:      #6B1A2A;
+      --wine-mid:  #8C2438;
+      --wine-lt:   #B05068;
+      --wine-pale: #E8C8CE;
+      --white:     #FFFFFF;
+      --off:       #FAF8F5;
+      --cream:     #F4EDE0;
+      --ink:       #1C1010;
+      --muted:     #7A6060;
+      --serif-d:   'DM Serif Display', Georgia, serif;
+      --serif-c:   'Cinzel', serif;
+      --sans:      'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow-x: hidden; line-height: 1.7; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /*  NAV  */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 5rem;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(107,26,42,.08);
+    }
+    .nav-logo { font-family: var(--serif-c); font-size: .95rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--wine); }
+    .nav-pill { font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; padding: .5rem 1.4rem; background: var(--wine); color: var(--white); border-radius: 100px; transition: background .2s; }
+    .nav-pill:hover { background: var(--wine-mid); }
+
+    /*  PAGE HERO  */
+    .page-hero {
+      background: var(--wine);
+      padding: 10rem 5rem 6rem;
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: 'DEVOTIONALS';
+      position: absolute; bottom: -1.5rem; right: 2rem;
+      font-family: var(--serif-c); font-size: 9rem; font-weight: 900;
+      color: rgba(255,255,255,.04); letter-spacing: .06em; pointer-events: none;
+    }
+    /* decorative circles */
+    .page-hero::after {
+      content: '';
+      position: absolute; top: -6rem; right: -6rem;
+      width: 30rem; height: 30rem; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.07);
+      pointer-events: none;
+    }
+    .ph-eyebrow {
+      font-family: var(--serif-c); font-size: .58rem; font-weight: 600;
+      letter-spacing: .28em; text-transform: uppercase;
+      color: rgba(255,255,255,.45); margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .ph-eyebrow::before { content: ''; width: 2rem; height: 1px; background: rgba(255,255,255,.3); }
+    .ph-h1 {
+      font-family: var(--serif-d);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 400; line-height: 1.05; color: var(--white);
+      margin-bottom: .3rem;
+    }
+    .ph-h1 em { font-style: italic; color: var(--wine-pale); }
+    .ph-sub {
+      font-size: .92rem; color: rgba(255,255,255,.55);
+      max-width: 520px; margin-top: 1.4rem; line-height: 1.8;
+    }
+
+    /* filter bar */
+    .filter-bar {
+      position: relative; z-index: 2;
+      margin-top: 2.8rem;
+      display: flex; gap: .6rem; flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-family: var(--serif-c); font-size: .54rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase;
+      padding: .45rem 1.2rem;
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.55);
+      border-radius: 100px; cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s;
+      background: transparent;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--white); color: var(--wine); border-color: var(--white);
+    }
+
+    /*  DEVOTIONALS LISTING  */
+    .devs-listing {
+      background: var(--off);
+      padding: 6rem 5rem;
+    }
+
+    /*  FEATURED (first devotional, full-width)  */
+    .dv-featured {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+      box-shadow: 0 4px 40px rgba(107,26,42,.07);
+      cursor: pointer;
+      transition: box-shadow .3s, transform .3s;
+    }
+    .dv-featured:hover { box-shadow: 0 16px 60px rgba(107,26,42,.12); transform: translateY(-4px); }
+    .dv-feat-img-wrap { position: relative; overflow: hidden; }
+    .dv-feat-img-wrap img { width: 100%; height: 100%; min-height: 480px; object-fit: cover; object-position: top; transition: transform .6s ease; }
+    .dv-featured:hover .dv-feat-img-wrap img { transform: scale(1.04); }
+    .dv-feat-img-overlay { position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, rgba(255,255,255,.08)); }
+    .dv-feat-badge {
+      position: absolute; top: 1.8rem; left: 1.8rem;
+      background: var(--wine); color: var(--white);
+      font-family: var(--serif-c); font-size: .52rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      padding: .3rem 1rem; border-radius: 100px;
+    }
+    .dv-feat-content {
+      padding: 3.5rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .dv-num { font-family: var(--serif-c); font-size: .54rem; font-weight: 900; letter-spacing: .16em; color: var(--wine-pale); margin-bottom: .7rem; }
+    .dv-theme-tag { font-size: .6rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: 1rem; }
+    .dv-title { font-family: var(--serif-d); font-weight: 400; line-height: 1.2; color: var(--ink); margin-bottom: .6rem; }
+    .dv-feat-content .dv-title { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+    .dv-verse-ref {
+      font-family: var(--serif-d); font-style: italic;
+      font-size: .88rem; color: var(--wine-lt); margin-bottom: 1.5rem;
+    }
+    .dv-excerpt { font-size: .88rem; color: var(--muted); line-height: 1.85; margin-bottom: 2rem; }
+    .dv-cta {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--wine); transition: gap .2s;
+    }
+    .dv-cta::after { content: '→'; transition: transform .2s; }
+    .dv-featured:hover .dv-cta { gap: 1rem; }
+
+    /*  DEVOTIONALS GRID  */
+    .devs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    /*  INDIVIDUAL CARD  */
+    .dv-card {
+      background: var(--white);
+      border-radius: 6px; overflow: hidden;
+      cursor: pointer; display: flex; flex-direction: column;
+      transition: box-shadow .3s, transform .3s;
+    }
+    .dv-card:hover { box-shadow: 0 12px 44px rgba(107,26,42,.1); transform: translateY(-4px); }
+    .dv-card-photo-wrap { position: relative; overflow: hidden; }
+    .dv-card-photo-wrap img { width: 100%; height: 220px; object-fit: cover; object-position: top center; transition: transform .5s ease; }
+    .dv-card:hover .dv-card-photo-wrap img { transform: scale(1.05); }
+    .dv-card-num-overlay {
+      position: absolute; bottom: 1rem; right: 1rem;
+      font-family: var(--serif-c); font-size: 2.5rem; font-weight: 900;
+      color: rgba(255,255,255,.18); line-height: 1;
+    }
+    .dv-card-wine-bar { height: 3px; background: var(--wine); }
+    .dv-card-body { padding: 2rem 2.2rem; flex: 1; display: flex; flex-direction: column; }
+    .dv-card-body .dv-title { font-size: 1.3rem; margin-bottom: .5rem; }
+    .dv-card-body .dv-verse-ref { font-size: .8rem; margin-bottom: 1rem; }
+    .dv-card-body .dv-excerpt { font-size: .82rem; flex: 1; margin-bottom: 1.4rem; }
+    .dv-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 1.1rem; border-top: 1px solid var(--cream);
+    }
+    .dv-card-meta { font-size: .62rem; color: var(--muted); letter-spacing: .06em; }
+    .dv-card-arrow {
+      width: 2.2rem; height: 2.2rem;
+      border: 1px solid var(--wine-pale); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--wine); font-size: .9rem;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .dv-card:hover .dv-card-arrow { background: var(--wine); border-color: var(--wine); color: var(--white); }
+
+    /*  INDIVIDUAL DEVOTIONAL MODAL / EXPANDED VIEW  */
+    /* Full devotionals shown inline below the grid */
+    .devs-full {
+      padding: 6rem 5rem;
+      background: var(--white);
+    }
+    .devs-full-header {
+      text-align: center; margin-bottom: 5rem;
+    }
+    .devs-full-header .sec-eyebrow {
+      font-family: var(--serif-c); font-size: .58rem; font-weight: 600;
+      letter-spacing: .28em; text-transform: uppercase;
+      color: var(--wine-lt); margin-bottom: .8rem;
+      display: flex; align-items: center; justify-content: center; gap: .8rem;
+    }
+    .devs-full-header .sec-eyebrow::before,
+    .devs-full-header .sec-eyebrow::after { content: ''; font-size: .42rem; color: var(--wine-pale); }
+    .devs-full-header h2 {
+      font-family: var(--serif-d);
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 400; color: var(--ink);
+    }
+    .devs-full-header h2 em { font-style: italic; color: var(--wine); }
+
+    /* single devotional article */
+    .dv-article {
+      max-width: 760px; margin: 0 auto 6rem;
+      padding-bottom: 6rem;
+      border-bottom: 1px solid var(--wine-pale);
+    }
+    .dv-article:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    /* article header */
+    .dv-art-header {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 0 2.5rem; align-items: start;
+      margin-bottom: 3rem;
+    }
+    .dv-art-num {
+      font-family: var(--serif-c); font-size: 5rem; font-weight: 900;
+      line-height: 1; color: var(--wine-pale); letter-spacing: -.02em;
+      grid-row: 1 / 3;
+    }
+    .dv-art-tag { font-size: .6rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: .5rem; }
+    .dv-art-title {
+      font-family: var(--serif-d);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400; line-height: 1.1; color: var(--ink);
+    }
+    .dv-art-title em { font-style: italic; color: var(--wine); }
+
+    /* scripture block */
+    .scripture-block {
+      background: var(--cream);
+      border-left: 3px solid var(--wine);
+      border-radius: 0 4px 4px 0;
+      padding: 2rem 2.5rem;
+      margin: 2.5rem 0;
+      position: relative;
+    }
+    .scripture-block::before {
+      content: '\201C';
+      font-family: var(--serif-d); font-size: 8rem; line-height: .7;
+      color: var(--wine-pale); position: absolute;
+      top: 1rem; right: 1.5rem; pointer-events: none;
+    }
+    .scripture-text {
+      font-family: var(--serif-d); font-style: italic;
+      font-size: 1.1rem; line-height: 1.75; color: var(--ink);
+      position: relative; z-index: 1;
+      margin-bottom: .8rem;
+    }
+    .scripture-ref {
+      font-family: var(--sans); font-size: .65rem; font-weight: 500;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--wine); display: block;
+    }
+
+    /* body text */
+    .dv-body-text {
+      font-size: .95rem; color: var(--muted);
+      line-height: 1.95; margin-bottom: 1.3rem;
+    }
+    .dv-body-text strong { color: var(--ink); font-weight: 500; }
+
+    /* bullet promises */
+    .dv-promises {
+      background: var(--off);
+      border-radius: 6px;
+      padding: 2rem 2.5rem;
+      margin: 2rem 0;
+    }
+    .dv-promises h4 {
+      font-family: var(--serif-c); font-size: .6rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--wine-lt); margin-bottom: 1.2rem;
+    }
+    .dv-promises ul { list-style: none; display: flex; flex-direction: column; gap: .8rem; }
+    .dv-promises li {
+      font-size: .9rem; color: var(--muted);
+      line-height: 1.65; padding-left: 1.5rem; position: relative;
+    }
+    .dv-promises li::before {
+      content: ''; position: absolute; left: 0;
+      font-size: .5rem; color: var(--wine-lt); top: .4rem;
+    }
+    .dv-promises li strong { color: var(--wine); font-weight: 500; }
+
+    /* prayer block */
+    .prayer-block {
+      background: var(--wine);
+      border-radius: 6px;
+      padding: 2rem 2.5rem;
+      margin: 2.5rem 0;
+    }
+    .prayer-label {
+      font-family: var(--serif-c); font-size: .54rem; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,255,255,.5); margin-bottom: .8rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .prayer-label::before { content: ''; font-size: .75rem; }
+    .prayer-text {
+      font-family: var(--serif-d); font-style: italic;
+      font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,.88);
+    }
+
+    /* song recommendation */
+    .song-rec {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.2rem 1.6rem;
+      border: 1px solid var(--wine-pale);
+      border-radius: 100px;
+      margin-top: 2rem; width: fit-content;
+    }
+    .song-rec-icon {
+      width: 2.4rem; height: 2.4rem;
+      background: var(--wine); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+    }
+    .song-rec-text { font-size: .75rem; }
+    .song-rec-label { font-size: .58rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--wine-lt); display: block; margin-bottom: .15rem; }
+    .song-rec-name { font-family: var(--serif-d); font-style: italic; font-size: .9rem; color: var(--ink); }
+
+    /* divider between devotionals */
+    .dv-divider {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin: 2rem 0 4rem;
+    }
+    .dv-divider-line { flex: 1; height: 1px; background: var(--wine-pale); }
+    .dv-divider-ornament { font-family: var(--serif-d); font-size: 1.2rem; color: var(--wine-pale); }
+
+    /*  SUBSCRIBE BAND  */
+    .sub-band {
+      background: var(--cream); padding: 6rem 5rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .sub-band::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 1px; height: 100%; background: linear-gradient(to bottom, transparent, rgba(107,26,42,.1), transparent); }
+    .sub-orn { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--wine-lt); display: flex; align-items: center; justify-content: center; gap: .8rem; margin-bottom: 1.5rem; position: relative; z-index: 1; }
+    .sub-orn::before, .sub-orn::after { content: '—'; color: var(--wine-pale); }
+    .sub-h2 { font-family: var(--serif-d); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; color: var(--ink); margin-bottom: .8rem; position: relative; z-index: 1; }
+    .sub-h2 em { font-style: italic; color: var(--wine); }
+    .sub-p { font-size: .88rem; color: var(--muted); max-width: 380px; margin: 0 auto 2.8rem; position: relative; z-index: 1; }
+    .sub-form { display: flex; max-width: 460px; margin: 0 auto; border: 1px solid rgba(107,26,42,.18); border-radius: 100px; background: var(--white); overflow: hidden; position: relative; z-index: 1; box-shadow: 0 4px 30px rgba(107,26,42,.07); transition: border-color .2s, box-shadow .2s; }
+    .sub-form:focus-within { border-color: var(--wine); box-shadow: 0 0 0 4px rgba(107,26,42,.08); }
+    .sub-form input { flex: 1; padding: 1rem 1.8rem; border: none; background: transparent; font-family: var(--sans); font-size: .85rem; color: var(--ink); outline: none; }
+    .sub-form input::placeholder { color: var(--muted); opacity: .6; }
+    .sub-form button { margin: .3rem .3rem .3rem 0; padding: .75rem 1.8rem; background: var(--wine); color: var(--white); border: none; border-radius: 100px; font-family: var(--sans); font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
+    .sub-form button:hover { background: var(--wine-mid); }
+
+    /*  FOOTER  */
+    footer { background: var(--ink); padding: 5rem 5rem 2.5rem; }
+    .foot-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 5rem; padding-bottom: 4rem; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 2rem; }
+    .foot-logo { font-family: var(--serif-c); font-size: .88rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine-lt); display: block; margin-bottom: .8rem; }
+    .foot-brand p { font-size: .8rem; color: rgba(255,255,255,.3); line-height: 1.85; max-width: 230px; margin-bottom: 1.5rem; }
+    .foot-verse { font-family: var(--serif-d); font-style: italic; font-size: .85rem; color: rgba(255,255,255,.22); line-height: 1.7; }
+    .foot-col h5 { font-family: var(--serif-c); font-size: .54rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.28); margin-bottom: 1.2rem; }
+    .foot-col ul { list-style: none; }
+    .foot-col li { margin-bottom: .5rem; }
+    .foot-col a { font-size: .8rem; color: rgba(255,255,255,.36); transition: color .2s; }
+    .foot-col a:hover { color: var(--wine-lt); }
+    .foot-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .foot-bottom p { font-size: .65rem; color: rgba(255,255,255,.18); }
+    .foot-bottom a { color: var(--wine-lt); opacity: .6; }
+
+    /* BACK TO TOP */
+    .back-top {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 800;
+      width: 3rem; height: 3rem;
+      background: var(--wine); color: var(--white);
+      border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; cursor: pointer;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .3s, transform .3s, background .2s;
+      box-shadow: 0 4px 20px rgba(107,26,42,.3);
+    }
+    .back-top.visible { opacity: 1; transform: translateY(0); }
+    .back-top:hover { background: var(--wine-mid); }
+
+    /*  RESPONSIVE  */
+    @media (max-width: 1100px) {
+      nav, .page-hero, .devs-listing, .devs-full, .sub-band, footer { padding-left: 2.5rem; padding-right: 2.5rem; }
+      .dv-featured { grid-template-columns: 1fr; }
+      .dv-feat-img-wrap img { min-height: 320px; }
+      .devs-grid { grid-template-columns: 1fr 1fr; }
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    }
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      nav { padding: 1rem 1.5rem; }
+      .page-hero { padding: 8rem 1.5rem 4rem; }
+      .devs-listing, .devs-full, .sub-band { padding-left: 1.5rem; padding-right: 1.5rem; padding-top: 4rem; padding-bottom: 4rem; }
+      footer { padding: 4rem 1.5rem 2rem; }
+      .devs-grid { grid-template-columns: 1fr; }
+      .dv-art-header { grid-template-columns: 1fr; }
+      .dv-art-num { font-size: 3.5rem; }
+      .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .foot-bottom { flex-direction: column; gap: .6rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">The Winepress</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="devotionals.html" class="active">Devotionals</a></li>
+      <li><a href="testimonies.html">Testimonies</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+    <a href="contact.html" class="nav-pill">Prayer Request</a>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="ph-eyebrow">The Winepress</div>
+    <h1 class="ph-h1">Devotionals &amp; <em>Reflections</em></h1>
+    <p class="ph-sub">Faith-rooted meditations for every season of the pressing — surrender, trust, obedience, and the long wait of hope.</p>
+    <div class="filter-bar">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Surrender</button>
+      <button class="filter-btn">Trust</button>
+      <button class="filter-btn">Identity</button>
+      <button class="filter-btn">Obedience</button>
+      <button class="filter-btn">Faith</button>
+      <button class="filter-btn">Patience</button>
+    </div>
+  </div>
+
+  <!-- DEVOTIONALS LISTING — CARDS -->
+  <section class="devs-listing">
+
+    <!-- FEATURED: Devotional 1 -->
+    <a href="#dv-1" class="dv-featured">
+      <div class="dv-feat-img-wrap">
+        <img src="assets/images/Afua4.jpg" alt="Create in Me a Clean Heart"/>
+        <div class="dv-feat-img-overlay"></div>
+        <div class="dv-feat-badge"> Featured</div>
+      </div>
+      <div class="dv-feat-content">
+        <div class="dv-num">001</div>
+        <div class="dv-theme-tag">Theme: Surrender &amp; Forgiveness</div>
+        <h2 class="dv-title">Create in Me a Clean Heart</h2>
+        <div class="dv-verse-ref">Psalm 51:10–12</div>
+        <p class="dv-excerpt">David's heartfelt prayer after Nathan confronted him — a cry for cleansing, renewal, and the restoration of joy. When we face our failures, God is never far. He opens His arms wide, ready to forgive.</p>
+        <span class="dv-cta">Read Devotional</span>
+      </div>
+    </a>
+
+    <!-- GRID: devotionals 2–6 -->
+    <div class="devs-grid">
+
+      <a href="#dv-2" class="dv-card">
+        <div class="dv-card-photo-wrap">
+          <img src="assets/images/Afua5.jpg" alt="Worth the Wait"/>
+          <div class="dv-card-num-overlay">02</div>
+        </div>
+        <div class="dv-card-wine-bar"></div>
+        <div class="dv-card-body">
+          <div class="dv-theme-tag">Theme: Trust &amp; Waiting</div>
+          <h3 class="dv-title" style="font-size:1.3rem;">Worth the Wait</h3>
+          <div class="dv-verse-ref">Habakkuk 2:1–3</div>
+          <p class="dv-excerpt">What does it mean to wait? To stay in a place of expectation. The vision is worth the wait — hold on.</p>
+          <div class="dv-card-footer">
+            <span class="dv-card-meta">Devotional 02</span>
+            <div class="dv-card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="#dv-3" class="dv-card">
+        <div class="dv-card-photo-wrap">
+          <img src="assets/images/Afua1.jpg" alt="Pleasing God"/>
+          <div class="dv-card-num-overlay">03</div>
+        </div>
+        <div class="dv-card-wine-bar"></div>
+        <div class="dv-card-body">
+          <div class="dv-theme-tag">Theme: Obedience &amp; Purpose</div>
+          <h3 class="dv-title" style="font-size:1.3rem;">Pleasing God</h3>
+          <div class="dv-verse-ref">Matthew 7:21–23</div>
+          <p class="dv-excerpt">It may seem good — but is it really God? We must run this race according to the rules He has given.</p>
+          <div class="dv-card-footer">
+            <span class="dv-card-meta">Devotional 03</span>
+            <div class="dv-card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="#dv-4" class="dv-card">
+        <div class="dv-card-photo-wrap">
+          <img src="assets/images/Afua2.jpg" alt="Great Faith"/>
+          <div class="dv-card-num-overlay">04</div>
+        </div>
+        <div class="dv-card-wine-bar"></div>
+        <div class="dv-card-body">
+          <div class="dv-theme-tag">Theme: Faith &amp; Revelation</div>
+          <h3 class="dv-title" style="font-size:1.3rem;">Great Faith</h3>
+          <div class="dv-verse-ref">Matthew 8:5–10, 13</div>
+          <p class="dv-excerpt">The revelation you carry determines the faith in which you walk. Do you know your God?</p>
+          <div class="dv-card-footer">
+            <span class="dv-card-meta">Devotional 04</span>
+            <div class="dv-card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="#dv-5" class="dv-card">
+        <div class="dv-card-photo-wrap">
+          <img src="assets/images/Afua3.jpg" alt="Our Obedience"/>
+          <div class="dv-card-num-overlay">05</div>
+        </div>
+        <div class="dv-card-wine-bar"></div>
+        <div class="dv-card-body">
+          <div class="dv-theme-tag">Theme: Obedience &amp; Trust</div>
+          <h3 class="dv-title" style="font-size:1.3rem;">Our Obedience</h3>
+          <div class="dv-verse-ref">Hosea 1:2–3</div>
+          <p class="dv-excerpt">God asked Hosea to do something that made no sense. Obeying God may seem absurd — but it is always worth it.</p>
+          <div class="dv-card-footer">
+            <span class="dv-card-meta">Devotional 05</span>
+            <div class="dv-card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+
+
+    </div>
+  </section>
+
+  <!-- FULL DEVOTIONAL TEXTS -->
+  <section class="devs-full">
+    <div class="devs-full-header">
+      <div class="sec-eyebrow">Read in Full</div>
+      <h2>Every word, <em>for every season.</em></h2>
+    </div>
+
+    <!--  DEVOTIONAL 1  -->
+    <article class="dv-article" id="dv-1">
+      <div class="dv-art-header">
+        <div class="dv-art-num">01</div>
+        <div class="dv-art-tag">Surrender &amp; Forgiveness</div>
+        <h2 class="dv-art-title">Create in Me a <em>Clean Heart</em></h2>
+      </div>
+
+      <div class="scripture-block">
+        <p class="scripture-text">"Create in me a clean heart, O God, and put a new and right spirit within me. Do not cast me away from your presence, and do not take your holy spirit from me. Restore to me the joy of your salvation, and sustain in me a willing spirit."</p>
+        <span class="scripture-ref">Psalm 51:10–12</span>
+      </div>
+
+      <p class="dv-body-text">This heartfelt psalm was offered by David when Nathan the Prophet came to him, addressing the weight of his actions after taking Bathsheba as his wife. In that moment of confrontation, David embraced his wrongdoing and turned to God in prayer, seeking forgiveness. Rather than shying away from God in his time of failure, he approached Him with the understanding that God is abundant in mercy.</p>
+
+      <p class="dv-body-text">When we find ourselves facing our own mistakes or shortcomings, it's important to remember to turn to our compassionate Heavenly Father. He does not cast us aside because of our failures <strong>(Hebrews 4:16)</strong>. Instead, He opens His arms wide, ready to forgive us when we humbly reach out to Him. Let's find comfort in knowing that no matter how heavy our hearts may feel, God's love and understanding are always there to embrace us.</p>
+
+      <div class="prayer-block">
+        <div class="prayer-label">Prayer</div>
+        <p class="prayer-text">Thank you, Father, for being rich in mercy. I come to you seeking forgiveness for any wrongdoings. Please cleanse me and renew a steadfast spirit within me. Help me to walk in Your ways, in Jesus' name. Amen.</p>
+      </div>
+    </article>
+
+    <!--  DEVOTIONAL 2  -->
+    <article class="dv-article" id="dv-2">
+      <div class="dv-art-header">
+        <div class="dv-art-num">02</div>
+        <div class="dv-art-tag">Trust &amp; Waiting</div>
+        <h2 class="dv-art-title">Worth <em>the Wait</em></h2>
+      </div>
+
+      <div class="scripture-block">
+        <p class="scripture-text">"What's God going to say to my questions? I'm braced for the worst. I'll climb to the lookout tower and scan the horizon. I'll wait to see what God says, how he'll answer my complaint. And then God answered: Write this. Write what you see. Write it out in big block letters so that it can be read on the run. This vision-message is a witness pointing to what's coming. It aches for the coming — it can hardly wait! And it doesn't lie. If it seems slow in coming, wait. It's on its way. It will come right on time."</p>
+        <span class="scripture-ref">Habakkuk 2:1–3 (MSG)</span>
+      </div>
+
+      <p class="dv-body-text">Waiting on the manifestation of God's promises in your life can be tough at times. What does it mean to wait? To wait means to stay in a place of expectation of something.</p>
+
+      <p class="dv-body-text">Discouragement can set in — as the writer says <strong>"I'm braced for the worst"</strong> — when we are in our waiting season. Today the Lord is encouraging us to trust in Him and to put our faith in Him, because He won't let us down.</p>
+
+      <div class="dv-promises">
+        <h4>Promises to hold on to in your waiting season</h4>
+        <ul>
+          <li><strong>He hasn't forgotten about you</strong> — Isaiah 49:15</li>
+          <li><strong>Our God is a faithful God</strong> — Hebrews 10:23, Psalm 121:3, Isaiah 66:9, Jeremiah 1:12</li>
+          <li><strong>His promises are Yea and Amen</strong> — 2 Corinthians 1:20</li>
+          <li><strong>You have nothing to fear. The Lord will do just what He says.</strong> — Lamentations 3:55–57, Isaiah 55:11</li>
+        </ul>
+      </div>
+
+      <p class="dv-body-text">The vision is worth the wait. Hold on and wait for it! I pray that your heart rests in the truth that God is not a man that He should lie.</p>
+
+      <div class="prayer-block">
+        <div class="prayer-label">Prayer</div>
+        <p class="prayer-text">Lord, sustain me in this season of waiting. Let my heart rest in Your faithfulness and not waver in doubt. I trust that Your promises are on their way, in Jesus' name. Amen.</p>
+      </div>
+
+      <div class="song-rec">
+        <div class="song-rec-icon"></div>
+        <div class="song-rec-text">
+          <span class="song-rec-label">Song Recommendation</span>
+          <span class="song-rec-name">While I'm Waiting — Travis Greene</span>
+        </div>
+      </div>
+    </article>
+
+    <!--  DEVOTIONAL 3  -->
+    <article class="dv-article" id="dv-3">
+      <div class="dv-art-header">
+        <div class="dv-art-num">03</div>
+        <div class="dv-art-tag">Obedience &amp; Purpose</div>
+        <h2 class="dv-art-title">Pleasing <em>God</em></h2>
+      </div>
+
+      <div class="scripture-block">
+        <p class="scripture-text">"Not everyone who calls me, Lord, Lord will enter the Kingdom of heaven; but only those who do what my Father in Heaven wants them to do. When the Judgement Day comes, many will say to me, Lord, Lord, in your name we spoke God's message, by your name we drove out many demons and performed many miracles! Then I will say to them, I never knew you. Get away from me, you wicked people."</p>
+        <span class="scripture-ref">Matthew 7:21–23</span>
+      </div>
+
+      <p class="dv-body-text">We need to run this Christian race according to the rules given. We are soldiers — as <strong>2 Timothy 2:4–5</strong> puts it — and we have a commanding officer, God, to please. There is a prize to be won.</p>
+
+      <p class="dv-body-text">In <strong>1 Corinthians 9:27</strong>, it says "I discipline my body like an athlete." To be an athlete you must be disciplined. You run the race according to the rules lest you are disqualified. A charge to keep we have and a God to glorify.</p>
+
+      <p class="dv-body-text">It's very easy to think you are doing the will of God especially when it seems acceptable in the sight of men. However, you must make sure you are in constant alignment with the will of God so you do not hear "Get away from me." When you went out there preaching, were souls saved? Yes. When you sang, were people touched? Yes. Then He says, depart from me. Every game has rules and the game is the game.</p>
+
+      <div class="dv-promises">
+        <h4>A heart check</h4>
+        <ul>
+          <li>It may be <em>good</em> — but is it really <strong>God?</strong></li>
+          <li>We must constantly evaluate ourselves with the lens of Scripture.</li>
+          <li>We must know what we are supposed to be doing and know who we are doing it for.</li>
+          <li>God is a God of order. Seek His heart, not what we want or think is right.</li>
+        </ul>
+      </div>
+
+      <div class="prayer-block">
+        <div class="prayer-label">Prayer</div>
+        <p class="prayer-text">Lord, may we be aligned to Your perfect will and plan. Help us to run this race so we may obtain the prize that You have set before us, in Jesus' name. Amen.</p>
+      </div>
+
+      <div class="song-rec">
+        <div class="song-rec-icon"></div>
+        <div class="song-rec-text">
+          <span class="song-rec-label">Song Recommendation</span>
+          <span class="song-rec-name">There Is a Race — Jabu Hlongwane</span>
+        </div>
+      </div>
+    </article>
+
+    <!--  DEVOTIONAL 4  -->
+    <article class="dv-article" id="dv-4">
+      <div class="dv-art-header">
+        <div class="dv-art-num">04</div>
+        <div class="dv-art-tag">Faith &amp; Revelation</div>
+        <h2 class="dv-art-title">Great <em>Faith</em></h2>
+      </div>
+
+      <div class="scripture-block">
+        <p class="scripture-text">"When Jesus had entered Capernaum, a centurion came to him, asking for help. 'Lord,' he said, 'my servant lies at home paralyzed, suffering terribly.' Jesus said to him, 'Shall I come and heal him?' The centurion replied, 'Lord, I do not deserve to have you come under my roof. But just say the word, and my servant will be healed...' When Jesus heard this, he was amazed and said, 'Truly I tell you, I have not found anyone in Israel with such great faith.' Then Jesus said to the centurion, 'Go! Let it be done just as you believed it would.' And his servant was healed at that moment."</p>
+        <span class="scripture-ref">Matthew 8:5–10, 13</span>
+      </div>
+
+      <p class="dv-body-text">Do you know that the revelation you carry determines the faith in which you walk?</p>
+
+      <p class="dv-body-text">The Centurion knew and understood the Authority Jesus carried. As an officer, he held a position of authority which commanded much respect in society, and he knew — if Jesus was who people said He was — then He Himself must be a man of greater Authority.</p>
+
+      <p class="dv-body-text">The Bible tells us that they that <strong>know their God shall be strong</strong> (Daniel 11:32). Our walk in faith is based on what we know about God. So today I ask you: what revelation of God do you carry?</p>
+
+      <p class="dv-body-text">Do you know that He can do <strong>exceedingly and abundantly above all that you may ask or think</strong>? (Ephesians 3:20)</p>
+
+      <div class="dv-promises">
+        <h4>Walk in the revelation</h4>
+        <ul>
+          <li>Like the Roman Officer, who knew the Authority Jesus had — may we know who God is and whose we are.</li>
+          <li>May the revelation we carry about God cause our faith to increase.</li>
+          <li>May we walk in the miracles that come from truly knowing Him.</li>
+        </ul>
+      </div>
+
+      <div class="prayer-block">
+        <div class="prayer-label">Prayer</div>
+        <p class="prayer-text">Thank you Lord for Your grace and Your power. May our faith in You increase as our revelation of You increases. May our faith cause us to walk in miracles. In Jesus' name, Amen.</p>
+      </div>
+    </article>
+
+    <!--  DEVOTIONAL 5  -->
+    <article class="dv-article" id="dv-5">
+      <div class="dv-art-header">
+        <div class="dv-art-num">05</div>
+        <div class="dv-art-tag">Obedience &amp; Trust</div>
+        <h2 class="dv-art-title">Our <em>Obedience</em></h2>
+      </div>
+
+      <div class="scripture-block">
+        <p class="scripture-text">"When the Lord began to speak through Hosea, the Lord said to him, 'Go, marry a promiscuous woman and have children with her, for like an adulterous wife this land is guilty of unfaithfulness to the Lord.' So he married Gomer daughter of Diblaim, and she conceived and bore him a son."</p>
+        <span class="scripture-ref">Hosea 1:2–3</span>
+      </div>
+
+      <p class="dv-body-text">From the Bible, we see a clear picture of what obedience to God looks like. There are times when God tells us to do something and it truly doesn't make sense to our human minds <strong>(1 Corinthians 2:14)</strong>.</p>
+
+      <p class="dv-body-text">God asked Hosea the prophet to marry Gomer, a prostitute, as an illustration of Israel's idolatry. God needed to use this union as a symbolic representation of His relationship with Israel. And because of Hosea's obedience, we see God's mercy, unfailing love, and redemption — how far He was willing to go to restore Israel's relationship with Him.</p>
+
+      <div class="dv-promises">
+        <h4>How this is relevant to you today</h4>
+        <ul>
+          <li>There will be times when we will have to obey God and it will <em>not</em> be easy — but we will have to do it because of our love for God.</li>
+          <li>What God may require of us may inconvenience us, but because we love and trust Him, we can be assured He has our best interest at heart <strong>(Matthew 7:11)</strong>.</li>
+          <li>Our obedience will lead to the salvation of others.</li>
+        </ul>
+      </div>
+
+      <p class="dv-body-text">Obeying God may seem very difficult or even absurd — but it is always worth it in the end.</p>
+
+      <div class="prayer-block">
+        <div class="prayer-label">Prayer</div>
+        <p class="prayer-text">Lord, give us the courage to obey You even when it doesn't make sense. May our obedience be a vessel for Your glory and the salvation of others. In Jesus' name, Amen.</p>
+      </div>
+    </article>
+
+    <!--  DEVOTIONAL 6  -->
+  </section>
+
+  <!-- SUBSCRIBE -->
+  <div class="sub-band">
+    <div class="sub-orn">Never Miss a Word</div>
+    <h2 class="sub-h2">New devotionals, <em>in your inbox.</em></h2>
+    <p class="sub-p">Quiet, faithful words — delivered when you need them most.</p>
+    <form class="sub-form" onsubmit="return false;">
+      <input type="email" placeholder="Your email address"/>
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="foot-logo">The Winepress</span>
+        <p>A devotional space for those in the pressing seasons of life — finding faith, hope, and beauty in the process.</p>
+        <p class="foot-verse">"Those who sow with tears will reap with songs of joy." — Psalm 126:5</p>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="devotionals.html">Devotionals</a></li>
+          <li><a href="testimonies.html">Testimonies</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Connect</h5>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Prayer Requests</a></li>
+          <li><a href="contact.html">Collaborate</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Series</h5>
+        <ul>
+          <li><a href="#dv-1">Create in Me a Clean Heart</a></li>
+          <li><a href="#dv-2">Worth the Wait</a></li>
+          <li><a href="#dv-3">Pleasing God</a></li>
+          <li><a href="#dv-4">Great Faith</a></li>
+          <li><a href="devotionals.html#dv-5">Our Obedience</a></li>
+          <li><a href="blog.html">What God Is Teaching Me (Blog)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2025 The Winepress. Made with faith &amp; intention.</p>
+      <p>Built with purpose · <a href="contact.html">Contact</a></p>
+    </div>
+  </footer>
+
+  <!-- BACK TO TOP -->
+  <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+    // Back to top visibility
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('visible', window.scrollY > 500);
+    });
+
+    // Filter buttons (visual toggle only — full filtering would need JS data)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

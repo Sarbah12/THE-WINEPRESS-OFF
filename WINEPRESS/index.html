@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Winepress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wine:      #6B1A2A;
+      --wine-mid:  #8C2438;
+      --wine-lt:   #B05068;
+      --wine-pale: #E8C8CE;
+      --white:     #FFFFFF;
+      --off:       #FAF8F5;
+      --cream:     #F4EDE0;
+      --ink:       #1C1010;
+      --muted:     #7A6060;
+      --serif-d:   'DM Serif Display', Georgia, serif;
+      --serif-c:   'Cinzel', serif;
+      --sans:      'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow-x: hidden; line-height: 1.7; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* 
+       NAV
+     */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 5rem;
+      transition: background .3s, box-shadow .3s;
+    }
+    nav.scrolled {
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(107,26,42,.08);
+    }
+    .nav-logo {
+      font-family: var(--serif-c);
+      font-size: .95rem; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--white);
+      transition: color .3s;
+    }
+    nav.scrolled .nav-logo { color: var(--wine); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,.8); transition: color .2s;
+    }
+    nav.scrolled .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--white); }
+    nav.scrolled .nav-links a:hover { color: var(--wine); }
+    nav.scrolled .nav-links a.active { color: var(--wine); font-weight: 500; }
+    .nav-pill {
+      font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      padding: .5rem 1.4rem;
+      background: var(--wine); color: var(--white);
+      border-radius: 100px; transition: background .2s;
+    }
+    nav.scrolled .nav-pill { background: var(--wine); }
+    .nav-pill:hover { background: var(--wine-mid); }
+
+    /* 
+       HERO — full bleed background.png
+     */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    /* the big background photo */
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: url('assets/images/background.png') center center / cover no-repeat;
+    }
+
+    /* layered overlays — left side darkens for text legibility, keeps right photo visible */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right,
+          rgba(20, 5, 8, 0.82) 0%,
+          rgba(20, 5, 8, 0.55) 45%,
+          rgba(20, 5, 8, 0.10) 72%,
+          rgba(20, 5, 8, 0.0)  100%
+        ),
+        linear-gradient(to top,
+          rgba(107,26,42,.6) 0%,
+          transparent 40%
+        );
+    }
+
+    /* content sits bottom-left */
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 5rem 6rem;
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: .9rem;
+      margin-bottom: 2rem;
+    }
+    .hero-eyebrow-line {
+      width: 3rem; height: 1px;
+      background: linear-gradient(to right, var(--wine-lt), transparent);
+    }
+    .hero-eyebrow span {
+      font-family: var(--serif-c);
+      font-size: .58rem; font-weight: 600;
+      letter-spacing: .28em; text-transform: uppercase;
+      color: var(--wine-lt);
+    }
+
+    .hero-h1 {
+      font-family: var(--serif-d);
+      font-size: clamp(3.8rem, 7vw, 7.5rem);
+      font-weight: 400; line-height: .95;
+      color: var(--white);
+      letter-spacing: -.02em;
+      margin-bottom: .2rem;
+    }
+    .hero-h1-em {
+      display: block;
+      font-family: var(--serif-d);
+      font-style: italic;
+      font-size: clamp(3.2rem, 6.2vw, 6.5rem);
+      color: var(--wine-pale);
+      line-height: 1;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-verse {
+      font-family: var(--serif-d);
+      font-style: italic;
+      font-size: 1rem; line-height: 1.75;
+      color: rgba(255,255,255,.65);
+      padding-left: 1.2rem;
+      border-left: 2px solid var(--wine-lt);
+      margin-bottom: 3rem;
+      max-width: 440px;
+    }
+    .hero-verse cite {
+      display: block; font-style: normal;
+      font-family: var(--sans); font-size: .62rem; font-weight: 500;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--wine-lt); margin-top: .5rem;
+    }
+
+    .hero-btns { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
+    .btn-wine {
+      display: inline-block; padding: .85rem 2.2rem;
+      background: var(--wine); color: var(--white);
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      border-radius: 100px; transition: background .2s, transform .15s;
+    }
+    .btn-wine:hover { background: var(--wine-mid); transform: translateY(-2px); }
+    .btn-ghost-white {
+      display: inline-block; padding: .85rem 2.2rem;
+      border: 1px solid rgba(255,255,255,.35); color: rgba(255,255,255,.8);
+      font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+      border-radius: 100px; transition: border-color .2s, color .2s;
+    }
+    .btn-ghost-white:hover { border-color: rgba(255,255,255,.7); color: var(--white); }
+
+    /* scroll indicator */
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; right: 5rem; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+    }
+    .hero-scroll span {
+      font-size: .58rem; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      writing-mode: vertical-rl;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 4rem;
+      background: linear-gradient(to bottom, rgba(255,255,255,.4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: .4; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
+    }
+
+    /* wine bar + marquee at bottom of hero */
+    .hero-marquee-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      background: var(--wine);
+      padding: .7rem 0;
+      overflow: hidden;
+    }
+    .marquee-track {
+      display: flex; gap: 2.5rem;
+      white-space: nowrap;
+      animation: marquee 28s linear infinite;
+    }
+    .marquee-track span {
+      font-family: var(--serif-c);
+      font-size: .58rem; font-weight: 400;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,255,255,.5); flex-shrink: 0;
+    }
+    .marquee-track .mdot { color: rgba(255,255,255,.22); }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* 
+       INTRO BAND
+     */
+    .intro {
+      background: var(--cream);
+      padding: 5.5rem 5rem;
+      position: relative; overflow: hidden;
+    }
+    .intro::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 4rem;
+      background: var(--white);
+      clip-path: polygon(0 100%, 100% 0, 100% 100%);
+    }
+    .intro-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+    .intro-orn {
+      font-family: var(--serif-c);
+      font-size: .58rem; font-weight: 600;
+      letter-spacing: .3em; text-transform: uppercase;
+      color: var(--wine-lt);
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .intro-orn::before, .intro-orn::after { content: ''; font-size: .42rem; color: var(--wine-pale); }
+    .intro-text {
+      font-family: var(--serif-d);
+      font-size: clamp(1.45rem, 2.8vw, 2.1rem);
+      line-height: 1.55; color: var(--ink);
+    }
+    .intro-text em { font-style: italic; color: var(--wine); }
+
+    /* 
+       ABOUT
+     */
+    .about {
+      background: var(--white);
+      padding: 9rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 8rem;
+      align-items: center;
+    }
+    .about-photos { position: relative; height: 600px; }
+    .about-photo-main {
+      position: absolute; top: 0; left: 0;
+      width: 73%; height: 88%;
+      object-fit: cover; object-position: top;
+      border-radius: 4px;
+      box-shadow: 0 16px 60px rgba(107,26,42,.13);
+    }
+    .about-photo-accent {
+      position: absolute; bottom: 0; right: 0;
+      width: 52%; height: 56%;
+      object-fit: cover; object-position: top center;
+      border-radius: 4px;
+      border: 5px solid var(--white);
+      box-shadow: 0 10px 40px rgba(107,26,42,.15);
+    }
+    .about-wine-block {
+      position: absolute; bottom: 3rem; left: -1.8rem;
+      width: 5rem; height: 5rem;
+      background: var(--wine); border-radius: 2px; z-index: -1;
+    }
+    /* floating verse tag */
+    .about-verse-chip {
+      position: absolute; top: 2rem; right: -1.5rem; z-index: 2;
+      background: var(--wine);
+      color: var(--white);
+      padding: 1rem 1.4rem;
+      border-radius: 4px;
+      max-width: 160px;
+      box-shadow: 0 6px 20px rgba(107,26,42,.25);
+    }
+    .about-verse-chip p {
+      font-family: var(--serif-d);
+      font-style: italic; font-size: .82rem;
+      line-height: 1.5; margin-bottom: .4rem;
+    }
+    .about-verse-chip span {
+      font-size: .58rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+    }
+
+    .about-eyebrow {
+      font-family: var(--serif-c);
+      font-size: .58rem; font-weight: 600;
+      letter-spacing: .28em; text-transform: uppercase;
+      color: var(--wine-lt);
+      display: flex; align-items: center; gap: .8rem;
+      margin-bottom: 1.4rem;
+    }
+    .about-eyebrow::before { content: ''; width: 2rem; height: 1px; background: var(--wine-lt); }
+    .about-h2 {
+      font-family: var(--serif-d);
+      font-size: clamp(2.4rem, 4.5vw, 4rem);
+      font-weight: 400; line-height: 1.1; color: var(--ink);
+      margin-bottom: 1.4rem;
+    }
+    .about-h2 em { font-style: italic; color: var(--wine); }
+    .about-p { font-size: .92rem; color: var(--muted); line-height: 1.9; margin-bottom: .9rem; }
+    .about-stats {
+      display: flex; gap: 2.5rem;
+      padding: 1.8rem 0; margin: 1.5rem 0;
+      border-top: 1px solid var(--wine-pale);
+      border-bottom: 1px solid var(--wine-pale);
+    }
+    .stat-num { font-family: var(--serif-d); font-size: 2.4rem; color: var(--wine); line-height: 1; display: block; }
+    .stat-lbl { font-size: .65rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: .2rem; display: block; }
+
+    /* 
+       DEVOTIONALS — HOME SECTION
+     */
+    .devs { background: var(--off); padding: 9rem 5rem; }
+    .devs-hdr { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--wine-pale); }
+    .sec-eyebrow { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: .5rem; }
+    .sec-h2 { font-family: var(--serif-d); font-size: clamp(2rem, 3.8vw, 3.2rem); font-weight: 400; line-height: 1.1; }
+    .sec-h2 em { font-style: italic; color: var(--wine); }
+    .view-all { font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--wine); display: flex; align-items: center; gap: .5rem; white-space: nowrap; transition: gap .2s; }
+    .view-all::after { content: '→'; }
+    .view-all:hover { gap: .9rem; }
+
+    /* featured full-width card */
+    .dv-featured-home {
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--white); border-radius: 8px;
+      overflow: hidden; margin-bottom: 2rem;
+      box-shadow: 0 4px 30px rgba(107,26,42,.07);
+      transition: box-shadow .3s, transform .3s;
+      cursor: pointer;
+    }
+    .dv-featured-home:hover { box-shadow: 0 16px 60px rgba(107,26,42,.12); transform: translateY(-4px); }
+    .dv-feat-img-wrap { position: relative; overflow: hidden; }
+    .dv-feat-img-wrap img { width: 100%; height: 100%; min-height: 420px; object-fit: cover; object-position: top; transition: transform .6s ease; }
+    .dv-featured-home:hover .dv-feat-img-wrap img { transform: scale(1.04); }
+    .dv-feat-img-tint { position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, rgba(255,255,255,.06)); }
+    .dv-feat-badge-home { position: absolute; top: 1.5rem; left: 1.5rem; background: var(--wine); color: var(--white); font-family: var(--serif-c); font-size: .52rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; padding: .28rem .95rem; border-radius: 100px; }
+    .dv-feat-text { padding: 3rem 3.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .dv-verse-ref-home { font-family: var(--serif-d); font-style: italic; font-size: .88rem; color: var(--wine-lt); margin-bottom: 1.2rem; }
+    .dv-cta-home { display: inline-flex; align-items: center; gap: .5rem; font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--wine); margin-top: .5rem; transition: gap .2s; }
+    .dv-featured-home:hover .dv-cta-home { gap: 1rem; }
+
+    /* 5-card grid below featured */
+    .devs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--wine-pale); }
+    .dv-small { background: var(--white); display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: background .25s; }
+    .dv-small:hover { background: var(--off); }
+    .dv-small-img { width: 100%; height: 160px; object-fit: cover; object-position: top center; transition: transform .5s ease; }
+    .dv-small:hover .dv-small-img { transform: scale(1.04); }
+    .dv-small-body { padding: 1.4rem 1.6rem; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
+    .dv-num { font-family: var(--serif-c); font-size: .52rem; font-weight: 900; letter-spacing: .16em; color: var(--wine-pale); margin-bottom: .5rem; }
+    .dv-tag { font-size: .58rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: .6rem; }
+    .dv-title { font-family: var(--serif-d); font-size: 1.05rem; font-weight: 400; line-height: 1.25; color: var(--ink); margin-bottom: .5rem; }
+    .dv-excerpt { font-size: .78rem; color: var(--muted); line-height: 1.7; margin-bottom: .8rem; }
+    .dv-meta { display: flex; align-items: center; justify-content: space-between; padding-top: .9rem; border-top: 1px solid var(--cream); margin-top: auto; }
+    .dv-meta-txt { font-size: .6rem; color: var(--muted); }
+    .dv-read { font-size: .62rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--wine); transition: letter-spacing .2s; }
+    .dv-small:hover .dv-read { letter-spacing: .12em; }
+
+    /* 
+       TESTIMONIES
+     */
+    .testi {
+      background: var(--white);
+      padding: 9rem 5rem;
+      position: relative;
+    }
+    .testi::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; bottom: 0; width: 5px;
+      background: linear-gradient(to bottom, var(--wine), var(--wine-lt));
+    }
+    .testi-top {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 7rem; align-items: end; margin-bottom: 4rem;
+    }
+    .testi-h2 { font-family: var(--serif-d); font-size: clamp(2.4rem, 4.5vw, 4rem); font-weight: 400; line-height: 1.1; }
+    .testi-h2 em { font-style: italic; color: var(--wine); }
+    .testi-intro p { font-size: .9rem; color: var(--muted); line-height: 1.85; margin-bottom: 1.5rem; }
+
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--wine-pale);
+    }
+    .t-card {
+      background: var(--white); overflow: hidden;
+      cursor: pointer; transition: background .25s;
+    }
+    .t-card:hover { background: var(--off); }
+    .t-photo { width: 100%; height: 230px; object-fit: cover; object-position: top center; }
+    .t-body { padding: 1.8rem 2.2rem 2.2rem; }
+    .t-badge {
+      display: inline-block;
+      font-family: var(--serif-c);
+      font-size: .5rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      padding: .22rem .85rem;
+      background: var(--wine); color: var(--white);
+      border-radius: 100px; margin-bottom: 1.1rem;
+    }
+    .t-quote { font-family: var(--serif-d); font-style: italic; font-size: 1rem; line-height: 1.65; color: var(--ink); margin-bottom: 1rem; }
+    .t-author { font-size: .63rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--wine-lt); }
+    .testi-cta { margin-top: 2.5rem; }
+
+    /* 
+       PHOTO STRIP
+     */
+    .strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      height: 440px; overflow: hidden;
+    }
+    .strip-item { position: relative; overflow: hidden; }
+    .strip-item img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform .6s ease; }
+    .strip-item:hover img { transform: scale(1.06); }
+    .strip-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(107,26,42,.72) 0%, transparent 55%); opacity: 0; transition: opacity .35s; }
+    .strip-item:hover .strip-overlay { opacity: 1; }
+    .strip-label { position: absolute; bottom: 1.8rem; left: 1.8rem; font-family: var(--serif-d); font-style: italic; font-size: 1.1rem; color: var(--white); opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s; }
+    .strip-item:hover .strip-label { opacity: 1; transform: translateY(0); }
+
+    /* 
+       RESOURCES
+     */
+    .res {
+      background: var(--wine);
+      padding: 9rem 5rem;
+      position: relative; overflow: hidden;
+    }
+    .res::after {
+      content: 'RESOURCES';
+      position: absolute; bottom: -1.5rem; right: 2rem;
+      font-family: var(--serif-c); font-size: 11rem; font-weight: 900;
+      color: rgba(255,255,255,.03); letter-spacing: .06em;
+      pointer-events: none;
+    }
+    .res .sec-eyebrow { color: rgba(255,255,255,.4); }
+    .res .sec-h2 { color: var(--white); margin-bottom: 4rem; }
+    .res .sec-h2 em { color: var(--wine-pale); }
+    .res-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: rgba(255,255,255,.08);
+    }
+    .r-tile {
+      background: var(--wine);
+      padding: 2.6rem 2.2rem;
+      position: relative; cursor: pointer;
+      transition: background .25s;
+    }
+    .r-tile:hover { background: var(--wine-mid); }
+    .r-icon {
+      width: 3.2rem; height: 3.2rem;
+      border: 1px solid rgba(255,255,255,.14); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-bottom: 1.5rem;
+      transition: border-color .2s;
+    }
+    .r-tile:hover .r-icon { border-color: rgba(255,255,255,.35); }
+    .r-tile h4 { font-family: var(--serif-d); font-size: 1.15rem; font-weight: 400; color: rgba(255,255,255,.9); margin-bottom: .5rem; }
+    .r-tile p { font-size: .78rem; color: rgba(255,255,255,.42); line-height: 1.7; }
+    .r-arrow { position: absolute; bottom: 1.8rem; right: 1.8rem; font-size: .85rem; color: rgba(255,255,255,.18); transition: color .2s, transform .2s; }
+    .r-tile:hover .r-arrow { color: rgba(255,255,255,.6); transform: translate(3px,-3px); }
+    .res-cta { text-align: center; margin-top: 3.5rem; }
+    .btn-res {
+      display: inline-block; padding: .85rem 2.4rem;
+      border: 1px solid rgba(255,255,255,.28); color: rgba(255,255,255,.85);
+      font-size: .7rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+      border-radius: 100px; transition: background .2s, border-color .2s;
+    }
+    .btn-res:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.5); }
+
+    /* 
+       SUBSCRIBE
+     */
+    .sub {
+      background: var(--cream);
+      padding: 8rem 5rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .sub::before {
+      content: ''; position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 1px; height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(107,26,42,.1), transparent);
+    }
+    .sub-orn { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--wine-lt); display: flex; align-items: center; justify-content: center; gap: .8rem; margin-bottom: 1.5rem; position: relative; z-index: 1; }
+    .sub-orn::before, .sub-orn::after { content: '—'; color: var(--wine-pale); }
+    .sub-h2 { font-family: var(--serif-d); font-size: clamp(2.4rem, 4.5vw, 3.8rem); font-weight: 400; line-height: 1.1; color: var(--ink); margin-bottom: .8rem; position: relative; z-index: 1; }
+    .sub-h2 em { font-style: italic; color: var(--wine); }
+    .sub-p { font-size: .88rem; color: var(--muted); max-width: 400px; margin: 0 auto 3rem; position: relative; z-index: 1; }
+    .sub-form {
+      display: flex; max-width: 480px; margin: 0 auto;
+      border: 1px solid rgba(107,26,42,.18); border-radius: 100px;
+      background: var(--white); overflow: hidden;
+      position: relative; z-index: 1;
+      box-shadow: 0 4px 30px rgba(107,26,42,.07);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .sub-form:focus-within { border-color: var(--wine); box-shadow: 0 0 0 4px rgba(107,26,42,.08); }
+    .sub-form input { flex: 1; padding: 1rem 1.8rem; border: none; background: transparent; font-family: var(--sans); font-size: .85rem; color: var(--ink); outline: none; }
+    .sub-form input::placeholder { color: var(--muted); opacity: .6; }
+    .sub-form button { margin: .3rem .3rem .3rem 0; padding: .75rem 1.8rem; background: var(--wine); color: var(--white); border: none; border-radius: 100px; font-family: var(--sans); font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
+    .sub-form button:hover { background: var(--wine-mid); }
+
+    /* 
+       FOOTER
+     */
+    footer {
+      background: var(--ink);
+      padding: 5.5rem 5rem 2.5rem;
+    }
+    .foot-grid {
+      display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 5rem; padding-bottom: 4rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 2rem;
+    }
+    .foot-logo { font-family: var(--serif-c); font-size: .88rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine-lt); display: block; margin-bottom: .8rem; }
+    .foot-brand p { font-size: .8rem; color: rgba(255,255,255,.3); line-height: 1.85; max-width: 230px; margin-bottom: 1.5rem; }
+    .foot-verse { font-family: var(--serif-d); font-style: italic; font-size: .85rem; color: rgba(255,255,255,.22); line-height: 1.7; }
+    .foot-col h5 { font-family: var(--serif-c); font-size: .54rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.28); margin-bottom: 1.2rem; }
+    .foot-col ul { list-style: none; }
+    .foot-col li { margin-bottom: .5rem; }
+    .foot-col a { font-size: .8rem; color: rgba(255,255,255,.36); transition: color .2s; }
+    .foot-col a:hover { color: var(--wine-lt); }
+    .foot-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .foot-bottom p { font-size: .65rem; color: rgba(255,255,255,.18); }
+    .foot-bottom a { color: var(--wine-lt); opacity: .6; }
+
+    /* 
+       ANIMATIONS
+     */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-eyebrow { animation: fadeUp .6s ease both .1s; }
+    .hero-h1      { animation: fadeUp .7s ease both .22s; }
+    .hero-h1-em   { animation: fadeUp .7s ease both .32s; }
+    .hero-verse   { animation: fadeUp .6s ease both .44s; }
+    .hero-btns    { animation: fadeUp .6s ease both .56s; }
+
+    /* 
+       RESPONSIVE
+     */
+    @media (max-width: 1100px) {
+      nav { padding: 1.2rem 2.5rem; }
+      .hero-content { padding: 0 2.5rem 6rem; max-width: 580px; }
+      .hero-scroll { right: 2.5rem; }
+      .about, .devs, .testi, .res, .sub { padding-left: 2.5rem; padding-right: 2.5rem; }
+      footer { padding-left: 2.5rem; padding-right: 2.5rem; }
+      .about { grid-template-columns: 1fr; gap: 4rem; padding-top: 6rem; }
+      .about-photos { height: 400px; }
+      .dv-featured-home { grid-template-columns: 1fr; }
+      .dv-feat-img-wrap img { min-height: 280px; }
+      .devs-grid { grid-template-columns: repeat(3, 1fr); }
+      .testi-top { grid-template-columns: 1fr; gap: 2rem; }
+      .testi-grid { grid-template-columns: 1fr 1fr; }
+      .res-grid { grid-template-columns: 1fr 1fr; }
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+      .strip { height: 320px; }
+      .intro { padding-left: 2.5rem; padding-right: 2.5rem; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      nav { padding: 1rem 1.5rem; }
+      .hero-content { padding: 0 1.5rem 7rem; }
+      .hero-scroll { display: none; }
+      .about, .devs, .testi, .res, .sub { padding-left: 1.5rem; padding-right: 1.5rem; padding-top: 5rem; padding-bottom: 5rem; }
+      footer { padding: 4rem 1.5rem 2rem; }
+      .about-photos { height: 360px; }
+      .about-verse-chip { display: none; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .res-grid { grid-template-columns: 1fr; }
+      .devs-grid { grid-template-columns: 1fr 1fr; }
+      .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .foot-bottom { flex-direction: column; gap: .6rem; text-align: center; }
+      .strip { grid-template-columns: 1fr; height: 300px; }
+      .strip-item:not(:first-child) { display: none; }
+      .sub-form { flex-direction: column; border-radius: 8px; }
+      .sub-form button { margin: 0; border-radius: 0 0 8px 8px; padding: 1rem; }
+      .intro { padding: 4rem 1.5rem 5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="main-nav">
+    <a href="index.html" class="nav-logo">The Winepress</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="devotionals.html">Devotionals</a></li>
+      <li><a href="testimonies.html">Testimonies</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="blog.html">Blog</a></li>
+    </ul>
+    <a href="contact.html" class="nav-pill">Prayer Request</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span>Faith · Reflection · Testimony</span>
+      </div>
+      <h1 class="hero-h1">Faith Forged</h1>
+      <span class="hero-h1-em">in the Pressing.</span>
+      <blockquote class="hero-verse">
+        "He cuts off every branch in me that bears no fruit, while every branch that does bear fruit he prunes so that it will be even more fruitful."
+        <cite>— John 15:2</cite>
+      </blockquote>
+      <div class="hero-btns">
+        <a href="devotionals.html" class="btn-wine">Read Devotionals</a>
+        <a href="about.html" class="btn-ghost-white">Our Story</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+
+    <div class="hero-marquee-bar">
+      <div class="marquee-track">
+        <span>Devotionals</span><span class="mdot"></span>
+        <span>Testimonies</span><span class="mdot"></span>
+        <span>Prayer</span><span class="mdot"></span>
+        <span>Reflection</span><span class="mdot"></span>
+        <span>Scripture</span><span class="mdot"></span>
+        <span>Community</span><span class="mdot"></span>
+        <span>Faith</span><span class="mdot"></span>
+        <span>Healing</span><span class="mdot"></span>
+        <span>Devotionals</span><span class="mdot"></span>
+        <span>Testimonies</span><span class="mdot"></span>
+        <span>Prayer</span><span class="mdot"></span>
+        <span>Reflection</span><span class="mdot"></span>
+        <span>Scripture</span><span class="mdot"></span>
+        <span>Community</span><span class="mdot"></span>
+        <span>Faith</span><span class="mdot"></span>
+        <span>Healing</span><span class="mdot"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <div class="intro-inner">
+      <div class="intro-orn">A space for the pressing seasons</div>
+      <p class="intro-text">
+        Whether you are in the <em>crushing</em>, the <em>waiting</em>, or the <em>pouring out</em> —
+        you are not alone. This is a place of Scripture, testimony, and deep-rooted hope.
+      </p>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div class="about-photos">
+      <img class="about-photo-main" src="assets/images/Afua2.jpg" alt="Afua smiling"/>
+      <img class="about-photo-accent" src="assets/images/Afua5.jpg" alt="Afua joyful"/>
+      <div class="about-wine-block"></div>
+      <div class="about-verse-chip">
+        <p>"Your pain has a purpose."</p>
+        <span>Romans 8:28</span>
+      </div>
+    </div>
+    <div class="about-text">
+      <div class="about-eyebrow">The Heart Behind This</div>
+      <h2 class="about-h2">What is <em>The Winepress?</em></h2>
+      <p class="about-p">The winepress is an ancient image — grapes crushed so that something new can flow. It is the place of pressure, of process, of transformation. This site was born out of that very season.</p>
+      <p class="about-p">Here you will find devotionals rooted in Scripture, real testimonies from people who walked through fire, and resources to anchor you in the Word when life feels unsteady.</p>
+      <div class="about-stats">
+        <div><span class="stat-num">40+</span><span class="stat-lbl">Devotionals</span></div>
+        <div><span class="stat-num">20+</span><span class="stat-lbl">Testimonies</span></div>
+        <div><span class="stat-num">100+</span><span class="stat-lbl">Lives Touched</span></div>
+      </div>
+      <a href="about.html" class="btn-wine">Read Our Story</a>
+    </div>
+  </section>
+
+  <!-- DEVOTIONALS -->
+  <section class="devs">
+    <div class="devs-hdr">
+      <div>
+        <div class="sec-eyebrow">Devotionals &amp; Reflections</div>
+        <h2 class="sec-h2">Words for <em>the journey.</em></h2>
+      </div>
+      <a href="devotionals.html" class="view-all">All devotionals</a>
+    </div>
+
+    <!-- FEATURED -->
+    <a href="devotionals.html#dv-1" class="dv-featured-home">
+      <div class="dv-feat-img-wrap">
+        <img src="assets/images/Afua4.jpg" alt="Create in Me a Clean Heart"/>
+        <div class="dv-feat-img-tint"></div>
+        <div class="dv-feat-badge-home"> Featured</div>
+      </div>
+      <div class="dv-feat-text">
+        <div class="dv-num">001</div>
+        <div class="dv-tag">Surrender &amp; Forgiveness</div>
+        <h3 class="dv-title" style="font-size:clamp(1.8rem,3vw,2.6rem);">Create in Me a Clean Heart</h3>
+        <div class="dv-verse-ref-home">Psalm 51:10–12</div>
+        <p class="dv-excerpt">David's heartfelt cry after Nathan confronted him — a prayer for cleansing, renewal, and the restoration of joy. When we face our failures, God opens His arms wide, ready to forgive.</p>
+        <span class="dv-cta-home">Read Devotional <span>→</span></span>
+      </div>
+    </a>
+
+    <!-- GRID: remaining 5 devotionals -->
+    <div class="devs-grid">
+
+      <a href="devotionals.html#dv-2" class="dv-small">
+        <img class="dv-small-img" src="assets/images/Afua5.jpg" alt="Worth the Wait"/>
+        <div class="dv-small-body">
+          <div>
+            <div class="dv-num">002</div>
+            <div class="dv-tag">Trust &amp; Waiting</div>
+            <h3 class="dv-title">Worth the Wait</h3>
+            <p class="dv-excerpt">The vision is worth the wait — hold on for it.</p>
+            <div class="dv-verse-ref-home" style="font-size:.75rem;">Habakkuk 2:1–3</div>
+          </div>
+          <div class="dv-meta">
+            <span class="dv-meta-txt">Devotional 02</span>
+            <span class="dv-read">Read →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="devotionals.html#dv-3" class="dv-small">
+        <img class="dv-small-img" src="assets/images/Afua1.jpg" alt="Pleasing God"/>
+        <div class="dv-small-body">
+          <div>
+            <div class="dv-num">003</div>
+            <div class="dv-tag">Obedience &amp; Purpose</div>
+            <h3 class="dv-title">Pleasing God</h3>
+            <p class="dv-excerpt">It may seem good — but is it really God?</p>
+            <div class="dv-verse-ref-home" style="font-size:.75rem;">Matthew 7:21–23</div>
+          </div>
+          <div class="dv-meta">
+            <span class="dv-meta-txt">Devotional 03</span>
+            <span class="dv-read">Read →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="devotionals.html#dv-4" class="dv-small">
+        <img class="dv-small-img" src="assets/images/Afua2.jpg" alt="Great Faith"/>
+        <div class="dv-small-body">
+          <div>
+            <div class="dv-num">004</div>
+            <div class="dv-tag">Faith &amp; Revelation</div>
+            <h3 class="dv-title">Great Faith</h3>
+            <p class="dv-excerpt">The revelation you carry determines the faith you walk in.</p>
+            <div class="dv-verse-ref-home" style="font-size:.75rem;">Matthew 8:5–10, 13</div>
+          </div>
+          <div class="dv-meta">
+            <span class="dv-meta-txt">Devotional 04</span>
+            <span class="dv-read">Read →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="devotionals.html#dv-5" class="dv-small">
+        <img class="dv-small-img" src="assets/images/Afua3.jpg" alt="Our Obedience"/>
+        <div class="dv-small-body">
+          <div>
+            <div class="dv-num">005</div>
+            <div class="dv-tag">Obedience &amp; Trust</div>
+            <h3 class="dv-title">Our Obedience</h3>
+            <p class="dv-excerpt">Obeying God may seem absurd — but it is always worth it.</p>
+            <div class="dv-verse-ref-home" style="font-size:.75rem;">Hosea 1:2–3</div>
+          </div>
+          <div class="dv-meta">
+            <span class="dv-meta-txt">Devotional 05</span>
+            <span class="dv-read">Read →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="blog.html" class="dv-small">
+        <img class="dv-small-img" src="assets/images/Afua4.jpg" alt="Trying Times"/>
+        <div class="dv-small-body">
+          <div>
+            <div class="dv-num">Blog</div>
+            <div class="dv-tag">Patience &amp; Perseverance</div>
+            <h3 class="dv-title">What God Is Teaching Me About Trying Times</h3>
+            <p class="dv-excerpt">Long-suffering may be hard — but God has purpose in it.</p>
+            <div class="dv-verse-ref-home" style="font-size:.75rem;">Romans 5:3–4</div>
+          </div>
+          <div class="dv-meta">
+            <span class="dv-meta-txt">Blog Post</span>
+            <span class="dv-read">Read →</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- TESTIMONIES -->
+  <section class="testi">
+    <div class="testi-top">
+      <h2 class="testi-h2">Real stories of <em>faith in the fire.</em></h2>
+      <div class="testi-intro">
+        <p>The Winepress is built on the belief that our stories matter — not just to us, but to the person who needs to hear that they too can make it through the pressing.</p>
+        <a href="testimonies.html" class="btn-wine" style="display:inline-block;">Read Testimonies</a>
+      </div>
+    </div>
+    <div class="testi-grid">
+      <div class="t-card">
+        <img class="t-photo" src="assets/images/Afua5.jpg" alt=""/>
+        <div class="t-body">
+          <div class="t-badge">Restoration</div>
+          <p class="t-quote">"I thought I was losing everything. But God was just making room for what He had already planned."</p>
+          <div class="t-author">— Abena K.</div>
+        </div>
+      </div>
+      <div class="t-card">
+        <img class="t-photo" src="assets/images/Afua2.jpg" alt=""/>
+        <div class="t-body">
+          <div class="t-badge">Healing</div>
+          <p class="t-quote">"The diagnosis felt like an ending. What followed was the most alive I have ever felt in my faith."</p>
+          <div class="t-author">— Emmanuel O.</div>
+        </div>
+      </div>
+      <div class="t-card">
+        <img class="t-photo" src="assets/images/Afua4.jpg" alt=""/>
+        <div class="t-body">
+          <div class="t-badge">Breakthrough</div>
+          <p class="t-quote">"After three years of silence, God answered in a way I never could have orchestrated myself."</p>
+          <div class="t-author">— Nana A.</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-cta">
+      <a href="testimonies.html#submit" class="btn-link" style="font-size:.72rem; font-weight:400; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:inline-flex; align-items:center; gap:.5rem;">Share your story <span>→</span></a>
+    </div>
+  </section>
+
+  <!-- PHOTO STRIP -->
+  <div class="strip">
+    <div class="strip-item">
+      <img src="assets/images/Afua1.jpg" alt="Joy in the pressing"/>
+      <div class="strip-overlay"></div>
+      <div class="strip-label">"Joy comes in the morning"</div>
+    </div>
+    <div class="strip-item">
+      <img src="assets/images/Afua3.jpg" alt="The pressing season"/>
+      <div class="strip-overlay"></div>
+      <div class="strip-label">"You were made for this"</div>
+    </div>
+    <div class="strip-item">
+      <img src="assets/images/Afua4.jpg" alt="Strength"/>
+      <div class="strip-overlay"></div>
+      <div class="strip-label">"Be still and know"</div>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <section class="res">
+    <div class="sec-eyebrow">Resources</div>
+    <h2 class="sec-h2">Tools for <em>the walk.</em></h2>
+    <div class="res-grid">
+      <div class="r-tile"><div class="r-icon"></div><h4>Bible Studies</h4><p>Structured guides for going deeper in the Word — alone or with others.</p><div class="r-arrow">↗</div></div>
+      <div class="r-tile"><div class="r-icon"></div><h4>Prayer Guides</h4><p>Framework prayers for grief, healing, waiting, and breakthrough.</p><div class="r-arrow">↗</div></div>
+      <div class="r-tile"><div class="r-icon"></div><h4>Journal Prompts</h4><p>Questions to help you process what God is doing in and through you.</p><div class="r-arrow">↗</div></div>
+      <div class="r-tile"><div class="r-icon"></div><h4>Worship Playlists</h4><p>Music for the quiet moments, the hard nights, and the breakthroughs.</p><div class="r-arrow">↗</div></div>
+    </div>
+    <div class="res-cta"><a href="resources.html" class="btn-res">Explore All Resources</a></div>
+  </section>
+
+  <!-- SUBSCRIBE -->
+  <section class="sub">
+    <div class="sub-orn">Stay Connected</div>
+    <h2 class="sub-h2">Devotionals, <em>in your inbox.</em></h2>
+    <p class="sub-p">No noise. Just quiet, faithful words — delivered when you need them most.</p>
+    <form class="sub-form" onsubmit="return false;">
+      <input type="email" placeholder="Your email address"/>
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="foot-logo">The Winepress</span>
+        <p>A devotional space for those in the pressing seasons of life — finding faith, hope, and beauty in the process.</p>
+        <p class="foot-verse">"Those who sow with tears will reap with songs of joy." — Psalm 126:5</p>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="devotionals.html">Devotionals</a></li>
+          <li><a href="testimonies.html">Testimonies</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Connect</h5>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Prayer Requests</a></li>
+          <li><a href="contact.html">Collaborate</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Devotionals</h5>
+        <ul>
+          <li><a href="devotionals.html#dv-1">Create in Me a Clean Heart</a></li>
+          <li><a href="devotionals.html#dv-2">Worth the Wait</a></li>
+          <li><a href="devotionals.html#dv-3">Pleasing God</a></li>
+          <li><a href="devotionals.html#dv-4">Great Faith</a></li>
+          <li><a href="devotionals.html#dv-5">Our Obedience</a></li>
+          <li><a href="blog.html">What God Is Teaching Me (Blog)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2025 The Winepress. Made with faith &amp; intention.</p>
+      <p>Built with purpose · <a href="contact.html">Contact</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Nav becomes white on scroll
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+  </script>
+
+</body>
+</html>

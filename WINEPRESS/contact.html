@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact — The Winepress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wine:      #6B1A2A;
+      --wine-mid:  #8C2438;
+      --wine-lt:   #B05068;
+      --wine-pale: #E8C8CE;
+      --white:     #FFFFFF;
+      --off:       #FAF8F5;
+      --cream:     #F4EDE0;
+      --ink:       #1C1010;
+      --muted:     #7A6060;
+      --serif-d:   'DM Serif Display', Georgia, serif;
+      --serif-c:   'Cinzel', serif;
+      --sans:      'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow-x: hidden; line-height: 1.7; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /*  NAV  */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 5rem;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(107,26,42,.08);
+    }
+    .nav-logo { font-family: var(--serif-c); font-size: .95rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); transition: color .2s; }
+    .nav-links a:hover { color: var(--wine); }
+    .nav-links a.active { color: var(--wine); font-weight: 500; }
+    .nav-pill { font-size: .68rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; padding: .5rem 1.4rem; background: var(--wine); color: var(--white); border-radius: 100px; transition: background .2s; }
+    .nav-pill:hover { background: var(--wine-mid); }
+
+    /*  HERO  */
+    .hero {
+      min-height: 60vh;
+      background: url('assets/images/background.png') center center / cover no-repeat;
+      position: relative;
+      display: flex; align-items: flex-end;
+      overflow: hidden;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right, rgba(20,5,8,.9) 0%, rgba(20,5,8,.65) 55%, rgba(20,5,8,.25) 100%),
+        linear-gradient(to top, rgba(107,26,42,.7) 0%, transparent 45%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 5rem 5rem;
+      max-width: 680px;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: .9rem;
+      margin-bottom: 1.8rem;
+    }
+    .hero-eyebrow-line { width: 3rem; height: 1px; background: linear-gradient(to right, var(--wine-lt), transparent); }
+    .hero-eyebrow span { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--wine-lt); }
+    .hero-h1 { font-family: var(--serif-d); font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 400; line-height: 1; color: var(--white); letter-spacing: -.02em; margin-bottom: .2rem; }
+    .hero-h1-em { display: block; font-family: var(--serif-d); font-style: italic; color: var(--wine-pale); font-size: clamp(2.5rem, 5vw, 4.8rem); line-height: 1; margin-bottom: 1.8rem; }
+    .hero-sub { font-size: .92rem; color: rgba(255,255,255,.6); line-height: 1.85; max-width: 440px; }
+
+    /*  TAB BAR  */
+    .tab-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--wine-pale);
+      display: flex;
+      padding: 0 5rem;
+      gap: 0;
+      position: sticky; top: 72px; z-index: 100;
+    }
+    .tab-btn {
+      font-family: var(--serif-c); font-size: .58rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      padding: 1.4rem 2rem;
+      color: var(--muted); background: transparent; border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .2s, border-color .2s;
+      position: relative; bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--wine); }
+    .tab-btn.active { color: var(--wine); border-bottom-color: var(--wine); }
+
+    /*  TAB PANELS  */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /*  SHARED FORM SECTION LAYOUT  */
+    .form-section {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      min-height: 80vh;
+    }
+
+    /* left info panel */
+    .form-info {
+      background: var(--off);
+      padding: 6rem 4rem 6rem 5rem;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .form-info::before {
+      content: '';
+      position: absolute; bottom: -6rem; left: -6rem;
+      width: 24rem; height: 24rem; border-radius: 50%;
+      border: 1px solid var(--wine-pale); pointer-events: none;
+    }
+    .info-eyebrow { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: 1rem; display: flex; align-items: center; gap: .8rem; }
+    .info-eyebrow::before { content: ''; width: 2rem; height: 1px; background: var(--wine-lt); }
+    .info-h2 { font-family: var(--serif-d); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400; line-height: 1.15; color: var(--ink); margin-bottom: 1.2rem; }
+    .info-h2 em { font-style: italic; color: var(--wine); }
+    .info-p { font-size: .9rem; color: var(--muted); line-height: 1.9; margin-bottom: 1rem; }
+
+    /* info cards */
+    .info-cards { display: flex; flex-direction: column; gap: .8rem; margin-top: 2.2rem; }
+    .info-card {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.2rem 1.4rem;
+      background: var(--white); border-radius: 4px;
+      border-left: 2px solid var(--wine-pale);
+      transition: border-color .2s;
+    }
+    .info-card:hover { border-color: var(--wine); }
+    .info-card-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }
+    .info-card-text h4 { font-family: var(--serif-d); font-size: .95rem; color: var(--ink); margin-bottom: .15rem; }
+    .info-card-text p { font-size: .78rem; color: var(--muted); line-height: 1.6; }
+
+    /* scripture card */
+    .info-scripture {
+      margin-top: 2rem;
+      background: var(--wine);
+      border-radius: 4px; padding: 1.6rem 1.8rem;
+    }
+    .info-scripture p { font-family: var(--serif-d); font-style: italic; font-size: 1rem; color: rgba(255,255,255,.88); line-height: 1.65; margin-bottom: .6rem; }
+    .info-scripture span { font-size: .6rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+
+    /* right form panel */
+    .form-panel {
+      background: var(--white);
+      padding: 6rem 5rem 6rem 4rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    /* form elements */
+    .contact-form { display: flex; flex-direction: column; gap: 1.3rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+    .form-group { display: flex; flex-direction: column; gap: .45rem; }
+    .form-group label { font-size: .63rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--wine-lt); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: .9rem 1.2rem;
+      background: var(--off);
+      border: 1px solid rgba(107,26,42,.12);
+      border-radius: 6px;
+      font-family: var(--sans); font-size: .88rem;
+      color: var(--ink); outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--wine);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(107,26,42,.07);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--muted); opacity: .5; }
+    .form-group select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B05068' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-color: var(--off); }
+    .form-group select:focus { background-color: var(--white); }
+    .form-group textarea { resize: vertical; min-height: 140px; line-height: 1.78; }
+
+    /* prayer type chips */
+    .prayer-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .prayer-chip {
+      font-size: .6rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      padding: .38rem 1rem;
+      border: 1px solid var(--wine-pale); border-radius: 100px;
+      color: var(--muted); cursor: pointer; background: transparent;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .prayer-chip.selected { background: var(--wine); border-color: var(--wine); color: var(--white); }
+
+    /* anon toggle */
+    .anon-row {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.1rem 1.3rem;
+      background: var(--off); border: 1px solid var(--wine-pale);
+      border-radius: 6px; cursor: pointer;
+    }
+    .anon-row input[type="checkbox"] { accent-color: var(--wine); margin-top: .2rem; flex-shrink: 0; }
+    .anon-row-text h4 { font-size: .82rem; font-weight: 500; color: var(--ink); margin-bottom: .1rem; }
+    .anon-row-text p { font-size: .75rem; color: var(--muted); line-height: 1.55; }
+
+    /* submit row */
+    .form-submit-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+    .btn-wine {
+      display: inline-block; padding: .9rem 2.4rem;
+      background: var(--wine); color: var(--white);
+      font-size: .72rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      border: none; border-radius: 100px; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-wine:hover { background: var(--wine-mid); transform: translateY(-2px); }
+    .form-note { font-size: .75rem; color: var(--muted); font-style: italic; font-family: var(--serif-d); }
+
+    /* success state */
+    .form-success {
+      display: none; text-align: center; padding: 3.5rem 2rem;
+    }
+    .form-success.show { display: block; }
+    .form-success-icon { font-size: 3rem; margin-bottom: 1.2rem; }
+    .form-success h3 { font-family: var(--serif-d); font-size: 2rem; color: var(--ink); margin-bottom: .6rem; }
+    .form-success h3 em { font-style: italic; color: var(--wine); }
+    .form-success p { font-size: .9rem; color: var(--muted); line-height: 1.85; max-width: 380px; margin: 0 auto; }
+
+    /*  PRAYER WALL  */
+    .prayer-wall {
+      background: var(--off);
+      padding: 8rem 5rem;
+    }
+    .pw-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding-bottom: 1.5rem; border-bottom: 1px solid var(--wine-pale);
+      margin-bottom: 4rem;
+    }
+    .pw-eyebrow { font-family: var(--serif-c); font-size: .58rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: .5rem; }
+    .pw-h2 { font-family: var(--serif-d); font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400; line-height: 1.1; }
+    .pw-h2 em { font-style: italic; color: var(--wine); }
+    .pw-note { font-size: .75rem; color: var(--muted); font-style: italic; font-family: var(--serif-d); text-align: right; max-width: 220px; }
+
+    .pw-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--wine-pale);
+    }
+    .pw-card {
+      background: var(--white);
+      padding: 2rem 2.2rem;
+      position: relative; overflow: hidden;
+      transition: background .25s;
+    }
+    .pw-card:hover { background: var(--cream); }
+    .pw-card::before {
+      content: '';
+      position: absolute; bottom: 1rem; right: 1.2rem;
+      font-size: 2rem; opacity: .08;
+    }
+    .pw-category {
+      display: inline-block;
+      font-family: var(--serif-c); font-size: .48rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase;
+      padding: .2rem .75rem;
+      background: var(--wine-pale); color: var(--wine);
+      border-radius: 100px; margin-bottom: 1rem;
+    }
+    .pw-text { font-family: var(--serif-d); font-style: italic; font-size: .95rem; line-height: 1.65; color: var(--ink); margin-bottom: 1rem; }
+    .pw-footer { display: flex; justify-content: space-between; align-items: center; }
+    .pw-anon { font-size: .6rem; color: var(--muted); }
+    .pw-time { font-size: .6rem; color: var(--wine-pale); }
+
+    /* pray button */
+    .pw-pray-btn {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .6rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+      background: transparent; border: none; color: var(--wine-lt);
+      cursor: pointer; padding: .4rem 0;
+      transition: color .2s;
+    }
+    .pw-pray-btn:hover { color: var(--wine); }
+    .pw-pray-btn.prayed { color: var(--wine); }
+    .pw-pray-btn span { font-size: .9rem; }
+
+    /*  CONTACT DETAILS STRIP  */
+    .contact-details-strip {
+      background: var(--cream);
+      border-top: 1px solid var(--wine-pale);
+      border-bottom: 1px solid var(--wine-pale);
+      padding: 2.5rem 5rem;
+      display: flex; align-items: center; justify-content: center;
+      gap: 4rem; flex-wrap: wrap;
+    }
+    .cd-item { display: flex; align-items: center; gap: .9rem; }
+    .cd-icon { width: 2.6rem; height: 2.6rem; background: var(--wine); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--serif-c); font-size: .45rem; font-weight: 600; letter-spacing: .1em; color: rgba(255,255,255,.8); flex-shrink: 0; text-transform: uppercase; }
+    .cd-label { font-size: .58rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--wine-lt); display: block; margin-bottom: .15rem; }
+    .cd-value { font-family: var(--serif-d); font-size: .95rem; color: var(--ink); }
+    .cd-item a.cd-value { transition: color .2s; }
+    .cd-item a.cd-value:hover { color: var(--wine); }
+    .cd-divider { width: 1px; height: 2.5rem; background: var(--wine-pale); }
+
+    /*  VERSE BAND  */
+    .verse-band {
+      background: var(--ink); padding: 5rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .verse-band-inner { text-align: center; max-width: 700px; }
+    .verse-band-inner blockquote { font-family: var(--serif-d); font-style: italic; font-size: clamp(1.3rem, 2.5vw, 1.9rem); color: rgba(255,255,255,.82); line-height: 1.6; margin-bottom: .8rem; }
+    .verse-band-inner cite { font-style: normal; font-family: var(--sans); font-size: .62rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--wine-lt); }
+
+    /*  FOOTER  */
+    footer { background: var(--ink); padding: 5rem 5rem 2.5rem; border-top: 1px solid rgba(255,255,255,.06); }
+    .foot-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 5rem; padding-bottom: 4rem; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 2rem; }
+    .foot-logo { font-family: var(--serif-c); font-size: .88rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine-lt); display: block; margin-bottom: .8rem; }
+    .foot-brand p { font-size: .8rem; color: rgba(255,255,255,.3); line-height: 1.85; max-width: 230px; margin-bottom: 1.5rem; }
+    .foot-verse { font-family: var(--serif-d); font-style: italic; font-size: .85rem; color: rgba(255,255,255,.22); line-height: 1.7; }
+    .foot-col h5 { font-family: var(--serif-c); font-size: .54rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.28); margin-bottom: 1.2rem; }
+    .foot-col ul { list-style: none; }
+    .foot-col li { margin-bottom: .5rem; }
+    .foot-col a { font-size: .8rem; color: rgba(255,255,255,.36); transition: color .2s; }
+    .foot-col a:hover { color: var(--wine-lt); }
+    .foot-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .foot-bottom p { font-size: .65rem; color: rgba(255,255,255,.18); }
+    .foot-bottom a { color: var(--wine-lt); opacity: .6; }
+
+    /* back to top */
+    .back-top { position: fixed; bottom: 2rem; right: 2rem; z-index: 800; width: 3rem; height: 3rem; background: var(--wine); color: var(--white); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; box-shadow: 0 4px 20px rgba(107,26,42,.3); }
+    .back-top.visible { opacity: 1; transform: translateY(0); }
+    .back-top:hover { background: var(--wine-mid); }
+
+    /*  RESPONSIVE  */
+    @media (max-width: 1100px) {
+      nav { padding: 1.2rem 2.5rem; }
+      .tab-bar { padding: 0 2.5rem; }
+      .contact-details-strip { padding: 2rem 2.5rem; gap: 2rem; }
+      .cd-divider { display: none; }
+      .hero-content { padding: 0 2.5rem 5rem; }
+      .form-section { grid-template-columns: 1fr; }
+      .form-info { padding: 4rem 2.5rem; }
+      .form-panel { padding: 4rem 2.5rem; }
+      .prayer-wall { padding: 6rem 2.5rem; }
+      .verse-band { padding: 4rem 2.5rem; }
+      footer { padding: 4rem 2.5rem 2rem; }
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+      .pw-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      nav { padding: 1rem 1.5rem; }
+      .contact-details-strip { padding: 2rem 1.5rem; gap: 1.5rem; flex-direction: column; align-items: flex-start; }
+      .tab-bar { padding: 0 1.5rem; overflow-x: auto; }
+      .tab-btn { padding: 1.2rem 1.2rem; white-space: nowrap; }
+      .hero-content { padding: 0 1.5rem 4rem; }
+      .form-info, .form-panel, .prayer-wall, .verse-band { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .pw-grid { grid-template-columns: 1fr; }
+      .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .foot-bottom { flex-direction: column; gap: .6rem; text-align: center; }
+      .pw-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">The Winepress</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="devotionals.html">Devotionals</a></li>
+      <li><a href="testimonies.html">Testimonies</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="blog.html">Blog</a></li>
+    </ul>
+    <a href="contact.html" class="nav-pill active">Prayer Request</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span>The Winepress</span>
+      </div>
+      <h1 class="hero-h1">You are not</h1>
+      <span class="hero-h1-em">alone in this.</span>
+      <p class="hero-sub">Whether you need prayer, want to share a thought, or are looking to collaborate — reach out. Every message is received with care.</p>
+    </div>
+  </section>
+
+  <!-- CONTACT DETAILS STRIP -->
+  <div class="contact-details-strip">
+    <div class="cd-item">
+      <div class="cd-icon">Tel</div>
+      <div>
+        <span class="cd-label">Phone</span>
+        <a href="tel:+233501384421" class="cd-value">(233) 50-138-4421</a>
+      </div>
+    </div>
+    <div class="cd-divider"></div>
+    <div class="cd-item">
+      <div class="cd-icon">Mail</div>
+      <div>
+        <span class="cd-label">Email</span>
+        <a href="mailto:maameafua86@gmail.com" class="cd-value">maameafua86@gmail.com</a>
+      </div>
+    </div>
+    <div class="cd-divider"></div>
+    <div class="cd-item">
+      <div class="cd-icon">Min</div>
+      <div>
+        <span class="cd-label">Ministry</span>
+        <span class="cd-value">The Winepress</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('prayer', this)">Prayer Request</button>
+    <button class="tab-btn" onclick="switchTab('general', this)">General Message</button>
+    <button class="tab-btn" onclick="switchTab('collaborate', this)">Collaborate</button>
+    <button class="tab-btn" onclick="switchTab('wall', this)">Prayer Wall</button>
+  </div>
+
+  <!--  TAB: PRAYER REQUEST  -->
+  <div class="tab-panel active" id="tab-prayer">
+    <div class="form-section">
+      <div class="form-info">
+        <div class="info-eyebrow">Prayer Request</div>
+        <h2 class="info-h2">Bring it <em>to God.</em></h2>
+        <p class="info-p">Nothing is too small, too messy, or too far gone. Share your request and Afua and the Winepress community will lift it up in prayer.</p>
+        <p class="info-p">You can choose to keep your request private (prayed over by Afua alone) or share it anonymously on the Prayer Wall.</p>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Completely Confidential</h4>
+              <p>Your name and details are never shared without your consent.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Prayed Over Personally</h4>
+              <p>Every request received is lifted up in genuine prayer.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Community Prayer Wall</h4>
+              <p>Opt in to share your request anonymously and let others pray with you.</p>
+            </div>
+          </div>
+        </div>
+        <div class="info-scripture">
+          <p>"Cast all your anxiety on him because he cares for you."</p>
+          <span>— 1 Peter 5:7</span>
+        </div>
+        <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:.6rem;">
+          <a href="tel:+233501384421" style="display:flex; align-items:center; gap:.7rem; font-size:.82rem; color:var(--muted); transition:color .2s;" onmouseover="this.style.color='var(--wine)'" onmouseout="this.style.color='var(--muted)'">
+             (233) 50-138-4421
+          </a>
+          <a href="mailto:maameafua86@gmail.com" style="display:flex; align-items:center; gap:.7rem; font-size:.82rem; color:var(--muted); transition:color .2s;" onmouseover="this.style.color='var(--wine)'" onmouseout="this.style.color='var(--muted)'">
+             maameafua86@gmail.com
+          </a>
+        </div> onsubmit="handleSubmit(event,'prayerForm','prayerSuccess')">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="p-name">Your Name</label>
+              <input type="text" id="p-name" placeholder="First name or nickname"/>
+            </div>
+            <div class="form-group">
+              <label for="p-email">Email Address</label>
+              <input type="email" id="p-email" placeholder="For a personal response" required/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>What area does your request relate to?</label>
+            <div class="prayer-chips">
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Health</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Relationships</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Family</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Work &amp; Purpose</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Mental Health</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Faith &amp; Doubt</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Finances</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Grief &amp; Loss</button>
+              <button type="button" class="prayer-chip" onclick="toggleChip(this)">Other</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="p-request">Your Prayer Request</label>
+            <textarea id="p-request" placeholder="Share as much or as little as you'd like. This is a safe space." required></textarea>
+          </div>
+
+          <label class="anon-row">
+            <input type="checkbox" id="p-wall"/>
+            <div class="anon-row-text">
+              <h4>Add to the Prayer Wall</h4>
+              <p>Share this request anonymously so the community can pray with you.</p>
+            </div>
+          </label>
+
+          <div class="form-submit-row">
+            <button type="submit" class="btn-wine">Send Prayer Request</button>
+            <span class="form-note">Received with care and lifted in prayer.</span>
+          </div>
+        </form>
+        <div class="form-success" id="prayerSuccess">
+          
+          <h3>Request <em>received.</em></h3>
+          <p>Your prayer request has been received. Afua will be lifting you up in prayer. You are not forgotten — God sees you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  TAB: GENERAL MESSAGE  -->
+  <div class="tab-panel" id="tab-general">
+    <div class="form-section">
+      <div class="form-info">
+        <div class="info-eyebrow">General Message</div>
+        <h2 class="info-h2">Say <em>hello.</em></h2>
+        <p class="info-p">Questions, comments, encouragement, suggestions for future devotionals or blog posts — Afua would love to hear from you. This is a community and every voice matters.</p>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Ask a Question</h4>
+              <p>Curious about faith, psychology, or anything on the site? Ask away.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Suggest a Topic</h4>
+              <p>Is there a devotional topic or blog theme you'd love to see covered?</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Just Say Hello</h4>
+              <p>No agenda needed. This community welcomes you as you are.</p>
+            </div>
+          </div>
+        </div>
+        <div class="info-scripture">
+          <p>"As iron sharpens iron, so one person sharpens another."</p>
+          <span>— Proverbs 27:17</span>
+        </div>
+      </div>
+
+      <div class="form-panel">
+        <form class="contact-form" id="generalForm" onsubmit="handleSubmit(event,'generalForm','generalSuccess')">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="g-name">Your Name</label>
+              <input type="text" id="g-name" placeholder="Your name" required/>
+            </div>
+            <div class="form-group">
+              <label for="g-email">Email Address</label>
+              <input type="email" id="g-email" placeholder="So we can reply" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="g-subject">Subject</label>
+            <select id="g-subject">
+              <option value="" disabled selected>What's this about?</option>
+              <option>Question about the site</option>
+              <option>Feedback or encouragement</option>
+              <option>Suggest a devotional topic</option>
+              <option>Suggest a blog post idea</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="g-message">Your Message</label>
+            <textarea id="g-message" placeholder="Share whatever is on your heart..." required></textarea>
+          </div>
+          <div class="form-submit-row">
+            <button type="submit" class="btn-wine">Send Message</button>
+            <span class="form-note">Usually replied to within a few days.</span>
+          </div>
+        </form>
+        <div class="form-success" id="generalSuccess">
+          
+          <h3>Message <em>sent!</em></h3>
+          <p>Thank you for reaching out. Afua will get back to you soon. In the meantime, keep pressing forward — God is with you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  TAB: COLLABORATE  -->
+  <div class="tab-panel" id="tab-collaborate">
+    <div class="form-section">
+      <div class="form-info">
+        <div class="info-eyebrow">Collaborate</div>
+        <h2 class="info-h2">Let's create <em>together.</em></h2>
+        <p class="info-p">The Winepress is open to collaboration with fellow believers, creators, counsellors, musicians, and anyone passionate about the intersection of faith and life.</p>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Guest Posts &amp; Devotionals</h4>
+              <p>Have a word on your heart? Submit a guest devotional or blog post.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Podcast or Interview</h4>
+              <p>Interested in a faith and psychology conversation? Let's talk.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">—</div>
+            <div class="info-card-text">
+              <h4>Community Partnership</h4>
+              <p>Churches, ministries, or mental health initiatives — let's explore together.</p>
+            </div>
+          </div>
+        </div>
+        <div class="info-scripture">
+          <p>"Two are better than one, because they have a good return for their labour."</p>
+          <span>— Ecclesiastes 4:9</span>
+        </div>
+      </div>
+
+      <div class="form-panel">
+        <form class="contact-form" id="collabForm" onsubmit="handleSubmit(event,'collabForm','collabSuccess')">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="c-name">Your Name</label>
+              <input type="text" id="c-name" placeholder="Your full name" required/>
+            </div>
+            <div class="form-group">
+              <label for="c-email">Email Address</label>
+              <input type="email" id="c-email" placeholder="Your best contact email" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="c-org">Organisation or Platform (optional)</label>
+            <input type="text" id="c-org" placeholder="Church, ministry, podcast, etc."/>
+          </div>
+          <div class="form-group">
+            <label for="c-type">Type of Collaboration</label>
+            <select id="c-type">
+              <option value="" disabled selected>What do you have in mind?</option>
+              <option>Guest Devotional or Blog Post</option>
+              <option>Podcast or Interview</option>
+              <option>Church or Ministry Partnership</option>
+              <option>Mental Health Initiative</option>
+              <option>Creative Project</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="c-idea">Tell Us About Your Idea</label>
+            <textarea id="c-idea" placeholder="Share your vision — what do you want to create together?" required></textarea>
+          </div>
+          <div class="form-submit-row">
+            <button type="submit" class="btn-wine">Submit Proposal</button>
+            <span class="form-note">Reviewed within 5–7 days.</span>
+          </div>
+        </form>
+        <div class="form-success" id="collabSuccess">
+          
+          <h3>Proposal <em>received!</em></h3>
+          <p>So excited about the possibility of creating together. Afua will review your proposal and be in touch soon. God's timing is perfect.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  TAB: PRAYER WALL  -->
+  <div class="tab-panel" id="tab-wall">
+    <section class="prayer-wall">
+      <div class="pw-header">
+        <div>
+          <div class="pw-eyebrow">Community Prayer Wall</div>
+          <h2 class="pw-h2">Standing in <em>agreement.</em></h2>
+        </div>
+        <p class="pw-note">All requests shared here are anonymous. Click "Pray" on any card to pray along.</p>
+      </div>
+
+      <div class="pw-grid">
+
+        <div class="pw-card">
+          <span class="pw-category">Health</span>
+          <p class="pw-text">"Praying for complete healing and strength for my body. God, you are my healer."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 2 days ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+        <div class="pw-card">
+          <span class="pw-category">Family</span>
+          <p class="pw-text">"I'm believing for restoration in my family. God, turn the hearts of parents and children to each other."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 3 days ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+        <div class="pw-card">
+          <span class="pw-category">Work &amp; Purpose</span>
+          <p class="pw-text">"Lord, open the right door for me. I've been waiting and I trust your timing — please confirm my path."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 5 days ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+        <div class="pw-card">
+          <span class="pw-category">Mental Health</span>
+          <p class="pw-text">"Some days are so heavy. Praying for the peace that passes all understanding — for myself and for others in this season."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 1 week ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+        <div class="pw-card">
+          <span class="pw-category">Finances</span>
+          <p class="pw-text">"Trusting God to provide. The numbers don't add up but I know He owns the cattle on a thousand hills."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 1 week ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+        <div class="pw-card">
+          <span class="pw-category">Faith &amp; Doubt</span>
+          <p class="pw-text">"Praying for stronger faith. I believe — please help my unbelief. I want to trust you fully."</p>
+          <div class="pw-footer">
+            <span class="pw-anon">Anonymous · 2 weeks ago</span>
+            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- VERSE BAND -->
+  <div class="verse-band">
+    <div class="verse-band-inner">
+      <blockquote>"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."</blockquote>
+      <cite>— Philippians 4:6</cite>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="foot-logo">The Winepress</span>
+        <p>A devotional space for those in the pressing seasons of life — finding faith, hope, and beauty in the process.</p>
+        <p class="foot-verse">"Those who sow with tears will reap with songs of joy." — Psalm 126:5</p>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="devotionals.html">Devotionals</a></li>
+          <li><a href="testimonies.html">Testimonies</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Reach Out</h5>
+        <ul>
+          <li><a href="contact.html">Prayer Request</a></li>
+          <li><a href="contact.html">General Message</a></li>
+          <li><a href="contact.html">Collaborate</a></li>
+          <li><a href="contact.html">Prayer Wall</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Devotionals</h5>
+        <ul>
+          <li><a href="devotionals.html#dv-1">Create in Me a Clean Heart</a></li>
+          <li><a href="devotionals.html#dv-2">Worth the Wait</a></li>
+          <li><a href="devotionals.html#dv-3">Pleasing God</a></li>
+          <li><a href="devotionals.html#dv-4">Great Faith</a></li>
+          <li><a href="devotionals.html#dv-5">Our Obedience</a></li>
+          <li><a href="blog.html">What God Is Teaching Me (Blog)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2025 The Winepress. Made with faith &amp; intention.</p>
+      <p>Built with purpose · <a href="contact.html">Contact</a></p>
+    </div>
+  </footer>
+
+  <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+    /*  Back to top  */
+    window.addEventListener('scroll', () => {
+      document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+    });
+
+    /*  Tab switching  */
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: document.querySelector('.tab-bar').offsetTop - 80, behavior: 'smooth' });
+    }
+
+    /*  Prayer chip toggle  */
+    function toggleChip(el) { el.classList.toggle('selected'); }
+
+    /*  Form submission  */
+    function handleSubmit(e, formId, successId) {
+      e.preventDefault();
+      document.getElementById(formId).style.display = 'none';
+      document.getElementById(successId).classList.add('show');
+    }
+
+    /*  Pray button toggle  */
+    function togglePray(btn) {
+      const prayed = btn.classList.toggle('prayed');
+      btn.innerHTML = prayed ? 'Prayed!' : 'Pray';
+    }
+
+    /*  Check URL hash on load to open correct tab  */
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash;
+      const map = { '#prayer': 'prayer', '#general': 'general', '#collaborate': 'collaborate', '#wall': 'wall' };
+      if (map[hash]) {
+        const btn = document.querySelector(`.tab-btn[onclick*="${map[hash]}"]`);
+        if (btn) switchTab(map[hash], btn);
+      }
+    });
+  </script>
+
+</body>
+</html>
