@@ -216,10 +216,13 @@
 
   document.addEventListener('DOMContentLoaded', async function () {
     bindTabs();
-    document.getElementById('refreshAll').addEventListener('click', async function () {
-      await loadOverview();
-      await loadCollection(activeCollection);
-    });
+    const refreshButton = document.getElementById('refreshAll');
+    if (refreshButton) {
+      refreshButton.addEventListener('click', async function () {
+        await loadOverview();
+        await loadCollection(activeCollection);
+      });
+    }
 
     await loadOverview();
     await loadCollection(activeCollection);

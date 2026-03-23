@@ -29,6 +29,24 @@ async function copyIfExists(sourcePath, targetPath) {
   }
 }
 
+async function writeAdminAlias(targetPath) {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="refresh" content="0; url=/admin.html"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Redirecting...</title>
+  <script>
+    window.location.replace('/admin.html');
+  </script>
+</head>
+<body></body>
+</html>
+`;
+  await fs.writeFile(targetPath, html);
+}
+
 async function build() {
   for (const dir of OUTPUT_DIRS) {
     await ensureCleanDir(dir);
@@ -53,10 +71,15 @@ async function build() {
       if (entry.name !== 'index.html' && entry.name.endsWith('.html')) {
         const aliasDir = path.join(dir, entry.name.replace(/\.html$/, ''));
         await fs.mkdir(aliasDir, { recursive: true });
-        await copyIfExists(
-          path.join(ROOT_DIR, entry.name),
-          path.join(aliasDir, 'index.html')
-        );
+        const aliasPath = path.join(aliasDir, 'index.html');
+        if (entry.name === 'admin.html') {
+          await writeAdminAlias(aliasPath);
+        } else {
+          await copyIfExists(
+            path.join(ROOT_DIR, entry.name),
+            aliasPath
+          );
+        }
       }
     }
   }
