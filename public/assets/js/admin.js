@@ -11,6 +11,7 @@
   let activeCollection = 'prayerRequests';
   let loadedItems = [];
   let filteredItems = [];
+  const selectedEntryIds = new Set();
 
   async function loadBackendStatus() {
     const target = document.getElementById('backendStatus');
@@ -153,13 +154,31 @@
   function normalizeItems(items) {
     const sortSelect = document.getElementById('sortEntries');
     const searchInput = document.getElementById('entrySearch');
+    const dateFilter = document.getElementById('dateFilter');
     const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
     const sortMode = sortSelect ? sortSelect.value : 'newest';
+    const dateMode = dateFilter ? dateFilter.value : 'all';
+    const now = Date.now();
 
     let nextItems = items.slice();
 
     if (query) {
       nextItems = nextItems.filter(item => searchableText(item).includes(query));
+    }
+
+    if (dateMode !== 'all') {
+      const thresholds = {
+        today: 1000 * 60 * 60 * 24,
+        week: 1000 * 60 * 60 * 24 * 7,
+        month: 1000 * 60 * 60 * 24 * 30
+      };
+      const limit = thresholds[dateMode];
+      if (limit) {
+        nextItems = nextItems.filter(item => {
+          const createdAt = new Date(item.createdAt || 0).getTime();
+          return createdAt && (now - createdAt) <= limit;
+        });
+      }
     }
 
     nextItems.sort((left, right) => {
@@ -235,6 +254,100 @@
     }
   }
 
+  async function copyFilteredView() {
+    if (!filteredItems.length) {
+      alert('There are no visible entries to copy right now.');
+      return;
+    }
+
+    const payload = filteredItems.map(item => {
+      const lines = Object.entries(item || {}).map(([key, value]) => {
+        const printable = Array.isArray(value) ? value.join(', ') : value;
+        return `${key}: ${printable == null ? '' : printable}`;
+      });
+      return lines.join('\n');
+    }).join('\n\n---\n\n');
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      alert('Current view copied.');
+    } catch {
+      alert('Could not copy the current view right now.');
+    }
+  }
+
+  function updateSummary(items) {
+    const visibleCount = document.getElementById('visibleCount');
+    const selectedCount = document.getElementById('selectedCount');
+    const latestEntry = document.getElementById('latestEntry');
+
+    if (visibleCount) {
+      visibleCount.textContent = `${items.length} entr${items.length === 1 ? 'y' : 'ies'}`;
+    }
+
+    if (selectedCount) {
+      selectedCount.textContent = `${selectedEntryIds.size} selected`;
+    }
+
+    if (latestEntry) {
+      const item = items[0];
+      latestEntry.textContent = item
+        ? `${formatDate(item.createdAt)}${item.name ? ` • ${item.name}` : ''}`
+        : 'No entries yet';
+    }
+  }
+
+  function syncSelectionState() {
+    document.querySelectorAll('[data-select-id]').forEach(input => {
+      const checked = selectedEntryIds.has(input.dataset.selectId);
+      input.checked = checked;
+      const card = input.closest('.entry-card');
+      if (card) {
+        card.classList.toggle('is-selected', checked);
+      }
+    });
+    updateSummary(filteredItems);
+  }
+
+  async function deleteSelectedEntries() {
+    const ids = Array.from(selectedEntryIds);
+    if (!ids.length) {
+      alert('Select one or more entries first.');
+      return;
+    }
+
+    if (!window.confirm(`Delete ${ids.length} selected entr${ids.length === 1 ? 'y' : 'ies'}?`)) {
+      return;
+    }
+
+    for (const entryId of ids) {
+      const response = await fetch(`/api/admin/${activeCollection}/${entryId}`, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || `Delete failed for ${entryId}.`);
+        return;
+      }
+    }
+
+    selectedEntryIds.clear();
+    await loadOverview();
+    await loadCollection(activeCollection);
+  }
+
+  function toggleSelectAllVisible() {
+    const allVisibleSelected = filteredItems.length > 0 && filteredItems.every(item => selectedEntryIds.has(item.id));
+    filteredItems.forEach(item => {
+      if (allVisibleSelected) {
+        selectedEntryIds.delete(item.id);
+      } else {
+        selectedEntryIds.add(item.id);
+      }
+    });
+    syncSelectionState();
+  }
+
   function renderCollection(items) {
     filteredItems = normalizeItems(items);
 
@@ -260,7 +373,10 @@
     list.innerHTML = filteredItems.map(item => `
       <article class="entry-card">
         <div class="entry-meta">
-          <span class="entry-id">${escapeHtml(item.id)}</span>
+          <div class="entry-meta-primary">
+            <input class="entry-select" type="checkbox" data-select-id="${item.id}" ${selectedEntryIds.has(item.id) ? 'checked' : ''}/>
+            <span class="entry-id">${escapeHtml(item.id)}</span>
+          </div>
           <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
         </div>
         <div class="entry-body">${entryBody(activeCollection, item)}</div>
@@ -270,14 +386,16 @@
           <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
         </div>
       </article>
-    `).join('');
+      `).join('');
 
     status.textContent = `${filteredItems.length} of ${items.length} item${items.length === 1 ? '' : 's'} shown.`;
     bindEntryActions();
+    syncSelectionState();
   }
 
   async function loadCollection(name) {
     activeCollection = name;
+    selectedEntryIds.clear();
     document.querySelectorAll('.admin-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.collection === name);
     });
@@ -303,6 +421,17 @@
   }
 
   function bindEntryActions() {
+    document.querySelectorAll('[data-select-id]').forEach(input => {
+      input.addEventListener('change', function () {
+        if (input.checked) {
+          selectedEntryIds.add(input.dataset.selectId);
+        } else {
+          selectedEntryIds.delete(input.dataset.selectId);
+        }
+        syncSelectionState();
+      });
+    });
+
     document.querySelectorAll('[data-copy-id]').forEach(button => {
       button.addEventListener('click', async function () {
         const entryId = button.dataset.copyId;
@@ -370,8 +499,12 @@
   function bindWorkspaceTools() {
     const searchInput = document.getElementById('entrySearch');
     const sortSelect = document.getElementById('sortEntries');
+    const dateFilter = document.getElementById('dateFilter');
     const exportJsonButton = document.getElementById('exportJson');
     const exportCsvButton = document.getElementById('exportCsv');
+    const copyFilteredButton = document.getElementById('copyFiltered');
+    const selectAllVisibleButton = document.getElementById('selectAllVisible');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
 
     if (searchInput) {
       searchInput.addEventListener('input', function () {
@@ -381,6 +514,14 @@
 
     if (sortSelect) {
       sortSelect.addEventListener('change', function () {
+        selectedEntryIds.clear();
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (dateFilter) {
+      dateFilter.addEventListener('change', function () {
+        selectedEntryIds.clear();
         renderCollection(loadedItems);
       });
     }
@@ -391,6 +532,18 @@
 
     if (exportCsvButton) {
       exportCsvButton.addEventListener('click', exportCsv);
+    }
+
+    if (copyFilteredButton) {
+      copyFilteredButton.addEventListener('click', copyFilteredView);
+    }
+
+    if (selectAllVisibleButton) {
+      selectAllVisibleButton.addEventListener('click', toggleSelectAllVisible);
+    }
+
+    if (deleteSelectedButton) {
+      deleteSelectedButton.addEventListener('click', deleteSelectedEntries);
     }
   }
 

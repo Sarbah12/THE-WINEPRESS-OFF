@@ -9,6 +9,9 @@
   };
 
   let activeCollection = 'prayerRequests';
+  let loadedItems = [];
+  let filteredItems = [];
+  const selectedEntryIds = new Set();
 
   async function loadBackendStatus() {
     const target = document.getElementById('backendStatus');
@@ -141,21 +144,267 @@
     `;
   }
 
+  function searchableText(item) {
+    return Object.values(item || {})
+      .flatMap(value => Array.isArray(value) ? value : [value])
+      .map(value => String(value || '').toLowerCase())
+      .join(' ');
+  }
+
+  function normalizeItems(items) {
+    const sortSelect = document.getElementById('sortEntries');
+    const searchInput = document.getElementById('entrySearch');
+    const dateFilter = document.getElementById('dateFilter');
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const sortMode = sortSelect ? sortSelect.value : 'newest';
+    const dateMode = dateFilter ? dateFilter.value : 'all';
+    const now = Date.now();
+
+    let nextItems = items.slice();
+
+    if (query) {
+      nextItems = nextItems.filter(item => searchableText(item).includes(query));
+    }
+
+    if (dateMode !== 'all') {
+      const thresholds = {
+        today: 1000 * 60 * 60 * 24,
+        week: 1000 * 60 * 60 * 24 * 7,
+        month: 1000 * 60 * 60 * 24 * 30
+      };
+      const limit = thresholds[dateMode];
+      if (limit) {
+        nextItems = nextItems.filter(item => {
+          const createdAt = new Date(item.createdAt || 0).getTime();
+          return createdAt && (now - createdAt) <= limit;
+        });
+      }
+    }
+
+    nextItems.sort((left, right) => {
+      const leftTime = new Date(left.createdAt || 0).getTime();
+      const rightTime = new Date(right.createdAt || 0).getTime();
+      return sortMode === 'oldest' ? leftTime - rightTime : rightTime - leftTime;
+    });
+
+    return nextItems;
+  }
+
+  function csvValue(value) {
+    return `"${String(value == null ? '' : value).replaceAll('"', '""')}"`;
+  }
+
+  function collectionExportRows(items) {
+    return items.map(item => {
+      const row = {};
+      Object.entries(item || {}).forEach(([key, value]) => {
+        row[key] = Array.isArray(value) ? value.join(', ') : value;
+      });
+      return row;
+    });
+  }
+
+  function downloadFile(filename, contents, type) {
+    const blob = new Blob([contents], { type });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function exportJson() {
+    const name = activeCollection || 'collection';
+    downloadFile(`${name}.json`, JSON.stringify(filteredItems, null, 2), 'application/json');
+  }
+
+  function exportCsv() {
+    const rows = collectionExportRows(filteredItems);
+    if (!rows.length) {
+      alert('There are no entries to export in this view yet.');
+      return;
+    }
+
+    const headers = Array.from(rows.reduce((set, row) => {
+      Object.keys(row).forEach(key => set.add(key));
+      return set;
+    }, new Set()));
+
+    const lines = [
+      headers.map(csvValue).join(','),
+      ...rows.map(row => headers.map(header => csvValue(row[header])).join(','))
+    ];
+
+    downloadFile(`${activeCollection}.csv`, lines.join('\n'), 'text/csv;charset=utf-8');
+  }
+
+  async function copyEntry(item) {
+    const lines = Object.entries(item || {}).map(([key, value]) => {
+      const printable = Array.isArray(value) ? value.join(', ') : value;
+      return `${key}: ${printable == null ? '' : printable}`;
+    });
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      alert('Entry copied.');
+    } catch {
+      alert('Could not copy this entry right now.');
+    }
+  }
+
+  async function copyFilteredView() {
+    if (!filteredItems.length) {
+      alert('There are no visible entries to copy right now.');
+      return;
+    }
+
+    const payload = filteredItems.map(item => {
+      const lines = Object.entries(item || {}).map(([key, value]) => {
+        const printable = Array.isArray(value) ? value.join(', ') : value;
+        return `${key}: ${printable == null ? '' : printable}`;
+      });
+      return lines.join('\n');
+    }).join('\n\n---\n\n');
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      alert('Current view copied.');
+    } catch {
+      alert('Could not copy the current view right now.');
+    }
+  }
+
+  function updateSummary(items) {
+    const visibleCount = document.getElementById('visibleCount');
+    const selectedCount = document.getElementById('selectedCount');
+    const latestEntry = document.getElementById('latestEntry');
+
+    if (visibleCount) {
+      visibleCount.textContent = `${items.length} entr${items.length === 1 ? 'y' : 'ies'}`;
+    }
+
+    if (selectedCount) {
+      selectedCount.textContent = `${selectedEntryIds.size} selected`;
+    }
+
+    if (latestEntry) {
+      const item = items[0];
+      latestEntry.textContent = item
+        ? `${formatDate(item.createdAt)}${item.name ? ` • ${item.name}` : ''}`
+        : 'No entries yet';
+    }
+  }
+
+  function syncSelectionState() {
+    document.querySelectorAll('[data-select-id]').forEach(input => {
+      const checked = selectedEntryIds.has(input.dataset.selectId);
+      input.checked = checked;
+      const card = input.closest('.entry-card');
+      if (card) {
+        card.classList.toggle('is-selected', checked);
+      }
+    });
+    updateSummary(filteredItems);
+  }
+
+  async function deleteSelectedEntries() {
+    const ids = Array.from(selectedEntryIds);
+    if (!ids.length) {
+      alert('Select one or more entries first.');
+      return;
+    }
+
+    if (!window.confirm(`Delete ${ids.length} selected entr${ids.length === 1 ? 'y' : 'ies'}?`)) {
+      return;
+    }
+
+    for (const entryId of ids) {
+      const response = await fetch(`/api/admin/${activeCollection}/${entryId}`, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || `Delete failed for ${entryId}.`);
+        return;
+      }
+    }
+
+    selectedEntryIds.clear();
+    await loadOverview();
+    await loadCollection(activeCollection);
+  }
+
+  function toggleSelectAllVisible() {
+    const allVisibleSelected = filteredItems.length > 0 && filteredItems.every(item => selectedEntryIds.has(item.id));
+    filteredItems.forEach(item => {
+      if (allVisibleSelected) {
+        selectedEntryIds.delete(item.id);
+      } else {
+        selectedEntryIds.add(item.id);
+      }
+    });
+    syncSelectionState();
+  }
+
+  function renderCollection(items) {
+    filteredItems = normalizeItems(items);
+
+    const list = document.getElementById('entryList');
+    const empty = document.getElementById('emptyState');
+    const status = document.getElementById('panelStatus');
+
+    list.innerHTML = '';
+    empty.style.display = 'none';
+
+    if (!items.length) {
+      empty.style.display = 'block';
+      status.textContent = 'No entries yet.';
+      return;
+    }
+
+    if (!filteredItems.length) {
+      empty.style.display = 'block';
+      status.textContent = 'No entries match your search.';
+      return;
+    }
+
+    list.innerHTML = filteredItems.map(item => `
+      <article class="entry-card">
+        <div class="entry-meta">
+          <div class="entry-meta-primary">
+            <input class="entry-select" type="checkbox" data-select-id="${item.id}" ${selectedEntryIds.has(item.id) ? 'checked' : ''}/>
+            <span class="entry-id">${escapeHtml(item.id)}</span>
+          </div>
+          <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
+        </div>
+        <div class="entry-body">${entryBody(activeCollection, item)}</div>
+        <div class="entry-actions">
+          ${activeCollection === 'testimonies' ? testimonyActions(item) : ''}
+          <button class="entry-btn secondary" data-copy-id="${item.id}">Copy</button>
+          <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
+        </div>
+      </article>
+      `).join('');
+
+    status.textContent = `${filteredItems.length} of ${items.length} item${items.length === 1 ? '' : 's'} shown.`;
+    bindEntryActions();
+    syncSelectionState();
+  }
+
   async function loadCollection(name) {
     activeCollection = name;
+    selectedEntryIds.clear();
     document.querySelectorAll('.admin-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.collection === name);
     });
 
     const title = document.getElementById('panelTitle');
-    const list = document.getElementById('entryList');
-    const empty = document.getElementById('emptyState');
     const status = document.getElementById('panelStatus');
 
     title.textContent = collectionLabels[name];
     status.textContent = 'Loading...';
-    list.innerHTML = '';
-    empty.style.display = 'none';
 
     try {
       const response = await fetch(`/api/admin/${name}`);
@@ -164,34 +413,35 @@
         throw new Error(data.error || 'Unable to load data.');
       }
 
-      if (!data.items.length) {
-        empty.style.display = 'block';
-        status.textContent = 'No entries yet.';
-        return;
-      }
-
-      list.innerHTML = data.items.map(item => `
-        <article class="entry-card">
-          <div class="entry-meta">
-            <span class="entry-id">${escapeHtml(item.id)}</span>
-            <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
-          </div>
-          <div class="entry-body">${entryBody(name, item)}</div>
-          <div class="entry-actions">
-            ${name === 'testimonies' ? testimonyActions(item) : ''}
-            <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
-          </div>
-        </article>
-      `).join('');
-
-      status.textContent = `${data.items.length} item${data.items.length === 1 ? '' : 's'} loaded.`;
-      bindEntryActions();
+      loadedItems = Array.isArray(data.items) ? data.items : [];
+      renderCollection(loadedItems);
     } catch (error) {
       status.textContent = error.message;
     }
   }
 
   function bindEntryActions() {
+    document.querySelectorAll('[data-select-id]').forEach(input => {
+      input.addEventListener('change', function () {
+        if (input.checked) {
+          selectedEntryIds.add(input.dataset.selectId);
+        } else {
+          selectedEntryIds.delete(input.dataset.selectId);
+        }
+        syncSelectionState();
+      });
+    });
+
+    document.querySelectorAll('[data-copy-id]').forEach(button => {
+      button.addEventListener('click', async function () {
+        const entryId = button.dataset.copyId;
+        const item = filteredItems.find(entry => entry.id === entryId);
+        if (item) {
+          await copyEntry(item);
+        }
+      });
+    });
+
     document.querySelectorAll('[data-delete-id]').forEach(button => {
       button.addEventListener('click', async function () {
         const entryId = button.dataset.deleteId;
@@ -246,8 +496,60 @@
     });
   }
 
+  function bindWorkspaceTools() {
+    const searchInput = document.getElementById('entrySearch');
+    const sortSelect = document.getElementById('sortEntries');
+    const dateFilter = document.getElementById('dateFilter');
+    const exportJsonButton = document.getElementById('exportJson');
+    const exportCsvButton = document.getElementById('exportCsv');
+    const copyFilteredButton = document.getElementById('copyFiltered');
+    const selectAllVisibleButton = document.getElementById('selectAllVisible');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function () {
+        selectedEntryIds.clear();
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (dateFilter) {
+      dateFilter.addEventListener('change', function () {
+        selectedEntryIds.clear();
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (exportJsonButton) {
+      exportJsonButton.addEventListener('click', exportJson);
+    }
+
+    if (exportCsvButton) {
+      exportCsvButton.addEventListener('click', exportCsv);
+    }
+
+    if (copyFilteredButton) {
+      copyFilteredButton.addEventListener('click', copyFilteredView);
+    }
+
+    if (selectAllVisibleButton) {
+      selectAllVisibleButton.addEventListener('click', toggleSelectAllVisible);
+    }
+
+    if (deleteSelectedButton) {
+      deleteSelectedButton.addEventListener('click', deleteSelectedEntries);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', async function () {
     bindTabs();
+    bindWorkspaceTools();
     const refreshButton = document.getElementById('refreshAll');
     if (refreshButton) {
       refreshButton.addEventListener('click', async function () {

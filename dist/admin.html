@@ -223,6 +223,69 @@
       font-size: .82rem;
     }
 
+    .workspace-tools {
+      display: flex;
+      gap: .7rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .workspace-input,
+    .workspace-select {
+      border: 1px solid rgba(107,26,42,.12);
+      background: var(--off);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: .8rem 1rem;
+      font: 500 .8rem var(--sans);
+      min-width: 210px;
+      outline: none;
+    }
+
+    .workspace-select {
+      min-width: 170px;
+      cursor: pointer;
+    }
+
+    .workspace-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .9rem;
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid rgba(107,26,42,.08);
+      background: linear-gradient(180deg, rgba(250,248,245,.9), rgba(255,255,255,.95));
+    }
+
+    .workspace-summary-card {
+      border: 1px solid rgba(107,26,42,.08);
+      border-radius: 16px;
+      background: var(--white);
+      padding: .95rem 1rem;
+    }
+
+    .workspace-summary-label {
+      font-family: var(--serif-c);
+      font-size: .52rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--wine-mid);
+      margin-bottom: .45rem;
+    }
+
+    .workspace-summary-value {
+      font-size: .86rem;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    .workspace-input:focus,
+    .workspace-select:focus {
+      border-color: var(--wine);
+      box-shadow: 0 0 0 3px rgba(107,26,42,.08);
+      background: var(--white);
+    }
+
     .entry-list {
       padding: 1.2rem;
       display: grid;
@@ -250,6 +313,25 @@
     .entry-id {
       font-family: var(--serif-c);
       color: var(--wine-mid);
+    }
+
+    .entry-card.is-selected {
+      border-color: rgba(107,26,42,.22);
+      box-shadow: 0 10px 30px rgba(107,26,42,.08);
+    }
+
+    .entry-select {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--wine);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .entry-meta-primary {
+      display: flex;
+      gap: .7rem;
+      align-items: center;
     }
 
     .entry-body {
@@ -301,6 +383,12 @@
       border-color: var(--wine);
     }
 
+    .entry-btn.secondary {
+      background: var(--white);
+      color: var(--wine);
+      border-color: rgba(107,26,42,.14);
+    }
+
     .empty-state {
       display: none;
       padding: 3rem 1.2rem 3.4rem;
@@ -332,6 +420,10 @@
       .hero-strip {
         flex-direction: column;
         align-items: start;
+      }
+
+      .workspace-summary {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -387,8 +479,48 @@
 
       <section class="workspace">
         <div class="workspace-head">
-          <h2 id="panelTitle">Prayer Requests</h2>
+          <div>
+            <h2 id="panelTitle">Prayer Requests</h2>
+            <div class="workspace-tools">
+              <input
+                class="workspace-input"
+                id="entrySearch"
+                type="search"
+                placeholder="Search this collection"
+              />
+              <select class="workspace-select" id="sortEntries">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+              <select class="workspace-select" id="dateFilter">
+                <option value="all">All time</option>
+                <option value="today">Today</option>
+                <option value="week">Last 7 days</option>
+                <option value="month">Last 30 days</option>
+              </select>
+              <button class="entry-btn secondary" id="exportJson">Export JSON</button>
+              <button class="entry-btn secondary" id="exportCsv">Export CSV</button>
+              <button class="entry-btn secondary" id="copyFiltered">Copy View</button>
+              <button class="entry-btn secondary" id="selectAllVisible">Select Visible</button>
+              <button class="entry-btn danger" id="deleteSelected">Delete Selected</button>
+            </div>
+          </div>
           <div class="workspace-status" id="panelStatus">Loading...</div>
+        </div>
+
+        <div class="workspace-summary">
+          <div class="workspace-summary-card">
+            <div class="workspace-summary-label">Visible Entries</div>
+            <div class="workspace-summary-value" id="visibleCount">0 entries</div>
+          </div>
+          <div class="workspace-summary-card">
+            <div class="workspace-summary-label">Selected Entries</div>
+            <div class="workspace-summary-value" id="selectedCount">0 selected</div>
+          </div>
+          <div class="workspace-summary-card">
+            <div class="workspace-summary-label">Latest Visible Entry</div>
+            <div class="workspace-summary-value" id="latestEntry">No entries yet</div>
+          </div>
         </div>
 
         <div class="entry-list" id="entryList"></div>
