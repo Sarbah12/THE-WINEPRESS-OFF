@@ -12,6 +12,7 @@
   let loadedItems = [];
   let filteredItems = [];
   const selectedEntryIds = new Set();
+  let jsonModalValue = '';
 
   async function loadBackendStatus() {
     const target = document.getElementById('backendStatus');
@@ -155,9 +156,11 @@
     const sortSelect = document.getElementById('sortEntries');
     const searchInput = document.getElementById('entrySearch');
     const dateFilter = document.getElementById('dateFilter');
+    const quickFilter = document.getElementById('quickFilter');
     const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
     const sortMode = sortSelect ? sortSelect.value : 'newest';
     const dateMode = dateFilter ? dateFilter.value : 'all';
+    const quickMode = quickFilter ? quickFilter.value : 'all';
     const now = Date.now();
 
     let nextItems = items.slice();
@@ -179,6 +182,21 @@
           return createdAt && (now - createdAt) <= limit;
         });
       }
+    }
+
+    if (quickMode !== 'all') {
+      nextItems = nextItems.filter(function (item) {
+        if (quickMode === 'urgent') return String(item.urgency || '').toLowerCase() === 'urgent';
+        if (quickMode === 'follow-up') return Boolean(item.followUp);
+        if (quickMode === 'wall') return Boolean(item.addToWall);
+        if (quickMode === 'pending-review') return item.status === 'pending-review';
+        if (quickMode === 'approved') return item.status === 'approved';
+        if (quickMode === 'archived') return item.status === 'archived';
+        if (quickMode === 'anonymous') return Boolean(item.anonymous);
+        if (quickMode === 'general-enquiry') return String(item.subject || '').toLowerCase() === 'general enquiry';
+        if (quickMode === 'with-organisation') return Boolean(String(item.organisation || '').trim());
+        return true;
+      });
     }
 
     nextItems.sort((left, right) => {
@@ -254,6 +272,93 @@
     }
   }
 
+  function quickFilterOptions(collection) {
+    const defaults = [{ value: 'all', label: 'All entries' }];
+    if (collection === 'prayerRequests') {
+      return defaults.concat([
+        { value: 'urgent', label: 'Urgent only' },
+        { value: 'follow-up', label: 'Follow-up requested' },
+        { value: 'wall', label: 'Prayer wall entries' }
+      ]);
+    }
+
+    if (collection === 'testimonies') {
+      return defaults.concat([
+        { value: 'pending-review', label: 'Pending review' },
+        { value: 'approved', label: 'Approved' },
+        { value: 'archived', label: 'Archived' },
+        { value: 'anonymous', label: 'Anonymous only' }
+      ]);
+    }
+
+    if (collection === 'messages') {
+      return defaults.concat([
+        { value: 'general-enquiry', label: 'General enquiries' }
+      ]);
+    }
+
+    if (collection === 'collaborations') {
+      return defaults.concat([
+        { value: 'with-organisation', label: 'With organisation' }
+      ]);
+    }
+
+    return defaults;
+  }
+
+  function syncQuickFilterOptions() {
+    const quickFilter = document.getElementById('quickFilter');
+    if (!quickFilter) {
+      return;
+    }
+
+    const previous = quickFilter.value || 'all';
+    const options = quickFilterOptions(activeCollection);
+    quickFilter.innerHTML = options.map(option => `
+      <option value="${option.value}">${option.label}</option>
+    `).join('');
+
+    quickFilter.value = options.some(option => option.value === previous) ? previous : 'all';
+  }
+
+  function openJsonModal(item) {
+    const modal = document.getElementById('jsonModal');
+    const title = document.getElementById('jsonModalTitle');
+    const code = document.getElementById('jsonModalCode');
+    if (!modal || !title || !code) {
+      return;
+    }
+
+    jsonModalValue = JSON.stringify(item, null, 2);
+    title.textContent = `${collectionLabels[activeCollection]} JSON`;
+    code.textContent = jsonModalValue;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeJsonModal() {
+    const modal = document.getElementById('jsonModal');
+    if (!modal) {
+      return;
+    }
+
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  async function copyJsonModalValue() {
+    if (!jsonModalValue) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(jsonModalValue);
+      alert('JSON copied.');
+    } catch {
+      alert('Could not copy JSON right now.');
+    }
+  }
+
   async function copyFilteredView() {
     if (!filteredItems.length) {
       alert('There are no visible entries to copy right now.');
@@ -295,6 +400,25 @@
         ? `${formatDate(item.createdAt)}${item.name ? ` • ${item.name}` : ''}`
         : 'No entries yet';
     }
+  }
+
+  function clearAllFilters() {
+    const searchInput = document.getElementById('entrySearch');
+    const sortSelect = document.getElementById('sortEntries');
+    const dateFilter = document.getElementById('dateFilter');
+    const quickFilter = document.getElementById('quickFilter');
+
+    if (searchInput) searchInput.value = '';
+    if (sortSelect) sortSelect.value = 'newest';
+    if (dateFilter) dateFilter.value = 'all';
+    if (quickFilter) quickFilter.value = 'all';
+
+    selectedEntryIds.clear();
+    renderCollection(loadedItems);
+  }
+
+  function printCurrentView() {
+    window.print();
   }
 
   function syncSelectionState() {
@@ -382,11 +506,12 @@
         <div class="entry-body">${entryBody(activeCollection, item)}</div>
         <div class="entry-actions">
           ${activeCollection === 'testimonies' ? testimonyActions(item) : ''}
+          <button class="entry-btn secondary" data-json-id="${item.id}">View JSON</button>
           <button class="entry-btn secondary" data-copy-id="${item.id}">Copy</button>
           <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
         </div>
       </article>
-      `).join('');
+    `).join('');
 
     status.textContent = `${filteredItems.length} of ${items.length} item${items.length === 1 ? '' : 's'} shown.`;
     bindEntryActions();
@@ -396,6 +521,7 @@
   async function loadCollection(name) {
     activeCollection = name;
     selectedEntryIds.clear();
+    syncQuickFilterOptions();
     document.querySelectorAll('.admin-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.collection === name);
     });
@@ -421,6 +547,16 @@
   }
 
   function bindEntryActions() {
+    document.querySelectorAll('[data-json-id]').forEach(button => {
+      button.addEventListener('click', function () {
+        const entryId = button.dataset.jsonId;
+        const item = filteredItems.find(entry => entry.id === entryId);
+        if (item) {
+          openJsonModal(item);
+        }
+      });
+    });
+
     document.querySelectorAll('[data-select-id]').forEach(input => {
       input.addEventListener('change', function () {
         if (input.checked) {
@@ -500,11 +636,17 @@
     const searchInput = document.getElementById('entrySearch');
     const sortSelect = document.getElementById('sortEntries');
     const dateFilter = document.getElementById('dateFilter');
+    const quickFilter = document.getElementById('quickFilter');
     const exportJsonButton = document.getElementById('exportJson');
     const exportCsvButton = document.getElementById('exportCsv');
     const copyFilteredButton = document.getElementById('copyFiltered');
+    const clearFiltersButton = document.getElementById('clearFilters');
+    const printViewButton = document.getElementById('printView');
     const selectAllVisibleButton = document.getElementById('selectAllVisible');
     const deleteSelectedButton = document.getElementById('deleteSelected');
+    const closeJsonModalButton = document.getElementById('closeJsonModal');
+    const copyJsonModalButton = document.getElementById('copyJsonModal');
+    const jsonModal = document.getElementById('jsonModal');
 
     if (searchInput) {
       searchInput.addEventListener('input', function () {
@@ -526,6 +668,13 @@
       });
     }
 
+    if (quickFilter) {
+      quickFilter.addEventListener('change', function () {
+        selectedEntryIds.clear();
+        renderCollection(loadedItems);
+      });
+    }
+
     if (exportJsonButton) {
       exportJsonButton.addEventListener('click', exportJson);
     }
@@ -538,6 +687,14 @@
       copyFilteredButton.addEventListener('click', copyFilteredView);
     }
 
+    if (clearFiltersButton) {
+      clearFiltersButton.addEventListener('click', clearAllFilters);
+    }
+
+    if (printViewButton) {
+      printViewButton.addEventListener('click', printCurrentView);
+    }
+
     if (selectAllVisibleButton) {
       selectAllVisibleButton.addEventListener('click', toggleSelectAllVisible);
     }
@@ -545,6 +702,28 @@
     if (deleteSelectedButton) {
       deleteSelectedButton.addEventListener('click', deleteSelectedEntries);
     }
+
+    if (closeJsonModalButton) {
+      closeJsonModalButton.addEventListener('click', closeJsonModal);
+    }
+
+    if (copyJsonModalButton) {
+      copyJsonModalButton.addEventListener('click', copyJsonModalValue);
+    }
+
+    if (jsonModal) {
+      jsonModal.addEventListener('click', function (event) {
+        if (event.target === jsonModal) {
+          closeJsonModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeJsonModal();
+      }
+    });
   }
 
   document.addEventListener('DOMContentLoaded', async function () {

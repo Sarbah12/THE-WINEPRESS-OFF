@@ -279,6 +279,58 @@
       color: var(--ink);
     }
 
+    .json-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(28,16,16,.52);
+      backdrop-filter: blur(10px);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+    }
+
+    .json-modal.is-open {
+      display: flex;
+    }
+
+    .json-sheet {
+      width: min(900px, 100%);
+      max-height: min(82vh, 900px);
+      overflow: auto;
+      background: linear-gradient(180deg, #fff 0%, #faf4f2 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(107,26,42,.1);
+      box-shadow: 0 24px 70px rgba(28,16,16,.2);
+      padding: 1.2rem;
+    }
+
+    .json-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .json-head h3 {
+      font-family: var(--serif-d);
+      font-size: 1.7rem;
+      font-weight: 400;
+    }
+
+    .json-code {
+      border-radius: 18px;
+      background: #1f1313;
+      color: #f9f4f1;
+      padding: 1.2rem;
+      font: 500 .82rem/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
     .workspace-input:focus,
     .workspace-select:focus {
       border-color: var(--wine);
@@ -498,9 +550,14 @@
                 <option value="week">Last 7 days</option>
                 <option value="month">Last 30 days</option>
               </select>
+              <select class="workspace-select" id="quickFilter">
+                <option value="all">All entries</option>
+              </select>
               <button class="entry-btn secondary" id="exportJson">Export JSON</button>
               <button class="entry-btn secondary" id="exportCsv">Export CSV</button>
               <button class="entry-btn secondary" id="copyFiltered">Copy View</button>
+              <button class="entry-btn secondary" id="clearFilters">Clear Filters</button>
+              <button class="entry-btn secondary" id="printView">Print View</button>
               <button class="entry-btn secondary" id="selectAllVisible">Select Visible</button>
               <button class="entry-btn danger" id="deleteSelected">Delete Selected</button>
             </div>
@@ -531,6 +588,19 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div class="json-modal" id="jsonModal">
+    <div class="json-sheet">
+      <div class="json-head">
+        <h3 id="jsonModalTitle">Entry JSON</h3>
+        <div class="entry-inline-actions">
+          <button class="entry-btn secondary" id="copyJsonModal">Copy JSON</button>
+          <button class="entry-btn danger" id="closeJsonModal">Close</button>
+        </div>
+      </div>
+      <pre class="json-code" id="jsonModalCode"></pre>
+    </div>
   </div>
 
   <script src="assets/js/admin.js"></script>
