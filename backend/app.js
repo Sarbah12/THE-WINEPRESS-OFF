@@ -4,6 +4,9 @@ const path = require('path');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(ROOT_DIR, 'backend', 'data');
+const FALLBACK_DATA_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'the-winepress-data')
+  : DATA_DIR;
 const SESSION_COOKIE = 'winepress_admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 const ADMIN_PIN = String(process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || '').trim();
@@ -208,10 +211,10 @@ async function readRequestBody(req) {
 
 async function createFileStorage() {
   async function ensureDataFiles() {
-    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.mkdir(FALLBACK_DATA_DIR, { recursive: true });
 
     for (const [name, seed] of Object.entries(dataFiles)) {
-      const filePath = path.join(DATA_DIR, `${name}.json`);
+      const filePath = path.join(FALLBACK_DATA_DIR, `${name}.json`);
       try {
         await fs.access(filePath);
       } catch {
@@ -221,13 +224,13 @@ async function createFileStorage() {
   }
 
   async function readCollection(name) {
-    const filePath = path.join(DATA_DIR, `${name}.json`);
+    const filePath = path.join(FALLBACK_DATA_DIR, `${name}.json`);
     const contents = await fs.readFile(filePath, 'utf8');
     return JSON.parse(contents);
   }
 
   async function writeCollection(name, data) {
-    const filePath = path.join(DATA_DIR, `${name}.json`);
+    const filePath = path.join(FALLBACK_DATA_DIR, `${name}.json`);
     await fs.writeFile(filePath, `${JSON.stringify(data, null, 2)}\n`);
   }
 
@@ -289,8 +292,12 @@ async function getStorage() {
   }
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    cachedStorage = await createBlobStorage();
-    return cachedStorage;
+    try {
+      cachedStorage = await createBlobStorage();
+      return cachedStorage;
+    } catch (error) {
+      console.error('Blob storage unavailable, falling back to file storage.', error);
+    }
   }
 
   cachedStorage = await createFileStorage();
