@@ -78,7 +78,6 @@
     .ph-h1 em { font-style: italic; color: var(--wine-pale); display: block; }
     .ph-sub { font-size: .92rem; color: rgba(255,255,255,.55); line-height: 1.85; margin-top: 1.5rem; max-width: 420px; }
 
-    /* right — category jump links */
     .ph-jump {
       display: flex; flex-direction: column; gap: 1px;
       background: rgba(255,255,255,.07); border-radius: 6px; overflow: hidden;
@@ -183,7 +182,6 @@
     .pg-link::after { content: '→'; }
     .pg-card:hover .pg-link { gap: .8rem; }
 
-    /* featured prayer section */
     .pg-featured {
       background: var(--wine);
       border-radius: 6px; padding: 3rem;
@@ -240,7 +238,6 @@
     .jp-prompt { font-family: var(--serif-d); font-style: italic; font-size: 1.1rem; line-height: 1.55; color: var(--ink); }
     .jp-hint { font-size: .78rem; color: var(--muted); line-height: 1.7; }
 
-    /* journal CTA strip */
     .journal-cta {
       margin-top: 3rem;
       background: var(--white);
@@ -281,10 +278,7 @@
       transition: transform .3s;
     }
     .vc-card:hover { transform: translateY(-4px); }
-    .vc-bg {
-      position: absolute; inset: 0;
-      border-radius: 6px;
-    }
+    .vc-bg { position: absolute; inset: 0; border-radius: 6px; }
     .vc-bg-1 { background: linear-gradient(135deg, #2B0A12 0%, #6B1A2A 100%); }
     .vc-bg-2 { background: linear-gradient(135deg, #1A0808 0%, #3D1520 100%); }
     .vc-bg-3 { background: linear-gradient(135deg, #0F0508 0%, #4A1220 100%); }
@@ -327,6 +321,7 @@
       cursor: pointer;
     }
     .wt-track:hover { background: var(--cream); }
+    .wt-track.playing { background: var(--cream); border-left: 3px solid var(--wine); }
     .wt-num { font-family: var(--serif-c); font-size: .52rem; font-weight: 900; letter-spacing: .12em; color: var(--wine-pale); min-width: 1.5rem; }
     .wt-info { flex: 1; }
     .wt-title { font-family: var(--serif-d); font-size: 1rem; color: var(--ink); line-height: 1.25; margin-bottom: .15rem; }
@@ -338,13 +333,56 @@
       display: flex; align-items: center; justify-content: center;
       color: var(--wine); font-size: .7rem;
       transition: background .2s, border-color .2s, color .2s;
+      flex-shrink: 0;
     }
-    .wt-track:hover .wt-play { background: var(--wine); border-color: var(--wine); color: var(--white); }
+    .wt-track:hover .wt-play,
+    .wt-track.playing .wt-play { background: var(--wine); border-color: var(--wine); color: var(--white); }
+
+    /* YouTube player modal */
+    .yt-modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(28,16,16,.85);
+      backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    .yt-modal-overlay.active { display: flex; }
+    .yt-modal {
+      background: var(--ink);
+      border-radius: 10px;
+      overflow: hidden;
+      width: min(600px, 95vw);
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      position: relative;
+    }
+    .yt-modal-header {
+      padding: 1.2rem 1.8rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .yt-modal-title { font-family: var(--serif-d); font-size: 1rem; color: var(--white); }
+    .yt-modal-artist { font-size: .72rem; color: rgba(255,255,255,.4); margin-top: .15rem; }
+    .yt-modal-close {
+      width: 2rem; height: 2rem; border-radius: 50%;
+      background: rgba(255,255,255,.08); border: none;
+      color: rgba(255,255,255,.6); font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .yt-modal-close:hover { background: rgba(255,255,255,.18); }
+    .yt-modal-player { position: relative; padding-bottom: 56.25%; height: 0; }
+    .yt-modal-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .yt-modal-footer {
+      padding: .8rem 1.8rem;
+      display: flex; align-items: center; gap: .6rem;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .yt-modal-tag { font-family: var(--serif-c); font-size: .46rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: .2rem .7rem; background: rgba(107,26,42,.5); color: var(--wine-pale); border-radius: 100px; }
+    .yt-modal-note { font-size: .72rem; color: rgba(255,255,255,.3); margin-left: auto; }
 
     .worship-note { font-family: var(--serif-d); font-style: italic; font-size: 1.2rem; line-height: 1.6; color: var(--ink); margin-bottom: 1.5rem; padding-left: 1.2rem; border-left: 3px solid var(--wine-pale); }
     .worship-sub { font-size: .88rem; color: var(--muted); line-height: 1.9; margin-bottom: 2rem; }
 
-    /* seasonal banners */
     .worship-seasons {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1px; background: var(--wine-pale);
@@ -395,7 +433,6 @@
     .bc-6 { background: linear-gradient(160deg, #2B0A12 0%, #5C1A28 60%, #6B1A2A 100%); }
     .bc-7 { background: linear-gradient(160deg, #0F0508 0%, #3D1520 60%, #6B1A2A 100%); }
     .bc-8 { background: linear-gradient(160deg, #1A0808 0%, #6B1A2A 60%, #8C2438 100%); }
-    /* spine line decoration */
     .book-cover-inner::before {
       content: '';
       position: absolute; top: 0; left: 1rem; bottom: 0;
@@ -405,7 +442,18 @@
     .book-cover-author { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); position: relative; z-index: 1; }
     .book-category { font-family: var(--serif-c); font-size: .48rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--wine-lt); margin-bottom: .3rem; }
     .book-title { font-family: var(--serif-d); font-size: .95rem; color: var(--ink); line-height: 1.3; margin-bottom: .3rem; }
-    .book-why { font-size: .78rem; color: var(--muted); line-height: 1.65; }
+    .book-why { font-size: .78rem; color: var(--muted); line-height: 1.65; margin-bottom: .6rem; }
+    .book-links { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: auto; }
+    .book-link-btn {
+      font-size: .58rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      padding: .28rem .9rem; border-radius: 100px;
+      transition: background .2s, color .2s, border-color .2s;
+      display: inline-block; white-space: nowrap;
+    }
+    .book-link-btn.primary { background: var(--wine); color: var(--white); }
+    .book-link-btn.primary:hover { background: var(--wine-mid); }
+    .book-link-btn.secondary { border: 1px solid var(--wine-pale); color: var(--wine); }
+    .book-link-btn.secondary:hover { background: var(--wine); color: var(--white); border-color: var(--wine); }
 
     /* ── SUBSCRIBE BAND ── */
     .sub-band {
@@ -425,7 +473,6 @@
     .sub-form button { margin: .3rem .3rem .3rem 0; padding: .75rem 1.8rem; background: var(--wine); color: var(--white); border: none; border-radius: 100px; font-family: var(--sans); font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
     .sub-form button:hover { background: var(--wine-mid); }
 
-    /* shared buttons */
     .btn-wine {
       display: inline-block; padding: .85rem 2.2rem;
       background: var(--wine); color: var(--white);
@@ -516,45 +563,27 @@
     </div>
     <div class="ph-jump">
       <a href="#bible-studies" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">01</span>
-          <span class="ph-jump-name">Bible Studies</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">01</span><span class="ph-jump-name">Bible Studies</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
       <a href="#prayer-guides" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">02</span>
-          <span class="ph-jump-name">Prayer Guides</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">02</span><span class="ph-jump-name">Prayer Guides</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
       <a href="#journal" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">03</span>
-          <span class="ph-jump-name">Journal Prompts</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">03</span><span class="ph-jump-name">Journal Prompts</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
       <a href="#verse-cards" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">04</span>
-          <span class="ph-jump-name">Verse Cards</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">04</span><span class="ph-jump-name">Verse Cards</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
       <a href="#worship" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">05</span>
-          <span class="ph-jump-name">Worship Playlists</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">05</span><span class="ph-jump-name">Worship Playlists</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
       <a href="#reading" class="ph-jump-item">
-        <div class="ph-jump-left">
-          <span class="ph-jump-num">06</span>
-          <span class="ph-jump-name">Recommended Reading</span>
-        </div>
+        <div class="ph-jump-left"><span class="ph-jump-num">06</span><span class="ph-jump-name">Recommended Reading</span></div>
         <span class="ph-jump-arrow">→</span>
       </a>
     </div>
@@ -565,99 +594,13 @@
     <div class="sec-label">01</div>
     <h2 class="sec-h2">Bible <em>Studies</em></h2>
     <p class="sec-sub">Structured guides for going deeper in the Word — whether you are studying alone, with a friend, or in a small group. Each study follows a season of the pressing.</p>
-
     <div class="bs-grid">
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="01">
-          <div class="bs-week">Week 1 · Series: The Press</div>
-          <div class="bs-title">What Is God Doing in This Season?</div>
-          <div class="bs-ref">John 15:1–8 · Isaiah 43:18–19</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">An introductory study on understanding seasons of pressing — what they are, why God allows them, and how to posture your heart to receive what He is doing.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="02">
-          <div class="bs-week">Week 2 · Series: The Press</div>
-          <div class="bs-title">Surrender: Letting Go of the Vine</div>
-          <div class="bs-ref">Psalm 51 · Romans 12:1–2</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">A study on full surrender — what it looks like to release control, lay down our plans, and trust the One who prunes with purpose and precision.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="03">
-          <div class="bs-week">Week 3 · Series: The Press</div>
-          <div class="bs-title">Waiting Well: Faith in the In-Between</div>
-          <div class="bs-ref">Habakkuk 2:1–3 · Psalm 27:14</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">A deep dive into the theology of waiting — learning to hold on to God's promises in seasons where nothing seems to be moving and discouragement creeps in.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="04">
-          <div class="bs-week">Week 4 · Series: The Press</div>
-          <div class="bs-title">Identity: Who Am I Outside of This?</div>
-          <div class="bs-ref">Ephesians 1:3–14 · 1 Peter 2:9</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">A study on rooting our identity firmly in Christ — not in our circumstances, our wounds, our failures, or what others say about us.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="05">
-          <div class="bs-week">Week 5 · Series: The Press</div>
-          <div class="bs-title">Obedience When It Doesn't Make Sense</div>
-          <div class="bs-ref">Hosea 1–3 · James 1:22–25</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">Using Hosea's story, this study explores what it looks like to obey God when His instruction seems illogical — and the fruitfulness that always follows.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bs-card">
-        <div class="bs-card-top" data-num="06">
-          <div class="bs-week">Week 6 · Series: The Press</div>
-          <div class="bs-title">From Pressing to Pouring: Wholeness</div>
-          <div class="bs-ref">Isaiah 61 · Revelation 21:5</div>
-        </div>
-        <div class="bs-body">
-          <p class="bs-desc">The final study — reflecting on what God has poured out through the pressing, and how to carry the fruit of the season into the next chapter of your journey.</p>
-          <div class="bs-footer">
-            <span class="bs-tag">Individual or Group</span>
-            <span class="bs-dl">Download PDF →</span>
-          </div>
-        </div>
-      </div>
-
+      <div class="bs-card"><div class="bs-card-top" data-num="01"><div class="bs-week">Week 1 · Series: The Press</div><div class="bs-title">What Is God Doing in This Season?</div><div class="bs-ref">John 15:1–8 · Isaiah 43:18–19</div></div><div class="bs-body"><p class="bs-desc">An introductory study on understanding seasons of pressing — what they are, why God allows them, and how to posture your heart to receive what He is doing.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <div class="bs-card"><div class="bs-card-top" data-num="02"><div class="bs-week">Week 2 · Series: The Press</div><div class="bs-title">Surrender: Letting Go of the Vine</div><div class="bs-ref">Psalm 51 · Romans 12:1–2</div></div><div class="bs-body"><p class="bs-desc">A study on full surrender — what it looks like to release control, lay down our plans, and trust the One who prunes with purpose and precision.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <div class="bs-card"><div class="bs-card-top" data-num="03"><div class="bs-week">Week 3 · Series: The Press</div><div class="bs-title">Waiting Well: Faith in the In-Between</div><div class="bs-ref">Habakkuk 2:1–3 · Psalm 27:14</div></div><div class="bs-body"><p class="bs-desc">A deep dive into the theology of waiting — learning to hold on to God's promises in seasons where nothing seems to be moving and discouragement creeps in.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <div class="bs-card"><div class="bs-card-top" data-num="04"><div class="bs-week">Week 4 · Series: The Press</div><div class="bs-title">Identity: Who Am I Outside of This?</div><div class="bs-ref">Ephesians 1:3–14 · 1 Peter 2:9</div></div><div class="bs-body"><p class="bs-desc">A study on rooting our identity firmly in Christ — not in our circumstances, our wounds, our failures, or what others say about us.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <div class="bs-card"><div class="bs-card-top" data-num="05"><div class="bs-week">Week 5 · Series: The Press</div><div class="bs-title">Obedience When It Doesn't Make Sense</div><div class="bs-ref">Hosea 1–3 · James 1:22–25</div></div><div class="bs-body"><p class="bs-desc">Using Hosea's story, this study explores what it looks like to obey God when His instruction seems illogical — and the fruitfulness that always follows.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <div class="bs-card"><div class="bs-card-top" data-num="06"><div class="bs-week">Week 6 · Series: The Press</div><div class="bs-title">From Pressing to Pouring: Wholeness</div><div class="bs-ref">Isaiah 61 · Revelation 21:5</div></div><div class="bs-body"><p class="bs-desc">The final study — reflecting on what God has poured out through the pressing, and how to carry the fruit of the season into the next chapter of your journey.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
     </div>
   </section>
 
@@ -666,9 +609,7 @@
     <div class="sec-label">02</div>
     <h2 class="sec-h2">Prayer <em>Guides</em></h2>
     <p class="sec-sub">Framework prayers for the seasons when you don't know what to say — structured around the pressing, the waiting, and the breakthrough.</p>
-
     <div class="pg-layout">
-
       <div class="pg-featured">
         <div class="pg-featured-left">
           <div class="pg-featured-label">Featured Guide</div>
@@ -681,63 +622,10 @@
           <div class="pg-featured-line">"I praise You in advance for what You are already working out on my behalf. Your promises are yes and amen."</div>
         </div>
       </div>
-
-      <div class="pg-card">
-        <div class="pg-card-header">
-          <h4 class="pg-card-title">When You Are Grieving</h4>
-          <span class="pg-badge">Grief</span>
-        </div>
-        <p class="pg-desc">A gentle prayer guide for seasons of loss — whether a person, a dream, a relationship, or a version of yourself.</p>
-        <ul class="pg-points">
-          <li>Prayers for lamentation and honesty before God</li>
-          <li>Scriptures for comfort in mourning</li>
-          <li>A closing prayer of surrender</li>
-        </ul>
-        <div class="pg-footer"><span class="pg-link">Download</span></div>
-      </div>
-
-      <div class="pg-card">
-        <div class="pg-card-header">
-          <h4 class="pg-card-title">When Your Faith Feels Weak</h4>
-          <span class="pg-badge">Faith</span>
-        </div>
-        <p class="pg-desc">For the seasons of doubt, dryness, and spiritual fatigue — when you want to believe but your faith feels like it is running on empty.</p>
-        <ul class="pg-points">
-          <li>Honest prayers for the struggling heart</li>
-          <li>Declarations rooted in God's character</li>
-          <li>Scriptures on the faithfulness of God</li>
-        </ul>
-        <div class="pg-footer"><span class="pg-link">Download</span></div>
-      </div>
-
-      <div class="pg-card">
-        <div class="pg-card-header">
-          <h4 class="pg-card-title">Praying for Mental Well-being</h4>
-          <span class="pg-badge">Mental Health</span>
-        </div>
-        <p class="pg-desc">A prayer guide that brings mental health into honest conversation with God — anxiety, depression, burnout, and the need for peace.</p>
-        <ul class="pg-points">
-          <li>Prayers for the anxious mind</li>
-          <li>Declarations of peace over your thoughts</li>
-          <li>A prayer for those supporting loved ones</li>
-        </ul>
-        <div class="pg-footer"><span class="pg-link">Download</span></div>
-      </div>
-
-      <div class="pg-card">
-        <div class="pg-card-header">
-          <h4 class="pg-card-title">Praying for Relationships</h4>
-          <span class="pg-badge">Relationships</span>
-        </div>
-        <p class="pg-desc">Guided prayers for relationships in tension — friendships, family, romantic relationships, and the hard work of forgiveness.</p>
-        <ul class="pg-points">
-          <li>Prayers for broken or strained relationships</li>
-          <li>A forgiveness prayer framework</li>
-          <li>Prayers for boundaries and wisdom</li>
-        </ul>
-        <div class="pg-footer"><span class="pg-link">Download</span></div>
-      </div>
-
+      <div class="pg-card"><div class="pg-card-header"><h4 class="pg-card-title">When You Are Grieving</h4><span class="pg-badge">Grief</span></div><p class="pg-desc">A gentle prayer guide for seasons of loss — whether a person, a dream, a relationship, or a version of yourself.</p><ul class="pg-points"><li>Prayers for lamentation and honesty before God</li><li>Scriptures for comfort in mourning</li><li>A closing prayer of surrender</li></ul><div class="pg-footer"><span class="pg-link">Download</span></div></div>
+      <div class="pg-card"><div class="pg-card-header"><h4 class="pg-card-title">When Your Faith Feels Weak</h4><span class="pg-badge">Faith</span></div><p class="pg-desc">For the seasons of doubt, dryness, and spiritual fatigue — when you want to believe but your faith feels like it is running on empty.</p><ul class="pg-points"><li>Honest prayers for the struggling heart</li><li>Declarations rooted in God's character</li><li>Scriptures on the faithfulness of God</li></ul><div class="pg-footer"><span class="pg-link">Download</span></div></div>
+      <div class="pg-card"><div class="pg-card-header"><h4 class="pg-card-title">Praying for Mental Well-being</h4><span class="pg-badge">Mental Health</span></div><p class="pg-desc">A prayer guide that brings mental health into honest conversation with God — anxiety, depression, burnout, and the need for peace.</p><ul class="pg-points"><li>Prayers for the anxious mind</li><li>Declarations of peace over your thoughts</li><li>A prayer for those supporting loved ones</li></ul><div class="pg-footer"><span class="pg-link">Download</span></div></div>
+      <div class="pg-card"><div class="pg-card-header"><h4 class="pg-card-title">Praying for Relationships</h4><span class="pg-badge">Relationships</span></div><p class="pg-desc">Guided prayers for relationships in tension — friendships, family, romantic relationships, and the hard work of forgiveness.</p><ul class="pg-points"><li>Prayers for broken or strained relationships</li><li>A forgiveness prayer framework</li><li>Prayers for boundaries and wisdom</li></ul><div class="pg-footer"><span class="pg-link">Download</span></div></div>
     </div>
   </section>
 
@@ -746,67 +634,16 @@
     <div class="sec-label">03</div>
     <h2 class="sec-h2">Journal <em>Prompts</em></h2>
     <p class="sec-sub">Reflective questions to help you process what God is doing in and through you — organised by season and theme.</p>
-
     <div class="journal-grid">
-
-      <div class="jp-card">
-        <div class="jp-num">01</div>
-        <div class="jp-season">Season: The Pressing</div>
-        <p class="jp-prompt">"What is God asking me to let go of in this season, and what fear is making it hard to release?"</p>
-        <p class="jp-hint">Sit with this for a few minutes before writing. Let the honest answer surface before the polished one.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">02</div>
-        <div class="jp-season">Season: Waiting</div>
-        <p class="jp-prompt">"Where have I seen God's faithfulness in my past? How does that history speak to my current waiting?"</p>
-        <p class="jp-hint">Write out at least three specific moments. The act of remembering builds faith for what is ahead.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">03</div>
-        <div class="jp-season">Season: Doubt</div>
-        <p class="jp-prompt">"What is the honest question I have been afraid to bring to God? Write it out — He can handle it."</p>
-        <p class="jp-hint">God is not fragile. Lament is a biblical practice. He meets us in the honest place, not the polished one.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">04</div>
-        <div class="jp-season">Season: Healing</div>
-        <p class="jp-prompt">"What does wholeness look like for me? Not perfection — but what would healed feel like in this specific area?"</p>
-        <p class="jp-hint">Allow yourself to imagine it. Hope is not naive — it is an act of faith when it is rooted in God's promises.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">05</div>
-        <div class="jp-season">Season: Identity</div>
-        <p class="jp-prompt">"How has this season changed how I see myself? Is that shift from God's Word or from the wound?"</p>
-        <p class="jp-hint">Our circumstances are not authoritative about who we are. Only Scripture holds that weight.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">06</div>
-        <div class="jp-season">Season: Gratitude</div>
-        <p class="jp-prompt">"What has this pressing season produced in me that I could not have received any other way?"</p>
-        <p class="jp-hint">Even if you cannot see it fully yet, ask God to show you. Thank Him in advance for what He is building.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">07</div>
-        <div class="jp-season">Season: Purpose</div>
-        <p class="jp-prompt">"If my story — including this hard chapter — was used to help someone else, who would that person be and what would they need to hear?"</p>
-        <p class="jp-hint">Our testimony is not just personal. It is often the lifeline for someone coming behind us.</p>
-      </div>
-
-      <div class="jp-card">
-        <div class="jp-num">08</div>
-        <div class="jp-season">Season: Obedience</div>
-        <p class="jp-prompt">"Is there something God has been asking me to do that I have been postponing? What is holding me back — fear, comfort, or unbelief?"</p>
-        <p class="jp-hint">Delayed obedience is a form of disobedience. But grace is the place from which we begin again.</p>
-      </div>
-
+      <div class="jp-card"><div class="jp-num">01</div><div class="jp-season">Season: The Pressing</div><p class="jp-prompt">"What is God asking me to let go of in this season, and what fear is making it hard to release?"</p><p class="jp-hint">Sit with this for a few minutes before writing. Let the honest answer surface before the polished one.</p></div>
+      <div class="jp-card"><div class="jp-num">02</div><div class="jp-season">Season: Waiting</div><p class="jp-prompt">"Where have I seen God's faithfulness in my past? How does that history speak to my current waiting?"</p><p class="jp-hint">Write out at least three specific moments. The act of remembering builds faith for what is ahead.</p></div>
+      <div class="jp-card"><div class="jp-num">03</div><div class="jp-season">Season: Doubt</div><p class="jp-prompt">"What is the honest question I have been afraid to bring to God? Write it out — He can handle it."</p><p class="jp-hint">God is not fragile. Lament is a biblical practice. He meets us in the honest place, not the polished one.</p></div>
+      <div class="jp-card"><div class="jp-num">04</div><div class="jp-season">Season: Healing</div><p class="jp-prompt">"What does wholeness look like for me? Not perfection — but what would healed feel like in this specific area?"</p><p class="jp-hint">Allow yourself to imagine it. Hope is not naive — it is an act of faith when it is rooted in God's promises.</p></div>
+      <div class="jp-card"><div class="jp-num">05</div><div class="jp-season">Season: Identity</div><p class="jp-prompt">"How has this season changed how I see myself? Is that shift from God's Word or from the wound?"</p><p class="jp-hint">Our circumstances are not authoritative about who we are. Only Scripture holds that weight.</p></div>
+      <div class="jp-card"><div class="jp-num">06</div><div class="jp-season">Season: Gratitude</div><p class="jp-prompt">"What has this pressing season produced in me that I could not have received any other way?"</p><p class="jp-hint">Even if you cannot see it fully yet, ask God to show you. Thank Him in advance for what He is building.</p></div>
+      <div class="jp-card"><div class="jp-num">07</div><div class="jp-season">Season: Purpose</div><p class="jp-prompt">"If my story — including this hard chapter — was used to help someone else, who would that person be and what would they need to hear?"</p><p class="jp-hint">Our testimony is not just personal. It is often the lifeline for someone coming behind us.</p></div>
+      <div class="jp-card"><div class="jp-num">08</div><div class="jp-season">Season: Obedience</div><p class="jp-prompt">"Is there something God has been asking me to do that I have been postponing? What is holding me back — fear, comfort, or unbelief?"</p><p class="jp-hint">Delayed obedience is a form of disobedience. But grace is the place from which we begin again.</p></div>
     </div>
-
     <div class="journal-cta">
       <div class="jcta-text">
         <h4>Download all <em>8 prompts</em> as a printable journal sheet</h4>
@@ -821,89 +658,15 @@
     <div class="sec-label">04</div>
     <h2 class="sec-h2">Verse <em>Cards</em></h2>
     <p class="sec-sub">Scripture cards for the pressing seasons — designed to be saved, printed, or shared. Each one a promise to hold on to.</p>
-
     <div class="vc-grid">
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-1"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Jeremiah 29:11</span>
-          <p class="vc-text">"For I know the plans I have for you — plans to prosper you and not to harm you, plans to give you hope and a future."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-2"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Romans 8:28</span>
-          <p class="vc-text">"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-3"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Isaiah 43:2</span>
-          <p class="vc-text">"When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-4"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Psalm 34:18</span>
-          <p class="vc-text">"The Lord is close to the broken-hearted and saves those who are crushed in spirit."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-5"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Philippians 4:13</span>
-          <p class="vc-text">"I can do all this through him who gives me strength."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-6"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Lamentations 3:22–23</span>
-          <p class="vc-text">"Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-7"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">Psalm 126:5</span>
-          <p class="vc-text">"Those who sow with tears will reap with songs of joy."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
-      <div class="vc-card">
-        <div class="vc-bg vc-bg-8"></div>
-        <div class="vc-overlay"></div>
-        <div class="vc-content">
-          <span class="vc-ref">2 Corinthians 12:9</span>
-          <p class="vc-text">"My grace is sufficient for you, for my power is made perfect in weakness."</p>
-          <span class="vc-dl">Save Card</span>
-        </div>
-      </div>
-
+      <div class="vc-card"><div class="vc-bg vc-bg-1"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Jeremiah 29:11</span><p class="vc-text">"For I know the plans I have for you — plans to prosper you and not to harm you, plans to give you hope and a future."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-2"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Romans 8:28</span><p class="vc-text">"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-3"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Isaiah 43:2</span><p class="vc-text">"When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-4"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Psalm 34:18</span><p class="vc-text">"The Lord is close to the broken-hearted and saves those who are crushed in spirit."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-5"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Philippians 4:13</span><p class="vc-text">"I can do all this through him who gives me strength."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-6"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Lamentations 3:22–23</span><p class="vc-text">"Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-7"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Psalm 126:5</span><p class="vc-text">"Those who sow with tears will reap with songs of joy."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-bg vc-bg-8"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">2 Corinthians 12:9</span><p class="vc-text">"My grace is sufficient for you, for my power is made perfect in weakness."</p><span class="vc-dl">Save Card</span></div></div>
     </div>
   </section>
 
@@ -911,127 +674,105 @@
   <section class="worship" id="worship">
     <div class="sec-label">05</div>
     <h2 class="sec-h2">Worship <em>Playlists</em></h2>
-    <p class="sec-sub">Curated songs for every season of the pressing — from the hard nights to the breakthrough mornings.</p>
+    <p class="sec-sub">Curated songs for every season of the pressing — click any track to listen on YouTube.</p>
 
     <div class="worship-intro">
       <div class="worship-tracks">
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('qBt7RRijQ6E','While I\'m Waiting','Travis Greene','Waiting')">
           <span class="wt-num">01</span>
-          <div class="wt-info">
-            <div class="wt-title">While I'm Waiting</div>
-            <div class="wt-artist">Travis Greene</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">While I'm Waiting</div><div class="wt-artist">Travis Greene</div></div>
           <span class="wt-tag">Waiting</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('V3fCQXpCpds','There Is a Race','Jabu Hlongwane','Obedience')">
           <span class="wt-num">02</span>
-          <div class="wt-info">
-            <div class="wt-title">There Is a Race</div>
-            <div class="wt-artist">Jabu Hlongwane</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">There Is a Race</div><div class="wt-artist">Jabu Hlongwane</div></div>
           <span class="wt-tag">Obedience</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('z9eXBgylpGE','Goodness of God','CeCe Winans','Gratitude')">
           <span class="wt-num">03</span>
-          <div class="wt-info">
-            <div class="wt-title">Goodness of God</div>
-            <div class="wt-artist">CeCe Winans</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">Goodness of God</div><div class="wt-artist">CeCe Winans</div></div>
           <span class="wt-tag">Gratitude</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('IoH0nDLdBCo','Way Maker','Sinach','Faith')">
           <span class="wt-num">04</span>
-          <div class="wt-info">
-            <div class="wt-title">Way Maker</div>
-            <div class="wt-artist">Sinach</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">Way Maker</div><div class="wt-artist">Sinach</div></div>
           <span class="wt-tag">Faith</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('yjD5WqaEiyU','Jireh','Elevation Worship &amp; Maverick City','Trust')">
           <span class="wt-num">05</span>
-          <div class="wt-info">
-            <div class="wt-title">Jireh</div>
-            <div class="wt-artist">Elevation Worship &amp; Maverick City</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">Jireh</div><div class="wt-artist">Elevation Worship &amp; Maverick City</div></div>
           <span class="wt-tag">Trust</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('Cs-aSAT-hCc','Graves into Gardens','Elevation Worship','Breakthrough')">
           <span class="wt-num">06</span>
-          <div class="wt-info">
-            <div class="wt-title">Graves into Gardens</div>
-            <div class="wt-artist">Elevation Worship</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">Graves into Gardens</div><div class="wt-artist">Elevation Worship</div></div>
           <span class="wt-tag">Breakthrough</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('8F_OFFQMsaI','The Blessing','Kari Jobe &amp; Cody Carnes','Peace')">
           <span class="wt-num">07</span>
-          <div class="wt-info">
-            <div class="wt-title">The Blessing</div>
-            <div class="wt-artist">Kari Jobe &amp; Cody Carnes</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">The Blessing</div><div class="wt-artist">Kari Jobe &amp; Cody Carnes</div></div>
           <span class="wt-tag">Peace</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
-        <div class="wt-track">
+        <div class="wt-track" onclick="openPlayer('MpE5atDOSGo','Trust in God','Elevation Worship','Faith')">
           <span class="wt-num">08</span>
-          <div class="wt-info">
-            <div class="wt-title">Trust in God</div>
-            <div class="wt-artist">Elevation Worship</div>
-          </div>
+          <div class="wt-info"><div class="wt-title">Trust in God</div><div class="wt-artist">Elevation Worship</div></div>
           <span class="wt-tag">Faith</span>
-          <div class="wt-play">Play</div>
+          <div class="wt-play">▶</div>
         </div>
-
       </div>
 
       <div class="worship-right">
         <p class="worship-note">"Music reaches the places in us that words alone cannot touch. These songs have carried many of us through the pressing."</p>
-        <p class="worship-sub">Each song is tagged to a season so you can find the right sound for where you are right now — whether you need to lament, declare, wait, or praise your way through.</p>
+        <p class="worship-sub">Each song is tagged to a season so you can find the right sound for where you are right now — whether you need to lament, declare, wait, or praise your way through. Click any track to play it directly.</p>
         <a href="contact.html" class="btn-outline">Suggest a Song</a>
       </div>
     </div>
 
     <div class="worship-seasons">
-      <div class="ws-season">
-        <div class="ws-season-name">For the Hard Nights</div>
-        <p class="ws-season-desc">Songs for when words fail and the tears come — music that gives language to what you're carrying.</p>
-      </div>
-      <div class="ws-season">
-        <div class="ws-season-name">For the Waiting Room</div>
-        <p class="ws-season-desc">Songs of active trust — for the in-between, the delay, the silence that feels like abandonment but is really preparation.</p>
-      </div>
-      <div class="ws-season">
-        <div class="ws-season-name">For the Breakthrough Morning</div>
-        <p class="ws-season-desc">Songs of praise for what God has done, is doing, and will do — declare your way into the next chapter.</p>
-      </div>
+      <div class="ws-season"><div class="ws-season-name">For the Hard Nights</div><p class="ws-season-desc">Songs for when words fail and the tears come — music that gives language to what you're carrying.</p></div>
+      <div class="ws-season"><div class="ws-season-name">For the Waiting Room</div><p class="ws-season-desc">Songs of active trust — for the in-between, the delay, the silence that feels like abandonment but is really preparation.</p></div>
+      <div class="ws-season"><div class="ws-season-name">For the Breakthrough Morning</div><p class="ws-season-desc">Songs of praise for what God has done, is doing, and will do — declare your way into the next chapter.</p></div>
     </div>
   </section>
+
+  <!-- YouTube Player Modal -->
+  <div class="yt-modal-overlay" id="ytModal" onclick="closePlayerOnOverlay(event)">
+    <div class="yt-modal">
+      <div class="yt-modal-header">
+        <div>
+          <div class="yt-modal-title" id="ytTitle">—</div>
+          <div class="yt-modal-artist" id="ytArtist">—</div>
+        </div>
+        <button class="yt-modal-close" onclick="closePlayer()">✕</button>
+      </div>
+      <div class="yt-modal-player">
+        <iframe id="ytIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="yt-modal-footer">
+        <span class="yt-modal-tag" id="ytTag">—</span>
+        <span class="yt-modal-note">Playing via YouTube</span>
+      </div>
+    </div>
+  </div>
 
   <!-- 06 RECOMMENDED READING -->
   <section class="reading" id="reading">
     <div class="sec-label">06</div>
     <h2 class="sec-h2">Recommended <em>Reading</em></h2>
-    <p class="sec-sub">Books that sit at the intersection of faith, psychology, and personal growth — each one curated for the wholeness journey.</p>
+    <p class="sec-sub">Books that sit at the intersection of faith, psychology, and personal growth — each one curated for the wholeness journey. Click to get your copy.</p>
 
     <div class="reading-grid">
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-1">
+          <img src="https://covers.openlibrary.org/b/isbn/0446691097-L.jpg" alt="Battlefield of the Mind book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-1" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(43,10,18,.85) 0%,rgba(43,10,18,.2) 55%);">
             <div class="book-cover-title">Battlefield of the Mind</div>
             <div class="book-cover-author">Joyce Meyer</div>
           </div>
@@ -1040,12 +781,16 @@
           <div class="book-category">Mental Health &amp; Faith</div>
           <div class="book-title">Battlefield of the Mind</div>
           <p class="book-why">A practical, Scripture-rooted exploration of how our thought patterns shape our spiritual life — and how to reclaim them.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Battlefield-Mind-Winning-Thoughts-Feelings/dp/0446691097" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://www.bookdepository.com/Battlefield-Mind-Joyce-Meyer/9780446691093" target="_blank" rel="noopener" class="book-link-btn secondary">Book Depository</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-2">
+          <img src="https://covers.openlibrary.org/b/isbn/031033750X-L.jpg" alt="The Purpose Driven Life book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-2" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,8,8,.85) 0%,rgba(26,8,8,.2) 55%);">
             <div class="book-cover-title">The Purpose Driven Life</div>
             <div class="book-cover-author">Rick Warren</div>
           </div>
@@ -1054,12 +799,16 @@
           <div class="book-category">Identity &amp; Purpose</div>
           <div class="book-title">The Purpose Driven Life</div>
           <p class="book-why">A grounding read for seasons of confusion about calling, direction, and what it means to live for something beyond yourself.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Purpose-Driven-Life-Were-Made/dp/031033750X" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://www.purposedriven.com/books/pdlbook/" target="_blank" rel="noopener" class="book-link-btn secondary">Official Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-3">
+          <img src="https://covers.openlibrary.org/b/isbn/0310348498-L.jpg" alt="Emotionally Healthy Spirituality book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-3" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,5,8,.85) 0%,rgba(15,5,8,.2) 55%);">
             <div class="book-cover-title">Emotionally Healthy Spirituality</div>
             <div class="book-cover-author">Peter Scazzero</div>
           </div>
@@ -1068,12 +817,16 @@
           <div class="book-category">Faith &amp; Psychology</div>
           <div class="book-title">Emotionally Healthy Spirituality</div>
           <p class="book-why">One of the most important books on the intersection of emotional health and spiritual maturity — essential for the wholeness journey.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Emotionally-Healthy-Spirituality-Impossible-Discipleship/dp/0310348498" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://www.emotionallyhealthy.org/product/emotionally-healthy-spirituality-book/" target="_blank" rel="noopener" class="book-link-btn secondary">Author Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-4">
+          <img src="https://covers.openlibrary.org/b/isbn/0525653074-L.jpg" alt="Get Out of Your Head book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-4" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(37,11,15,.85) 0%,rgba(37,11,15,.2) 55%);">
             <div class="book-cover-title">Get Out of Your Head</div>
             <div class="book-cover-author">Jennie Allen</div>
           </div>
@@ -1082,12 +835,16 @@
           <div class="book-category">Mental Health &amp; Faith</div>
           <div class="book-title">Get Out of Your Head</div>
           <p class="book-why">A practical guide to stopping the spiral of negative thinking, rooted in neuroscience and anchored in Scripture.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Get-Out-Your-Head-Stopping/dp/0525653074" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://www.jennieallen.com/books/get-out-of-your-head" target="_blank" rel="noopener" class="book-link-btn secondary">Author Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-5">
+          <img src="https://covers.openlibrary.org/b/isbn/0525653090-L.jpg" alt="The Ruthless Elimination of Hurry book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-5" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(28,16,16,.85) 0%,rgba(28,16,16,.2) 55%);">
             <div class="book-cover-title">The Ruthless Elimination of Hurry</div>
             <div class="book-cover-author">John Mark Comer</div>
           </div>
@@ -1096,12 +853,16 @@
           <div class="book-category">Rest &amp; Spiritual Formation</div>
           <div class="book-title">The Ruthless Elimination of Hurry</div>
           <p class="book-why">For those in seasons of burnout — a deeply countercultural call to slow down and rediscover the unhurried life of Jesus.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Ruthless-Elimination-Hurry-Emotionally-Spiritual/dp/0525653090" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://johnmarkcomer.com/books/the-ruthless-elimination-of-hurry" target="_blank" rel="noopener" class="book-link-btn secondary">Author Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-6">
+          <img src="https://covers.openlibrary.org/b/isbn/0310247454-L.jpg" alt="Boundaries book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-6" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(43,10,18,.85) 0%,rgba(43,10,18,.2) 55%);">
             <div class="book-cover-title">Boundaries</div>
             <div class="book-cover-author">Dr. Henry Cloud &amp; Dr. John Townsend</div>
           </div>
@@ -1110,12 +871,16 @@
           <div class="book-category">Relationships &amp; Healing</div>
           <div class="book-title">Boundaries</div>
           <p class="book-why">A Christian psychologist's guide to healthy relationships — essential reading for anyone navigating people-pleasing, resentment, or relational pain.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Boundaries-When-Take-Control-Your/dp/0310247454" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://www.cloudtownsend.com/boundaries/" target="_blank" rel="noopener" class="book-link-btn secondary">Authors' Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-7">
+          <img src="https://covers.openlibrary.org/b/isbn/0718039947-L.jpg" alt="It's Not Supposed to Be This Way book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-7" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,5,8,.85) 0%,rgba(15,5,8,.2) 55%);">
             <div class="book-cover-title">It's Not Supposed to Be This Way</div>
             <div class="book-cover-author">Lysa TerKeurst</div>
           </div>
@@ -1124,12 +889,16 @@
           <div class="book-category">Grief &amp; Disappointment</div>
           <div class="book-title">It's Not Supposed to Be This Way</div>
           <p class="book-why">Written from Lysa's own crushing season — an honest, hope-filled guide to finding God in shattered expectations and unanswered prayers.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Its-Not-Supposed-This-Way/dp/0718039947" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://lysaterkeurst.com/books/its-not-supposed-to-be-this-way/" target="_blank" rel="noopener" class="book-link-btn secondary">Author Site</a>
+          </div>
         </div>
       </div>
 
       <div class="book-card">
         <div class="book-cover">
-          <div class="book-cover-inner bc-8">
+          <img src="https://covers.openlibrary.org/b/isbn/1400205069-L.jpg" alt="Uninvited book cover" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"><div class="book-cover-inner bc-8" style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,8,8,.85) 0%,rgba(26,8,8,.2) 55%);">
             <div class="book-cover-title">Uninvited</div>
             <div class="book-cover-author">Lysa TerKeurst</div>
           </div>
@@ -1138,6 +907,10 @@
           <div class="book-category">Identity &amp; Belonging</div>
           <div class="book-title">Uninvited</div>
           <p class="book-why">For anyone who has wrestled with rejection, feeling excluded, or not enough — a deeply healing book about finding your place in God's story.</p>
+          <div class="book-links">
+            <a href="https://www.amazon.com/Uninvited-Living-Loved-When-Feels/dp/1400205069" target="_blank" rel="noopener" class="book-link-btn primary">Buy on Amazon</a>
+            <a href="https://lysaterkeurst.com/books/uninvited/" target="_blank" rel="noopener" class="book-link-btn secondary">Author Site</a>
+          </div>
         </div>
       </div>
 
@@ -1208,6 +981,32 @@
     window.addEventListener('scroll', () => {
       document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
     });
+
+    function openPlayer(videoId, title, artist, tag) {
+      document.getElementById('ytTitle').textContent = title;
+      document.getElementById('ytArtist').textContent = artist;
+      document.getElementById('ytTag').textContent = tag;
+      document.getElementById('ytIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+      document.getElementById('ytModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // highlight active track
+      document.querySelectorAll('.wt-track').forEach(t => t.classList.remove('playing'));
+      event.currentTarget.classList.add('playing');
+    }
+
+    function closePlayer() {
+      document.getElementById('ytIframe').src = '';
+      document.getElementById('ytModal').classList.remove('active');
+      document.body.style.overflow = '';
+      document.querySelectorAll('.wt-track').forEach(t => t.classList.remove('playing'));
+    }
+
+    function closePlayerOnOverlay(e) {
+      if (e.target === document.getElementById('ytModal')) closePlayer();
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
   </script>
 
 </body>
