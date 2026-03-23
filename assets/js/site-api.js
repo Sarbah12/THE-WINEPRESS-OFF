@@ -85,6 +85,125 @@
     btn.textContent = prayed ? 'Prayed!' : 'Pray';
   }
 
+  function injectMotionStyles() {
+    if (document.getElementById('winepress-motion-styles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'winepress-motion-styles';
+    style.textContent = `
+      .motion-reveal {
+        opacity: 0;
+        transform: translate3d(0, 28px, 0) scale(.985);
+        transition:
+          opacity 780ms cubic-bezier(.22, 1, .36, 1),
+          transform 780ms cubic-bezier(.22, 1, .36, 1);
+        will-change: opacity, transform;
+      }
+
+      .motion-reveal.is-visible {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      .motion-soft {
+        transition:
+          transform 420ms cubic-bezier(.22, 1, .36, 1),
+          box-shadow 420ms cubic-bezier(.22, 1, .36, 1),
+          background-color 420ms cubic-bezier(.22, 1, .36, 1),
+          border-color 420ms cubic-bezier(.22, 1, .36, 1),
+          color 320ms cubic-bezier(.22, 1, .36, 1),
+          opacity 320ms cubic-bezier(.22, 1, .36, 1);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .motion-reveal,
+        .motion-reveal.is-visible,
+        .motion-soft {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function initMotion() {
+    injectMotionStyles();
+
+    const revealTargets = Array.from(document.querySelectorAll([
+      '.hero-content',
+      '.page-hero',
+      '.hero',
+      '.intro-band',
+      '.blog-section',
+      '.afua-section',
+      '.mission',
+      '.connect',
+      '.sub',
+      '.sub-band',
+      '.testi',
+      '.res',
+      '.prayer-wall',
+      '.form-section',
+      '.entry-card',
+      '.metric',
+      '.workspace',
+      '.info-card',
+      '.pw-card',
+      '.t-card',
+      '.dv-small',
+      '.r-tile',
+      '.ps-item',
+      '.strip-item',
+      '.jp-card',
+      '.book-card',
+      '.resource-card'
+    ].join(',')));
+
+    revealTargets.forEach(function (element, index) {
+      if (element.dataset.motionBound === 'true') {
+        return;
+      }
+
+      element.dataset.motionBound = 'true';
+      element.classList.add('motion-reveal');
+      element.style.transitionDelay = `${Math.min(index % 6, 5) * 70}ms`;
+    });
+
+    document.querySelectorAll('a, button, .nav-pill, .btn-wine, .btn-outline, .btn-white, .btn-res, .prayer-chip, .pw-pray-btn, .t-card, .dv-small, .r-tile').forEach(function (element) {
+      element.classList.add('motion-soft');
+    });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      revealTargets.forEach(function (element) {
+        element.classList.add('is-visible');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.16,
+      rootMargin: '0px 0px -8% 0px'
+    });
+
+    revealTargets.forEach(function (element) {
+      observer.observe(element);
+    });
+  }
+
   function sourceFromPage() {
     const page = (window.location.pathname.split('/').pop() || 'index.html').replace('.html', '');
     return page || 'home';
@@ -179,6 +298,7 @@
   window.togglePray = togglePray;
 
   document.addEventListener('DOMContentLoaded', function () {
+    initMotion();
     attachSubscriptionForms();
     loadPrayerWall();
   });
