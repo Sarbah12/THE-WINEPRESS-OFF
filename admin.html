@@ -366,7 +366,7 @@
         </div>
         <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
           <button class="hero-action" id="refreshAll">Refresh Data</button>
-          <button class="hero-action" id="logoutAdmin" style="background:rgba(255,255,255,.02);">Log Out</button>
+          <button class="hero-action" id="returnHome" style="background:rgba(255,255,255,.02);">Return Home</button>
         </div>
       </section>
 
@@ -403,12 +403,8 @@
 
   <script src="assets/js/admin.js"></script>
   <script>
-    document.getElementById('logoutAdmin').addEventListener('click', async function () {
-      await fetch('/api/admin/logout', {
-        method: 'POST',
-        credentials: 'same-origin'
-      });
-      window.location.href = '/admin-login.html';
+    document.getElementById('returnHome').addEventListener('click', function () {
+      window.location.href = '/';
     });
   </script>
 </body>

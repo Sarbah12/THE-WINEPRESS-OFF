@@ -215,20 +215,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', async function () {
-    try {
-      const sessionResponse = await fetch('/api/admin/session', {
-        credentials: 'same-origin'
-      });
-
-      if (!sessionResponse.ok) {
-        window.location.href = '/admin-login.html';
-        return;
-      }
-    } catch {
-      window.location.href = '/admin-login.html';
-      return;
-    }
-
     bindTabs();
     document.getElementById('refreshAll').addEventListener('click', async function () {
       await loadOverview();

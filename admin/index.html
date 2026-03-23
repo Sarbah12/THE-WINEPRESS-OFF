@@ -337,7 +337,7 @@
           <h1>Ministry activity at a glance</h1>
           <p>Keep up with incoming prayer needs, follow up on outreach, and review testimonies before publishing.</p>
         </div>
-        <button class="hero-action" id="logoutAdmin">Sign Out</button>
+        <button class="hero-action" id="returnHome">Return Home</button>
       </section>
 
       <section class="metrics">
@@ -376,12 +376,8 @@
 
   <script src="assets/js/admin.js"></script>
   <script>
-    document.getElementById('logoutAdmin').addEventListener('click', async function () {
-      await fetch('/api/admin/logout', {
-        method: 'POST',
-        credentials: 'same-origin'
-      });
-      window.location.href = '/admin-login.html';
+    document.getElementById('returnHome').addEventListener('click', function () {
+      window.location.href = '/';
     });
   </script>
 </body>
