@@ -338,47 +338,46 @@
     .wt-track:hover .wt-play,
     .wt-track.playing .wt-play { background: var(--wine); border-color: var(--wine); color: var(--white); }
 
-    /* YouTube player modal */
-    .yt-modal-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 9999;
-      background: rgba(28,16,16,.85);
-      backdrop-filter: blur(8px);
-      align-items: center; justify-content: center;
-    }
-    .yt-modal-overlay.active { display: flex; }
-    .yt-modal {
-      background: var(--ink);
+    .worship-player-card {
+      margin-top: 1.5rem;
+      background: linear-gradient(145deg, #2B0A12 0%, #1C1010 100%);
       border-radius: 10px;
-      overflow: hidden;
-      width: min(600px, 95vw);
-      box-shadow: 0 30px 80px rgba(0,0,0,.6);
-      position: relative;
+      padding: 1.6rem 1.8rem;
+      color: var(--white);
+      box-shadow: 0 20px 50px rgba(107,26,42,.12);
     }
-    .yt-modal-header {
-      padding: 1.2rem 1.8rem;
+    .worship-player-top {
       display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;
     }
-    .yt-modal-title { font-family: var(--serif-d); font-size: 1rem; color: var(--white); }
-    .yt-modal-artist { font-size: .72rem; color: rgba(255,255,255,.4); margin-top: .15rem; }
-    .yt-modal-close {
-      width: 2rem; height: 2rem; border-radius: 50%;
-      background: rgba(255,255,255,.08); border: none;
-      color: rgba(255,255,255,.6); font-size: 1rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background .2s;
+    .worship-player-meta h3 {
+      font-family: var(--serif-d); font-size: 1.15rem; font-weight: 400;
+      color: var(--white); line-height: 1.2;
     }
-    .yt-modal-close:hover { background: rgba(255,255,255,.18); }
-    .yt-modal-player { position: relative; padding-bottom: 56.25%; height: 0; }
-    .yt-modal-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-    .yt-modal-footer {
-      padding: .8rem 1.8rem;
-      display: flex; align-items: center; gap: .6rem;
-      border-top: 1px solid rgba(255,255,255,.07);
+    .worship-player-meta p {
+      font-size: .76rem; color: rgba(255,255,255,.55); margin-top: .2rem;
     }
-    .yt-modal-tag { font-family: var(--serif-c); font-size: .46rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: .2rem .7rem; background: rgba(107,26,42,.5); color: var(--wine-pale); border-radius: 100px; }
-    .yt-modal-note { font-size: .72rem; color: rgba(255,255,255,.3); margin-left: auto; }
+    .worship-player-badge {
+      font-family: var(--serif-c); font-size: .46rem; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      padding: .25rem .75rem; border-radius: 100px;
+      background: rgba(255,255,255,.12); color: var(--wine-pale);
+    }
+    .worship-player-embed {
+      width: 100%;
+      height: 190px;
+      border: 0;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: .8rem;
+      background: rgba(255,255,255,.06);
+    }
+    .worship-player-note {
+      font-size: .72rem;
+      color: rgba(255,255,255,.45);
+      line-height: 1.7;
+    }
+    .worship-player-note a { color: var(--wine-pale); }
 
     .worship-note { font-family: var(--serif-d); font-style: italic; font-size: 1.2rem; line-height: 1.6; color: var(--ink); margin-bottom: 1.5rem; padding-left: 1.2rem; border-left: 3px solid var(--wine-pale); }
     .worship-sub { font-size: .88rem; color: var(--muted); line-height: 1.9; margin-bottom: 2rem; }
@@ -674,57 +673,76 @@
   <section class="worship" id="worship">
     <div class="sec-label">05</div>
     <h2 class="sec-h2">Worship <em>Playlists</em></h2>
-    <p class="sec-sub">Curated songs for every season of the pressing — click any track to listen on YouTube.</p>
+    <p class="sec-sub">Curated songs for every season of the pressing — click any track to play it right here on the website.</p>
 
     <div class="worship-intro">
-      <div class="worship-tracks">
-        <div class="wt-track" onclick="openPlayer('qBt7RRijQ6E','While I\'m Waiting','Travis Greene','Waiting')">
+      <div>
+        <div class="worship-tracks">
+        <div class="wt-track playing" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/while-im-waiting-feat-chandler-moore-live/1263219160" data-title="While I'm Waiting" data-artist="Travis Greene" data-tag="Waiting">
           <span class="wt-num">01</span>
           <div class="wt-info"><div class="wt-title">While I'm Waiting</div><div class="wt-artist">Travis Greene</div></div>
           <span class="wt-tag">Waiting</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('V3fCQXpCpds','There Is a Race','Jabu Hlongwane','Obedience')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/there-is-a-race/401512410" data-title="There Is a Race" data-artist="Jabu Hlongwane" data-tag="Obedience">
           <span class="wt-num">02</span>
           <div class="wt-info"><div class="wt-title">There Is a Race</div><div class="wt-artist">Jabu Hlongwane</div></div>
           <span class="wt-tag">Obedience</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('z9eXBgylpGE','Goodness of God','CeCe Winans','Gratitude')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/goodness-of-god-live/1550189769" data-title="Goodness of God" data-artist="CeCe Winans" data-tag="Gratitude">
           <span class="wt-num">03</span>
           <div class="wt-info"><div class="wt-title">Goodness of God</div><div class="wt-artist">CeCe Winans</div></div>
           <span class="wt-tag">Gratitude</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('IoH0nDLdBCo','Way Maker','Sinach','Faith')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/way-maker/1699131964" data-title="Way Maker" data-artist="Sinach" data-tag="Faith">
           <span class="wt-num">04</span>
           <div class="wt-info"><div class="wt-title">Way Maker</div><div class="wt-artist">Sinach</div></div>
           <span class="wt-tag">Faith</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('yjD5WqaEiyU','Jireh','Elevation Worship &amp; Maverick City','Trust')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/jireh-feat-chandler-moore-naomi-raine/1557087898" data-title="Jireh" data-artist="Elevation Worship &amp; Maverick City" data-tag="Trust">
           <span class="wt-num">05</span>
           <div class="wt-info"><div class="wt-title">Jireh</div><div class="wt-artist">Elevation Worship &amp; Maverick City</div></div>
           <span class="wt-tag">Trust</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('Cs-aSAT-hCc','Graves into Gardens','Elevation Worship','Breakthrough')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/graves-into-gardens-live/1502316157" data-title="Graves into Gardens" data-artist="Elevation Worship" data-tag="Breakthrough">
           <span class="wt-num">06</span>
           <div class="wt-info"><div class="wt-title">Graves into Gardens</div><div class="wt-artist">Elevation Worship</div></div>
           <span class="wt-tag">Breakthrough</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('8F_OFFQMsaI','The Blessing','Kari Jobe &amp; Cody Carnes','Peace')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/the-blessing-live/1502316160" data-title="The Blessing" data-artist="Kari Jobe &amp; Cody Carnes" data-tag="Peace">
           <span class="wt-num">07</span>
           <div class="wt-info"><div class="wt-title">The Blessing</div><div class="wt-artist">Kari Jobe &amp; Cody Carnes</div></div>
           <span class="wt-tag">Peace</span>
           <div class="wt-play">▶</div>
         </div>
-        <div class="wt-track" onclick="openPlayer('MpE5atDOSGo','Trust in God','Elevation Worship','Faith')">
+        <div class="wt-track" onclick="openPlayer(this)" data-embed="https://embed.music.apple.com/us/song/trust-in-god-feat-chris-brown/1680569028" data-title="Trust in God" data-artist="Elevation Worship" data-tag="Faith">
           <span class="wt-num">08</span>
           <div class="wt-info"><div class="wt-title">Trust in God</div><div class="wt-artist">Elevation Worship</div></div>
           <span class="wt-tag">Faith</span>
           <div class="wt-play">▶</div>
+        </div>
+        </div>
+        <div class="worship-player-card">
+          <div class="worship-player-top">
+            <div class="worship-player-meta">
+              <h3 id="audioTitle">While I'm Waiting</h3>
+              <p id="audioArtist">Travis Greene</p>
+            </div>
+            <span class="worship-player-badge" id="audioTag">Waiting</span>
+          </div>
+          <iframe
+            id="worshipEmbed"
+            class="worship-player-embed"
+            src="https://embed.music.apple.com/us/song/while-im-waiting-feat-chandler-moore-live/1263219160"
+            allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+          ></iframe>
+          <p class="worship-player-note">This player now uses embedded Apple Music song pages, so the tracks can open and play on the site without requiring local audio files.</p>
         </div>
       </div>
 
@@ -741,26 +759,6 @@
       <div class="ws-season"><div class="ws-season-name">For the Breakthrough Morning</div><p class="ws-season-desc">Songs of praise for what God has done, is doing, and will do — declare your way into the next chapter.</p></div>
     </div>
   </section>
-
-  <!-- YouTube Player Modal -->
-  <div class="yt-modal-overlay" id="ytModal" onclick="closePlayerOnOverlay(event)">
-    <div class="yt-modal">
-      <div class="yt-modal-header">
-        <div>
-          <div class="yt-modal-title" id="ytTitle">—</div>
-          <div class="yt-modal-artist" id="ytArtist">—</div>
-        </div>
-        <button class="yt-modal-close" onclick="closePlayer()">✕</button>
-      </div>
-      <div class="yt-modal-player">
-        <iframe id="ytIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-      </div>
-      <div class="yt-modal-footer">
-        <span class="yt-modal-tag" id="ytTag">—</span>
-        <span class="yt-modal-note">Playing via YouTube</span>
-      </div>
-    </div>
-  </div>
 
   <!-- 06 RECOMMENDED READING -->
   <section class="reading" id="reading">
@@ -982,31 +980,24 @@
       document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
     });
 
-    function openPlayer(videoId, title, artist, tag) {
-      document.getElementById('ytTitle').textContent = title;
-      document.getElementById('ytArtist').textContent = artist;
-      document.getElementById('ytTag').textContent = tag;
-      document.getElementById('ytIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
-      document.getElementById('ytModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
+    function openPlayer(track) {
+      const embed = track.dataset.embed;
+      const title = track.dataset.title;
+      const artist = track.dataset.artist;
+      const tag = track.dataset.tag;
+      const player = document.getElementById('worshipEmbed');
 
-      // highlight active track
+      document.getElementById('audioTitle').textContent = title;
+      document.getElementById('audioArtist').textContent = artist;
+      document.getElementById('audioTag').textContent = tag;
+
+      if (player.getAttribute('src') !== embed) {
+        player.setAttribute('src', embed);
+      }
+
       document.querySelectorAll('.wt-track').forEach(t => t.classList.remove('playing'));
-      event.currentTarget.classList.add('playing');
+      track.classList.add('playing');
     }
-
-    function closePlayer() {
-      document.getElementById('ytIframe').src = '';
-      document.getElementById('ytModal').classList.remove('active');
-      document.body.style.overflow = '';
-      document.querySelectorAll('.wt-track').forEach(t => t.classList.remove('playing'));
-    }
-
-    function closePlayerOnOverlay(e) {
-      if (e.target === document.getElementById('ytModal')) closePlayer();
-    }
-
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
   </script>
 
 </body>
