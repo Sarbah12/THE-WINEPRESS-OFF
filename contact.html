@@ -698,62 +698,14 @@
         <p class="pw-note">All requests shared here are anonymous. Click "Pray" on any card to pray along.</p>
       </div>
 
-      <div class="pw-grid">
-
-        <div class="pw-card">
-          <span class="pw-category">Health</span>
-          <p class="pw-text">"Praying for complete healing and strength for my body. God, you are my healer."</p>
+      <div class="pw-grid" id="prayerWallGrid">
+        <div class="pw-card" style="grid-column:1 / -1;">
+          <span class="pw-category">Prayer Wall</span>
+          <p class="pw-text">Loading the latest community requests...</p>
           <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 2 days ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
+            <span class="pw-anon">Please wait a moment.</span>
           </div>
         </div>
-
-        <div class="pw-card">
-          <span class="pw-category">Family</span>
-          <p class="pw-text">"I'm believing for restoration in my family. God, turn the hearts of parents and children to each other."</p>
-          <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 3 days ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
-          </div>
-        </div>
-
-        <div class="pw-card">
-          <span class="pw-category">Work &amp; Purpose</span>
-          <p class="pw-text">"Lord, open the right door for me. I've been waiting and I trust your timing — please confirm my path."</p>
-          <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 5 days ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
-          </div>
-        </div>
-
-        <div class="pw-card">
-          <span class="pw-category">Mental Health</span>
-          <p class="pw-text">"Some days are so heavy. Praying for the peace that passes all understanding — for myself and for others in this season."</p>
-          <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 1 week ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
-          </div>
-        </div>
-
-        <div class="pw-card">
-          <span class="pw-category">Finances</span>
-          <p class="pw-text">"Trusting God to provide. The numbers don't add up but I know He owns the cattle on a thousand hills."</p>
-          <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 1 week ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
-          </div>
-        </div>
-
-        <div class="pw-card">
-          <span class="pw-category">Faith &amp; Doubt</span>
-          <p class="pw-text">"Praying for stronger faith. I believe — please help my unbelief. I want to trust you fully."</p>
-          <div class="pw-footer">
-            <span class="pw-anon">Anonymous · 2 weeks ago</span>
-            <button class="pw-pray-btn" onclick="togglePray(this)">Pray</button>
-          </div>
-        </div>
-
       </div>
     </section>
   </div>
@@ -814,6 +766,7 @@
   <a href="https://wa.me/233501384421?text=Hello%20The%20Winepress%2C%20I%20would%20love%20to%20connect." target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position:fixed;right:5.8rem;bottom:2rem;z-index:950;display:inline-flex;align-items:center;justify-content:center;padding:.9rem 1.2rem;border-radius:999px;background:#25D366;color:#fff;font:600 .78rem 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 30px rgba(37,211,102,.28);">WhatsApp</a>
   <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <script src="assets/js/site-api.js"></script>
   <script>
     /*  Back to top  */
     window.addEventListener('scroll', () => {
@@ -833,48 +786,63 @@
     function toggleChip(el) { el.classList.toggle('selected'); }
 
     /*  Form submission  */
-    function handleSubmit(e, type) {
+    async function handleSubmit(e, type) {
       e.preventDefault();
-      const phone = '233501384421';
-      let message = 'Hello The Winepress, I would love to connect.';
+      const formMap = {
+        prayer: document.getElementById('prayerForm'),
+        general: document.getElementById('generalForm'),
+        collaborate: document.getElementById('collabForm')
+      };
+      const successMap = {
+        prayer: document.getElementById('prayerSuccess'),
+        general: document.getElementById('generalSuccess'),
+        collaborate: document.getElementById('collabSuccess')
+      };
+      const form = formMap[type];
+      const success = successMap[type];
 
-      if (type === 'prayer') {
-        const name = document.getElementById('p-name').value.trim();
-        const email = document.getElementById('p-email').value.trim();
-        const request = document.getElementById('p-request').value.trim();
-        const wall = document.getElementById('p-wall').checked ? 'Yes' : 'No';
-        const topics = Array.from(document.querySelectorAll('#tab-prayer .prayer-chip.selected')).map(chip => chip.textContent.trim()).join(', ') || 'Not specified';
-        message = 'Prayer Request%0A'
-          + 'Name: ' + encodeURIComponent(name || 'Not provided') + '%0A'
-          + 'Email: ' + encodeURIComponent(email || 'Not provided') + '%0A'
-          + 'Topics: ' + encodeURIComponent(topics) + '%0A'
-          + 'Prayer Wall: ' + encodeURIComponent(wall) + '%0A'
-          + 'Request: ' + encodeURIComponent(request || 'Not provided');
-      } else if (type === 'general') {
-        const name = document.getElementById('g-name').value.trim();
-        const email = document.getElementById('g-email').value.trim();
-        const subject = document.getElementById('g-subject').value.trim();
-        const text = document.getElementById('g-message').value.trim();
-        message = 'General Message%0A'
-          + 'Name: ' + encodeURIComponent(name) + '%0A'
-          + 'Email: ' + encodeURIComponent(email) + '%0A'
-          + 'Subject: ' + encodeURIComponent(subject || 'Not specified') + '%0A'
-          + 'Message: ' + encodeURIComponent(text);
-      } else if (type === 'collaborate') {
-        const name = document.getElementById('c-name').value.trim();
-        const email = document.getElementById('c-email').value.trim();
-        const org = document.getElementById('c-org').value.trim();
-        const collabType = document.getElementById('c-type').value.trim();
-        const idea = document.getElementById('c-idea').value.trim();
-        message = 'Collaboration Proposal%0A'
-          + 'Name: ' + encodeURIComponent(name) + '%0A'
-          + 'Email: ' + encodeURIComponent(email) + '%0A'
-          + 'Organisation: ' + encodeURIComponent(org || 'Not provided') + '%0A'
-          + 'Type: ' + encodeURIComponent(collabType || 'Not specified') + '%0A'
-          + 'Idea: ' + encodeURIComponent(idea);
+      WinepressAPI.setSubmitting(form, true);
+
+      try {
+        if (type === 'prayer') {
+          await WinepressAPI.request('/api/prayer-requests', {
+            name: document.getElementById('p-name').value.trim(),
+            email: document.getElementById('p-email').value.trim(),
+            request: document.getElementById('p-request').value.trim(),
+            addToWall: document.getElementById('p-wall').checked,
+            topics: Array.from(document.querySelectorAll('#tab-prayer .prayer-chip.selected')).map(chip => chip.textContent.trim())
+          });
+
+          form.style.display = 'none';
+          success.classList.add('show');
+          await WinepressAPI.loadPrayerWall();
+        } else if (type === 'general') {
+          await WinepressAPI.request('/api/messages', {
+            name: document.getElementById('g-name').value.trim(),
+            email: document.getElementById('g-email').value.trim(),
+            subject: document.getElementById('g-subject').value.trim(),
+            message: document.getElementById('g-message').value.trim()
+          });
+
+          form.style.display = 'none';
+          success.classList.add('show');
+        } else if (type === 'collaborate') {
+          await WinepressAPI.request('/api/collaborations', {
+            name: document.getElementById('c-name').value.trim(),
+            email: document.getElementById('c-email').value.trim(),
+            organisation: document.getElementById('c-org').value.trim(),
+            type: document.getElementById('c-type').value.trim(),
+            idea: document.getElementById('c-idea').value.trim()
+          });
+
+          form.style.display = 'none';
+          success.classList.add('show');
+        }
+      } catch (error) {
+        WinepressAPI.updateStatus(form, error.message, true);
+      } finally {
+        WinepressAPI.setSubmitting(form, false);
       }
-
-      window.open('https://wa.me/' + phone + '?text=' + message, '_blank');
     }
 
     /*  Pray button toggle  */

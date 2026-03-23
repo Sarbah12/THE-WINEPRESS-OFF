@@ -855,6 +855,7 @@
   <a href="https://wa.me/233501384421?text=Hello%20The%20Winepress%2C%20I%20would%20love%20to%20connect." target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position:fixed;right:5.8rem;bottom:2rem;z-index:950;display:inline-flex;align-items:center;justify-content:center;padding:.9rem 1.2rem;border-radius:999px;background:#25D366;color:#fff;font:600 .78rem 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 30px rgba(37,211,102,.28);">WhatsApp</a>
   <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <script src="assets/js/site-api.js"></script>
   <script>
     /*  Back to top  */
     window.addEventListener('scroll', () => {
@@ -957,10 +958,31 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStory(); });
 
     /*  Form submission  */
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
-      document.getElementById('storyForm').style.display = 'none';
-      document.getElementById('formSuccess').classList.add('show');
+      const form = document.getElementById('storyForm');
+
+      WinepressAPI.setSubmitting(form, true);
+
+      try {
+        await WinepressAPI.request('/api/testimonies', {
+          anonymous: document.getElementById('anonCheck').checked,
+          firstName: document.getElementById('firstName').value.trim(),
+          lastName: document.getElementById('lastName').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          theme: document.getElementById('theme').value.trim(),
+          headline: document.getElementById('headline').value.trim(),
+          story: document.getElementById('story').value.trim(),
+          verse: document.getElementById('verse').value.trim()
+        });
+
+        form.style.display = 'none';
+        document.getElementById('formSuccess').classList.add('show');
+      } catch (error) {
+        WinepressAPI.updateStatus(form, error.message, true);
+      } finally {
+        WinepressAPI.setSubmitting(form, false);
+      }
     }
   </script>
 
