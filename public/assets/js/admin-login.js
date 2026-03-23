@@ -5,7 +5,7 @@
     });
 
     if (response.ok) {
-      window.location.href = '/admin.html';
+      window.location.href = '/admin/';
     }
   }
 
@@ -27,8 +27,7 @@
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-          username: document.getElementById('adminUsername').value.trim(),
-          password: document.getElementById('adminPassword').value
+          pin: document.getElementById('adminPin').value
         })
       });
 
@@ -45,7 +44,7 @@
       }
 
       status.textContent = 'Access granted. Opening dashboard...';
-      window.location.href = '/admin.html';
+      window.location.href = '/admin/';
     } catch (error) {
       status.textContent = error.message;
     } finally {

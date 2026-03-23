@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <base href="/"/>
   <title>Admin Login — The Winepress</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,41 +125,24 @@
       min-height: 1.2rem;
     }
 
-    .hint {
-      margin-top: 1.5rem;
-      padding: 1rem 1.1rem;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(107,26,42,.06), rgba(176,80,104,.08));
-      font-size: .84rem;
-    }
   </style>
 </head>
 <body>
   <section class="login-card">
     <div class="eyebrow">The Winepress</div>
-    <h1>Admin <em>Login</em></h1>
-    <p>This dashboard is protected. Sign in with the admin username and password you set in your local environment.</p>
+    <h1>Admin <em>PIN</em></h1>
+    <p>This dashboard is protected. Enter the admin PIN you set in your environment.</p>
 
     <form id="adminLoginForm">
       <label>
-        Username
-        <input id="adminUsername" type="text" placeholder="Admin username" required/>
-      </label>
-
-      <label>
-        Password
-        <input id="adminPassword" type="password" placeholder="Admin password" required/>
+        PIN
+        <input id="adminPin" type="password" inputmode="numeric" placeholder="Enter admin PIN" required/>
       </label>
 
       <button type="submit">Open Dashboard</button>
     </form>
 
     <div id="loginStatus"></div>
-
-    <div class="hint">
-      Start the backend like this:
-      <br><strong>ADMIN_USERNAME=yourname ADMIN_PASSWORD=your-secret PORT=3001 npm start</strong>
-    </div>
   </section>
 
   <script src="assets/js/admin-login.js"></script>

@@ -49,6 +49,15 @@ async function build() {
         path.join(ROOT_DIR, entry.name),
         path.join(dir, entry.name)
       );
+
+      if (entry.name !== 'index.html' && entry.name.endsWith('.html')) {
+        const aliasDir = path.join(dir, entry.name.replace(/\.html$/, ''));
+        await fs.mkdir(aliasDir, { recursive: true });
+        await copyIfExists(
+          path.join(ROOT_DIR, entry.name),
+          path.join(aliasDir, 'index.html')
+        );
+      }
     }
   }
 

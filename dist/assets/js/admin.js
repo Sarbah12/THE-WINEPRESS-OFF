@@ -221,11 +221,11 @@
       });
 
       if (!sessionResponse.ok) {
-        window.location.href = '/admin-login.html';
+        window.location.href = '/admin-login/';
         return;
       }
     } catch {
-      window.location.href = '/admin-login.html';
+      window.location.href = '/admin-login/';
       return;
     }
 
