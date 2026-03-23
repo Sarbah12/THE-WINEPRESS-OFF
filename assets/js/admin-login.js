@@ -5,7 +5,7 @@
     });
 
     if (response.ok) {
-      window.location.href = '/admin.html';
+      window.location.href = '/admin/';
     }
   }
 
@@ -44,7 +44,7 @@
       }
 
       status.textContent = 'Access granted. Opening dashboard...';
-      window.location.href = '/admin.html';
+      window.location.href = '/admin/';
     } catch (error) {
       status.textContent = error.message;
     } finally {

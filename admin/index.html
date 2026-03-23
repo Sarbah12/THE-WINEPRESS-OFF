@@ -260,79 +260,55 @@
       font-size: .92rem;
     }
 
-    .entry-body strong {
-      color: var(--wine);
-      font-weight: 700;
-    }
-
     .entry-actions,
     .entry-inline-actions {
       display: flex;
-      gap: .75rem;
+      gap: .7rem;
       flex-wrap: wrap;
-      align-items: center;
       margin-top: 1rem;
     }
 
     .entry-btn,
     .status-select {
       border-radius: 999px;
-      padding: .72rem 1rem;
+      border: 1px solid rgba(107,26,42,.12);
+      padding: .8rem 1rem;
       font: 600 .72rem var(--sans);
       letter-spacing: .08em;
       text-transform: uppercase;
-      border: 1px solid rgba(107,26,42,.12);
-      background: var(--off);
     }
 
     .entry-btn {
       cursor: pointer;
+      background: var(--off);
+      color: var(--ink);
     }
 
     .entry-btn.danger {
-      background: #fff1f1;
-      border-color: rgba(140,36,56,.18);
-      color: #8C2438;
+      background: #2b0c12;
+      border-color: #2b0c12;
+      color: var(--white);
     }
 
     .entry-btn.muted {
-      background: var(--wine);
-      color: var(--white);
-      border-color: var(--wine);
+      background: rgba(107,26,42,.08);
+      border-color: rgba(107,26,42,.08);
+      color: var(--wine);
     }
 
     .empty-state {
-      display: none;
-      padding: 3rem 1.2rem 3.4rem;
+      padding: 3rem 1.5rem;
       text-align: center;
       color: var(--muted);
-    }
-
-    .empty-state h3 {
-      font-family: var(--serif-d);
-      font-size: 1.8rem;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: .5rem;
+      display: none;
     }
 
     @media (max-width: 980px) {
-      .shell {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-      }
-
-      .metrics {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-strip {
-        flex-direction: column;
-        align-items: start;
-      }
+      body { padding: 1rem; }
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .metrics { grid-template-columns: 1fr; }
+      .hero-strip { flex-direction: column; align-items: start; }
     }
   </style>
 </head>
@@ -341,54 +317,51 @@
     <aside class="sidebar">
       <div class="brand-kicker">The Winepress</div>
       <h1 class="brand-title">Backend <em>Admin</em></h1>
-      <p class="brand-copy">A simple interface for the site data. Review submissions, manage testimonies, and clean up the prayer wall without touching raw JSON files.</p>
+      <p class="brand-copy">Review every prayer request, message, testimony, and subscription in one place.</p>
 
       <div class="admin-tabs">
         <button class="admin-tab active" data-collection="prayerRequests">Prayer Requests</button>
+        <button class="admin-tab" data-collection="subscriptions">Subscribers</button>
         <button class="admin-tab" data-collection="messages">Messages</button>
         <button class="admin-tab" data-collection="collaborations">Collaborations</button>
         <button class="admin-tab" data-collection="testimonies">Testimonies</button>
-        <button class="admin-tab" data-collection="subscriptions">Subscribers</button>
         <button class="admin-tab" data-collection="prayerWall">Prayer Wall</button>
       </div>
 
-      <div class="quick-note">
-        Open this page through your backend server, for example:
-        <br><strong>http://127.0.0.1:3001/admin.html</strong>
-      </div>
+      <div class="quick-note">Only real submissions appear here now. Generated prayer wall entries have been removed.</div>
     </aside>
 
     <main class="panel">
       <section class="hero-strip">
         <div>
-          <h1>Manage the work <em>behind the site.</em></h1>
-          <p>This dashboard talks directly to your local backend. It is best for local use unless you add authentication before deploying it publicly.</p>
+          <h1>Ministry activity at a glance</h1>
+          <p>Keep up with incoming prayer needs, follow up on outreach, and review testimonies before publishing.</p>
         </div>
-        <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
-          <button class="hero-action" id="refreshAll">Refresh Data</button>
-          <button class="hero-action" id="logoutAdmin" style="background:rgba(255,255,255,.02);">Log Out</button>
-        </div>
+        <button class="hero-action" id="logoutAdmin">Sign Out</button>
       </section>
 
       <section class="metrics">
-        <div class="metric" data-summary="prayerRequests">
+        <article class="metric">
           <div class="metric-label">Prayer Requests</div>
-          <div class="metric-value">0</div>
-        </div>
-        <div class="metric" data-summary="messages">
+          <div class="metric-value" data-summary="prayerRequests">0</div>
+        </article>
+        <article class="metric">
+          <div class="metric-label">Subscribers</div>
+          <div class="metric-value" data-summary="subscriptions">0</div>
+        </article>
+        <article class="metric">
           <div class="metric-label">Messages</div>
-          <div class="metric-value">0</div>
-        </div>
-        <div class="metric" data-summary="testimonies">
-          <div class="metric-label">Testimonies</div>
-          <div class="metric-value">0</div>
-        </div>
+          <div class="metric-value" data-summary="messages">0</div>
+        </article>
       </section>
 
       <section class="workspace">
         <div class="workspace-head">
           <h2 id="panelTitle">Prayer Requests</h2>
-          <div class="workspace-status" id="panelStatus">Loading...</div>
+          <div class="entry-inline-actions">
+            <div class="workspace-status" id="panelStatus">Loading...</div>
+            <button class="entry-btn muted" id="refreshAll">Refresh</button>
+          </div>
         </div>
 
         <div class="entry-list" id="entryList"></div>
