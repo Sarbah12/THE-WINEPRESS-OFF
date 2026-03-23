@@ -1,5 +1,7 @@
 (function () {
   const STATUS_STYLE = 'margin-top:.8rem;font-size:.76rem;color:#6B1A2A;';
+  const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+  const WEB3FORMS_KEY = window.WINEPRESS_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_ACCESS_KEY';
 
   async function request(url, payload) {
     const response = await fetch(url, {
@@ -13,6 +15,35 @@
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       throw new Error(data.error || 'Something went wrong. Please try again.');
+    }
+
+    return data;
+  }
+
+  async function sendWeb3FormsEmail(options) {
+    if (!WEB3FORMS_KEY || WEB3FORMS_KEY === 'YOUR_WEB3FORMS_ACCESS_KEY') {
+      return { skipped: true };
+    }
+
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      from_name: 'The Winepress Website',
+      subject: options.subject,
+      ...options.fields
+    };
+
+    const response = await fetch(WEB3FORMS_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.success === false) {
+      throw new Error(data.message || 'Email notification could not be sent.');
     }
 
     return data;
@@ -50,10 +81,10 @@
   }
 
   async function submitSubscription(form) {
-    const emailInput = form.querySelector('input[type="email"]');
-    const email = emailInput ? emailInput.value.trim() : '';
-    if (!email) {
-      updateStatus(form, 'Please enter your email address first.', true);
+    const nameInput = form.querySelector('input');
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) {
+      updateStatus(form, 'Please enter your name first.', true);
       return;
     }
 
@@ -62,11 +93,11 @@
 
     try {
       await request('/api/subscriptions', {
-        email,
+        name,
         source: form.dataset.source || sourceFromPage()
       });
       form.reset();
-      updateStatus(form, 'You are subscribed. New Winepress updates will come to your inbox.', false);
+      updateStatus(form, 'You are on the list. Thank you for subscribing to The Winepress.', false);
     } catch (error) {
       updateStatus(form, error.message, true);
     } finally {
@@ -128,6 +159,7 @@
 
   window.WinepressAPI = {
     request,
+    sendWeb3FormsEmail,
     attachSubscriptionForms,
     loadPrayerWall,
     setSubmitting,

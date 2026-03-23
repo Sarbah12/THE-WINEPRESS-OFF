@@ -752,8 +752,8 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="For follow-up only, not published" required/>
+            <label for="storyOrigin">City, Church, or Community (optional)</label>
+            <input type="text" id="storyOrigin" placeholder="Optional context for your testimony"/>
           </div>
           <div class="form-group">
             <label for="theme">Theme of Your Testimony</label>
@@ -802,7 +802,7 @@
       <div class="form-success" id="formSuccess">
         <div class="form-success-icon"></div>
         <h3>Thank you for <em>sharing.</em></h3>
-        <p>Your testimony has been received. We'll review it with care and be in touch via email. Your story matters more than you know.</p>
+        <p>Your testimony has been received. We'll review it with care. Your story matters more than you know.</p>
       </div>
 
     </div>
@@ -855,6 +855,7 @@
   <a href="https://wa.me/233501384421?text=Hello%20The%20Winepress%2C%20I%20would%20love%20to%20connect." target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position:fixed;right:5.8rem;bottom:2rem;z-index:950;display:inline-flex;align-items:center;justify-content:center;padding:.9rem 1.2rem;border-radius:999px;background:#25D366;color:#fff;font:600 .78rem 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 30px rgba(37,211,102,.28);">WhatsApp</a>
   <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+  <script src="assets/js/site-config.js"></script>
   <script src="assets/js/site-api.js"></script>
   <script>
     /*  Back to top  */
@@ -965,15 +966,33 @@
       WinepressAPI.setSubmitting(form, true);
 
       try {
-        await WinepressAPI.request('/api/testimonies', {
+        const testimonyPayload = {
           anonymous: document.getElementById('anonCheck').checked,
           firstName: document.getElementById('firstName').value.trim(),
           lastName: document.getElementById('lastName').value.trim(),
-          email: document.getElementById('email').value.trim(),
+          origin: document.getElementById('storyOrigin').value.trim(),
           theme: document.getElementById('theme').value.trim(),
           headline: document.getElementById('headline').value.trim(),
           story: document.getElementById('story').value.trim(),
           verse: document.getElementById('verse').value.trim()
+        };
+
+        await WinepressAPI.request('/api/testimonies', {
+          ...testimonyPayload
+        });
+        await WinepressAPI.sendWeb3FormsEmail({
+          subject: 'New Testimony Submission - The Winepress',
+          fields: {
+            form_type: 'Testimony Submission',
+            name: testimonyPayload.anonymous
+              ? 'Anonymous'
+              : `${testimonyPayload.firstName} ${testimonyPayload.lastName}`.trim() || 'Not provided',
+            origin: testimonyPayload.origin || 'Not provided',
+            theme: testimonyPayload.theme || 'Not specified',
+            headline: testimonyPayload.headline,
+            verse: testimonyPayload.verse || 'Not provided',
+            message: testimonyPayload.story
+          }
         });
 
         form.style.display = 'none';

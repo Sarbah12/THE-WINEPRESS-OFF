@@ -89,6 +89,8 @@ const dataFiles = {
   prayerWall: initialPrayerWall
 };
 
+const adminCollections = new Set(Object.keys(dataFiles));
+
 function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -151,6 +153,35 @@ async function appendCollection(name, entry) {
   current.unshift(entry);
   await writeCollection(name, current);
   return entry;
+}
+
+async function removeFromCollection(name, id) {
+  const current = await readCollection(name);
+  const filtered = current.filter(entry => entry.id !== id);
+  const removed = filtered.length !== current.length;
+  if (removed) {
+    await writeCollection(name, filtered);
+  }
+  return removed;
+}
+
+async function updateCollectionEntry(name, id, updates) {
+  const current = await readCollection(name);
+  let updatedEntry = null;
+  const next = current.map(entry => {
+    if (entry.id !== id) {
+      return entry;
+    }
+
+    updatedEntry = { ...entry, ...updates };
+    return updatedEntry;
+  });
+
+  if (updatedEntry) {
+    await writeCollection(name, next);
+  }
+
+  return updatedEntry;
 }
 
 async function readRequestBody(req) {
@@ -223,10 +254,71 @@ async function serveStatic(req, res) {
 
 async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  const adminMatch = url.pathname.match(/^\/api\/admin\/([a-zA-Z-]+)(?:\/([^/]+))?$/);
 
   if (req.method === 'GET' && url.pathname === '/api/health') {
     sendJson(res, 200, { ok: true, service: 'the-winepress-backend' });
     return true;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/api/admin/overview') {
+    const overview = {};
+    for (const name of adminCollections) {
+      overview[name] = (await readCollection(name)).length;
+    }
+    sendJson(res, 200, { collections: overview });
+    return true;
+  }
+
+  if (adminMatch) {
+    const collectionName = adminMatch[1];
+    const entryId = adminMatch[2];
+
+    if (!adminCollections.has(collectionName)) {
+      sendJson(res, 404, { error: 'Collection not found.' });
+      return true;
+    }
+
+    if (req.method === 'GET' && !entryId) {
+      const items = await readCollection(collectionName);
+      sendJson(res, 200, { items });
+      return true;
+    }
+
+    if (req.method === 'DELETE' && entryId) {
+      const removed = await removeFromCollection(collectionName, entryId);
+      if (!removed) {
+        sendJson(res, 404, { error: 'Entry not found.' });
+        return true;
+      }
+
+      sendJson(res, 200, { message: 'Entry deleted.' });
+      return true;
+    }
+
+    if (req.method === 'PATCH' && entryId) {
+      const payload = await readRequestBody(req);
+
+      if (collectionName !== 'testimonies') {
+        sendJson(res, 400, { error: 'This collection does not support updates.' });
+        return true;
+      }
+
+      const status = sanitizeText(payload.status, 40);
+      if (!status) {
+        sendJson(res, 400, { error: 'A status value is required.' });
+        return true;
+      }
+
+      const updated = await updateCollectionEntry(collectionName, entryId, { status });
+      if (!updated) {
+        sendJson(res, 404, { error: 'Entry not found.' });
+        return true;
+      }
+
+      sendJson(res, 200, { message: 'Entry updated.', item: updated });
+      return true;
+    }
   }
 
   if (req.method === 'GET' && url.pathname === '/api/prayer-wall') {
@@ -248,16 +340,16 @@ async function handleApi(req, res) {
   const payload = await readRequestBody(req);
 
   if (url.pathname === '/api/subscriptions') {
-    const email = sanitizeText(payload.email, 160).toLowerCase();
+    const subscriberName = sanitizeText(payload.name, 160);
     const source = sanitizeText(payload.source, 120) || 'website';
-    if (!email || !email.includes('@')) {
-      sendJson(res, 400, { error: 'A valid email address is required.' });
+    if (!subscriberName) {
+      sendJson(res, 400, { error: 'A name is required.' });
       return true;
     }
 
     await appendCollection('subscriptions', {
       id: createId('sub'),
-      email,
+      name: subscriberName,
       source,
       createdAt: new Date().toISOString()
     });
@@ -266,22 +358,21 @@ async function handleApi(req, res) {
   }
 
   if (url.pathname === '/api/prayer-requests') {
-    const email = sanitizeText(payload.email, 160).toLowerCase();
     const request = sanitizeText(payload.request, 4000);
     const topics = Array.isArray(payload.topics)
       ? payload.topics.map(topic => sanitizeText(topic, 60)).filter(Boolean)
       : [];
     const addToWall = Boolean(payload.addToWall);
 
-    if (!email || !email.includes('@') || !request) {
-      sendJson(res, 400, { error: 'Email and prayer request are required.' });
+    if (!request) {
+      sendJson(res, 400, { error: 'A prayer request is required.' });
       return true;
     }
 
     const entry = {
       id: createId('prayer'),
       name: sanitizeText(payload.name, 120) || 'Anonymous',
-      email,
+      season: sanitizeText(payload.season, 160),
       topics,
       request,
       addToWall,
@@ -307,17 +398,16 @@ async function handleApi(req, res) {
 
   if (url.pathname === '/api/messages') {
     const name = sanitizeText(payload.name, 120);
-    const email = sanitizeText(payload.email, 160).toLowerCase();
     const message = sanitizeText(payload.message, 4000);
-    if (!name || !email || !email.includes('@') || !message) {
-      sendJson(res, 400, { error: 'Name, email, and message are required.' });
+    if (!name || !message) {
+      sendJson(res, 400, { error: 'Name and message are required.' });
       return true;
     }
 
     await appendCollection('messages', {
       id: createId('msg'),
       name,
-      email,
+      city: sanitizeText(payload.city, 160),
       subject: sanitizeText(payload.subject, 160) || 'General enquiry',
       message,
       createdAt: new Date().toISOString()
@@ -328,18 +418,17 @@ async function handleApi(req, res) {
 
   if (url.pathname === '/api/collaborations') {
     const name = sanitizeText(payload.name, 120);
-    const email = sanitizeText(payload.email, 160).toLowerCase();
     const idea = sanitizeText(payload.idea, 4000);
-    if (!name || !email || !email.includes('@') || !idea) {
-      sendJson(res, 400, { error: 'Name, email, and collaboration idea are required.' });
+    if (!name || !idea) {
+      sendJson(res, 400, { error: 'Name and collaboration idea are required.' });
       return true;
     }
 
     await appendCollection('collaborations', {
       id: createId('collab'),
       name,
-      email,
       organisation: sanitizeText(payload.organisation, 160),
+      platform: sanitizeText(payload.platform, 160),
       type: sanitizeText(payload.type, 160) || 'General collaboration',
       idea,
       createdAt: new Date().toISOString()
@@ -349,11 +438,10 @@ async function handleApi(req, res) {
   }
 
   if (url.pathname === '/api/testimonies') {
-    const email = sanitizeText(payload.email, 160).toLowerCase();
     const headline = sanitizeText(payload.headline, 200);
     const story = sanitizeText(payload.story, 6000);
-    if (!email || !email.includes('@') || !headline || !story) {
-      sendJson(res, 400, { error: 'Email, headline, and testimony are required.' });
+    if (!headline || !story) {
+      sendJson(res, 400, { error: 'Headline and testimony are required.' });
       return true;
     }
 
@@ -362,7 +450,7 @@ async function handleApi(req, res) {
       anonymous: Boolean(payload.anonymous),
       firstName: sanitizeText(payload.firstName, 120),
       lastName: sanitizeText(payload.lastName, 120),
-      email,
+      origin: sanitizeText(payload.origin, 160),
       theme: sanitizeText(payload.theme, 120),
       headline,
       story,
