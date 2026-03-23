@@ -32,7 +32,14 @@
         })
       });
 
-      const data = await response.json().catch(() => ({}));
+      const raw = await response.text();
+      let data = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = { error: raw || 'Login failed.' };
+      }
+
       if (!response.ok) {
         throw new Error(data.error || 'Login failed.');
       }

@@ -127,6 +127,21 @@ function parseCookies(req) {
   }, {});
 }
 
+function isSecureRequest(req) {
+  const forwardedProto = req.headers['x-forwarded-proto'];
+  if (typeof forwardedProto === 'string') {
+    return forwardedProto.split(',')[0].trim() === 'https';
+  }
+
+  return Boolean(req.socket && req.socket.encrypted);
+}
+
+function getRequestOrigin(req) {
+  const protocol = isSecureRequest(req) ? 'https' : 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  return `${protocol}://${host}`;
+}
+
 function base64UrlEncode(value) {
   return Buffer.from(value)
     .toString('base64')
@@ -160,6 +175,22 @@ function createSessionCookie(username) {
   return `${payload}.${signature}`;
 }
 
+function buildSessionCookie(req, value, maxAge) {
+  const parts = [
+    `${SESSION_COOKIE}=${encodeURIComponent(value)}`,
+    'HttpOnly',
+    'Path=/',
+    'SameSite=Lax',
+    `Max-Age=${maxAge}`
+  ];
+
+  if (isSecureRequest(req)) {
+    parts.push('Secure');
+  }
+
+  return parts.join('; ');
+}
+
 function getActiveSession(req) {
   const cookies = parseCookies(req);
   const token = cookies[SESSION_COOKIE];
@@ -189,10 +220,10 @@ function getActiveSession(req) {
 }
 
 function sendJson(res, statusCode, payload, extraHeaders = {}) {
-  res.writeHead(statusCode, {
-    ...JSON_HEADERS,
-    ...extraHeaders
-  });
+  res.statusCode = statusCode;
+  for (const [key, value] of Object.entries({ ...JSON_HEADERS, ...extraHeaders })) {
+    res.setHeader(key, value);
+  }
   res.end(JSON.stringify(payload));
 }
 
@@ -207,6 +238,10 @@ async function readRequestBody(req) {
 
   if (typeof req.body === 'string') {
     return req.body ? JSON.parse(req.body) : {};
+  }
+
+  if (Buffer.isBuffer(req.body)) {
+    return req.body.length ? JSON.parse(req.body.toString('utf8')) : {};
   }
 
   const chunks = [];
@@ -357,8 +392,7 @@ async function readCollection(name) {
 }
 
 async function handleApi(req, res) {
-  const origin = req.headers.host || 'localhost';
-  const url = new URL(req.url, `http://${origin}`);
+  const url = new URL(req.url, getRequestOrigin(req));
   const adminMatch = url.pathname.match(/^\/api\/admin\/([a-zA-Z-]+)(?:\/([^/]+))?$/);
 
   if (req.method === 'POST' && url.pathname === '/api/admin/login') {
@@ -381,7 +415,7 @@ async function handleApi(req, res) {
       200,
       { ok: true, username },
       {
-        'Set-Cookie': `${SESSION_COOKIE}=${encodeURIComponent(createSessionCookie(username))}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`
+        'Set-Cookie': buildSessionCookie(req, createSessionCookie(username), Math.floor(SESSION_TTL_MS / 1000))
       }
     );
     return true;
@@ -393,7 +427,7 @@ async function handleApi(req, res) {
       200,
       { ok: true },
       {
-        'Set-Cookie': `${SESSION_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`
+        'Set-Cookie': buildSessionCookie(req, '', 0)
       }
     );
     return true;
