@@ -14,6 +14,20 @@
   const selectedEntryIds = new Set();
   let jsonModalValue = '';
 
+  async function readJsonResponse(response, fallbackMessage) {
+    const raw = await response.text();
+
+    try {
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {
+        error: response.ok
+          ? fallbackMessage
+          : 'The backend returned an unexpected response. Please refresh or redeploy and try again.'
+      };
+    }
+  }
+
   async function loadBackendStatus() {
     const target = document.getElementById('backendStatus');
     if (!target) {
@@ -24,7 +38,7 @@
 
     try {
       const response = await fetch('/api/health');
-      const data = await response.json();
+      const data = await readJsonResponse(response, 'Backend health check failed.');
       if (!response.ok) {
         throw new Error(data.error || 'Backend health check failed.');
       }
@@ -48,7 +62,7 @@
 
   async function loadOverview() {
     const response = await fetch('/api/admin/overview');
-    const data = await response.json();
+    const data = await readJsonResponse(response, 'Unable to load overview.');
     if (!response.ok) {
       throw new Error(data.error || 'Unable to load overview.');
     }
@@ -448,7 +462,7 @@
       const response = await fetch(`/api/admin/${activeCollection}/${entryId}`, {
         method: 'DELETE'
       });
-      const data = await response.json();
+      const data = await readJsonResponse(response, `Delete failed for ${entryId}.`);
       if (!response.ok) {
         alert(data.error || `Delete failed for ${entryId}.`);
         return;
@@ -534,7 +548,7 @@
 
     try {
       const response = await fetch(`/api/admin/${name}`);
-      const data = await response.json();
+      const data = await readJsonResponse(response, 'Unable to load data.');
       if (!response.ok) {
         throw new Error(data.error || 'Unable to load data.');
       }
@@ -588,7 +602,7 @@
         const response = await fetch(`/api/admin/${activeCollection}/${entryId}`, {
           method: 'DELETE'
         });
-        const data = await response.json();
+        const data = await readJsonResponse(response, 'Delete failed.');
         if (!response.ok) {
           alert(data.error || 'Delete failed.');
           return;
@@ -613,7 +627,7 @@
           body: JSON.stringify({ status })
         });
 
-        const data = await response.json();
+        const data = await readJsonResponse(response, 'Update failed.');
         if (!response.ok) {
           alert(data.error || 'Update failed.');
           return;
