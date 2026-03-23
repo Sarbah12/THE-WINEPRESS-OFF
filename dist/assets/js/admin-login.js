@@ -1,59 +1,18 @@
 (function () {
   async function checkSession() {
-    const response = await fetch('/api/admin/session', {
-      credentials: 'same-origin'
-    });
-
-    if (response.ok) {
-      window.location.href = '/admin.html';
-    }
+    window.location.href = '/admin.html';
   }
 
   async function submitLogin(event) {
     event.preventDefault();
-
-    const form = document.getElementById('adminLoginForm');
-    const status = document.getElementById('loginStatus');
-    const submit = form.querySelector('button[type="submit"]');
-
-    status.textContent = 'Signing in...';
-    submit.disabled = true;
-
-    try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          pin: document.getElementById('adminPin').value
-        })
-      });
-
-      const raw = await response.text();
-      let data = {};
-      try {
-        data = raw ? JSON.parse(raw) : {};
-      } catch {
-        data = { error: raw || 'Login failed.' };
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed.');
-      }
-
-      status.textContent = 'Access granted. Opening dashboard...';
-      window.location.href = '/admin.html';
-    } catch (error) {
-      status.textContent = error.message;
-    } finally {
-      submit.disabled = false;
-    }
+    window.location.href = '/admin.html';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     checkSession();
-    document.getElementById('adminLoginForm').addEventListener('submit', submitLogin);
+    const form = document.getElementById('adminLoginForm');
+    if (form) {
+      form.addEventListener('submit', submitLogin);
+    }
   });
 })();

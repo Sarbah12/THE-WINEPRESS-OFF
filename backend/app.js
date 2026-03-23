@@ -9,6 +9,7 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 const ADMIN_PIN = String(process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || '').trim();
 const SESSION_USER_LABEL = 'admin';
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PIN || 'winepress-dev-session-secret';
+const PUBLIC_ADMIN_ACCESS = true;
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -345,6 +346,11 @@ async function handleApi(req, res) {
   const adminMatch = url.pathname.match(/^\/api\/admin\/([a-zA-Z-]+)(?:\/([^/]+))?$/);
 
   if (req.method === 'POST' && url.pathname === '/api/admin/login') {
+    if (PUBLIC_ADMIN_ACCESS) {
+      sendJson(res, 200, { ok: true, username: SESSION_USER_LABEL, publicAccess: true });
+      return true;
+    }
+
     if (!ADMIN_PIN) {
       sendJson(res, 503, { error: 'Admin PIN is not configured on the server.' });
       return true;
@@ -370,6 +376,11 @@ async function handleApi(req, res) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/admin/logout') {
+    if (PUBLIC_ADMIN_ACCESS) {
+      sendJson(res, 200, { ok: true, publicAccess: true });
+      return true;
+    }
+
     sendJson(
       res,
       200,
@@ -382,6 +393,11 @@ async function handleApi(req, res) {
   }
 
   if (req.method === 'GET' && url.pathname === '/api/admin/session') {
+    if (PUBLIC_ADMIN_ACCESS) {
+      sendJson(res, 200, { ok: true, username: SESSION_USER_LABEL, publicAccess: true });
+      return true;
+    }
+
     const session = getActiveSession(req);
     if (!session) {
       sendUnauthorized(res);
@@ -399,12 +415,6 @@ async function handleApi(req, res) {
   }
 
   if (req.method === 'GET' && url.pathname === '/api/admin/overview') {
-    const session = getActiveSession(req);
-    if (!session) {
-      sendUnauthorized(res);
-      return true;
-    }
-
     const overview = {};
     for (const name of adminCollections) {
       overview[name] = (await readCollection(name)).length;
@@ -414,12 +424,6 @@ async function handleApi(req, res) {
   }
 
   if (adminMatch) {
-    const session = getActiveSession(req);
-    if (!session) {
-      sendUnauthorized(res);
-      return true;
-    }
-
     const collectionName = adminMatch[1];
     const entryId = adminMatch[2];
 
