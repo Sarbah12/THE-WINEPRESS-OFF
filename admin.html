@@ -223,6 +223,38 @@
       font-size: .82rem;
     }
 
+    .workspace-tools {
+      display: flex;
+      gap: .7rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .workspace-input,
+    .workspace-select {
+      border: 1px solid rgba(107,26,42,.12);
+      background: var(--off);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: .8rem 1rem;
+      font: 500 .8rem var(--sans);
+      min-width: 210px;
+      outline: none;
+    }
+
+    .workspace-select {
+      min-width: 170px;
+      cursor: pointer;
+    }
+
+    .workspace-input:focus,
+    .workspace-select:focus {
+      border-color: var(--wine);
+      box-shadow: 0 0 0 3px rgba(107,26,42,.08);
+      background: var(--white);
+    }
+
     .entry-list {
       padding: 1.2rem;
       display: grid;
@@ -299,6 +331,12 @@
       background: var(--wine);
       color: var(--white);
       border-color: var(--wine);
+    }
+
+    .entry-btn.secondary {
+      background: var(--white);
+      color: var(--wine);
+      border-color: rgba(107,26,42,.14);
     }
 
     .empty-state {
@@ -387,7 +425,23 @@
 
       <section class="workspace">
         <div class="workspace-head">
-          <h2 id="panelTitle">Prayer Requests</h2>
+          <div>
+            <h2 id="panelTitle">Prayer Requests</h2>
+            <div class="workspace-tools">
+              <input
+                class="workspace-input"
+                id="entrySearch"
+                type="search"
+                placeholder="Search this collection"
+              />
+              <select class="workspace-select" id="sortEntries">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+              <button class="entry-btn secondary" id="exportJson">Export JSON</button>
+              <button class="entry-btn secondary" id="exportCsv">Export CSV</button>
+            </div>
+          </div>
           <div class="workspace-status" id="panelStatus">Loading...</div>
         </div>
 

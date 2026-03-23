@@ -353,8 +353,8 @@
       </div>
 
       <div class="quick-note">
-        Open this page through your backend server, for example:
-        <br><strong>http://127.0.0.1:3001/admin.html</strong>
+        <strong style="display:block; margin-bottom:.35rem; color:#6B1A2A;">Backend Status</strong>
+        <span id="backendStatus">Checking backend connection...</span>
       </div>
     </aside>
 
@@ -362,7 +362,7 @@
       <section class="hero-strip">
         <div>
           <h1>Manage the work <em>behind the site.</em></h1>
-          <p>This dashboard talks directly to your local backend. It is best for local use unless you add authentication before deploying it publicly.</p>
+          <p>This dashboard reads the same live backend your public forms submit to, so new entries should appear here after refresh.</p>
         </div>
         <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
           <button class="hero-action" id="refreshAll">Refresh Data</button>

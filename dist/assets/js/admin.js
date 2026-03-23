@@ -10,6 +10,38 @@
 
   let activeCollection = 'prayerRequests';
 
+  async function loadBackendStatus() {
+    const target = document.getElementById('backendStatus');
+    if (!target) {
+      return;
+    }
+
+    target.textContent = 'Checking backend connection...';
+
+    try {
+      const response = await fetch('/api/health');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Backend health check failed.');
+      }
+
+      const isVercel = window.location.hostname.includes('vercel.app');
+      if (data.storage === 'blob') {
+        target.textContent = 'Backend connected. Live submissions are saving to Vercel Blob.';
+        return;
+      }
+
+      if (isVercel) {
+        target.textContent = 'Backend is running, but storage is using temporary file mode. Add BLOB_READ_WRITE_TOKEN in Vercel so frontend submissions appear reliably in admin.';
+        return;
+      }
+
+      target.textContent = 'Backend connected. Local file storage is active for development.';
+    } catch (error) {
+      target.textContent = error.message || 'Unable to verify backend connection right now.';
+    }
+  }
+
   async function loadOverview() {
     const response = await fetch('/api/admin/overview');
     const data = await response.json();
@@ -219,11 +251,13 @@
     const refreshButton = document.getElementById('refreshAll');
     if (refreshButton) {
       refreshButton.addEventListener('click', async function () {
+        await loadBackendStatus();
         await loadOverview();
         await loadCollection(activeCollection);
       });
     }
 
+    await loadBackendStatus();
     await loadOverview();
     await loadCollection(activeCollection);
   });
