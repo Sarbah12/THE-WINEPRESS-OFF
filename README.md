@@ -21,7 +21,6 @@ Then open `http://127.0.0.1:3000`.
 
 Set these Vercel environment variables:
 
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
+- `ADMIN_PIN`
 - `ADMIN_SESSION_SECRET`
 - `BLOB_READ_WRITE_TOKEN`

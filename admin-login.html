@@ -136,18 +136,13 @@
 <body>
   <section class="login-card">
     <div class="eyebrow">The Winepress</div>
-    <h1>Admin <em>Login</em></h1>
-    <p>This dashboard is protected. Sign in with the admin username and password you set in your local environment.</p>
+    <h1>Admin <em>PIN</em></h1>
+    <p>This dashboard is protected. Enter the admin PIN you set in your environment.</p>
 
     <form id="adminLoginForm">
       <label>
-        Username
-        <input id="adminUsername" type="text" placeholder="Admin username" required/>
-      </label>
-
-      <label>
-        Password
-        <input id="adminPassword" type="password" placeholder="Admin password" required/>
+        PIN
+        <input id="adminPin" type="password" inputmode="numeric" placeholder="Enter admin PIN" required/>
       </label>
 
       <button type="submit">Open Dashboard</button>
@@ -157,7 +152,7 @@
 
     <div class="hint">
       Start the backend like this:
-      <br><strong>ADMIN_USERNAME=yourname ADMIN_PASSWORD=your-secret PORT=3001 npm start</strong>
+      <br><strong>ADMIN_PIN=your-secret-pin PORT=3001 npm start</strong>
     </div>
   </section>
 

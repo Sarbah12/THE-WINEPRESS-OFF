@@ -44,8 +44,7 @@ This project is now set up to work in two modes:
 3. In Vercel Storage, create a Blob store and connect it to this project.
 4. Add these environment variables in Vercel:
 
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
+- `ADMIN_PIN`
 - `ADMIN_SESSION_SECRET`
 - `BLOB_READ_WRITE_TOKEN`
 

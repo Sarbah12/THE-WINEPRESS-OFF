@@ -6,9 +6,9 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(ROOT_DIR, 'backend', 'data');
 const SESSION_COOKIE = 'winepress_admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'winepress-admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PASSWORD || 'winepress-dev-session-secret';
+const ADMIN_PIN = String(process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || '').trim();
+const SESSION_USER_LABEL = 'admin';
+const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || ADMIN_PIN || 'winepress-dev-session-secret';
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -115,7 +115,7 @@ function signValue(value) {
     .replace(/=+$/g, '');
 }
 
-function createSessionCookie(username) {
+function createSessionCookie(username = SESSION_USER_LABEL) {
   const payload = base64UrlEncode(JSON.stringify({
     username,
     expiresAt: Date.now() + SESSION_TTL_MS
@@ -345,26 +345,25 @@ async function handleApi(req, res) {
   const adminMatch = url.pathname.match(/^\/api\/admin\/([a-zA-Z-]+)(?:\/([^/]+))?$/);
 
   if (req.method === 'POST' && url.pathname === '/api/admin/login') {
-    if (!ADMIN_PASSWORD) {
-      sendJson(res, 503, { error: 'Admin password is not configured on the server.' });
+    if (!ADMIN_PIN) {
+      sendJson(res, 503, { error: 'Admin PIN is not configured on the server.' });
       return true;
     }
 
     const payload = await readRequestBody(req);
-    const username = sanitizeText(payload.username, 120);
-    const password = String(payload.password || '');
+    const pin = String(payload.pin || '').trim();
 
-    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-      sendJson(res, 401, { error: 'Invalid admin credentials.' });
+    if (pin !== ADMIN_PIN) {
+      sendJson(res, 401, { error: 'Invalid admin PIN.' });
       return true;
     }
 
     sendJson(
       res,
       200,
-      { ok: true, username },
+      { ok: true, username: SESSION_USER_LABEL },
       {
-        'Set-Cookie': buildSessionCookie(req, createSessionCookie(username), Math.floor(SESSION_TTL_MS / 1000))
+        'Set-Cookie': buildSessionCookie(req, createSessionCookie(SESSION_USER_LABEL), Math.floor(SESSION_TTL_MS / 1000))
       }
     );
     return true;
