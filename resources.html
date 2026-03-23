@@ -121,11 +121,16 @@
       gap: 1.5rem;
     }
     .bs-card {
+      appearance: none;
+      width: 100%;
+      text-align: left;
       background: var(--off);
       border-radius: 6px; overflow: hidden;
       border: 1px solid transparent;
       transition: border-color .25s, box-shadow .25s, transform .25s;
       cursor: pointer; display: flex; flex-direction: column;
+      padding: 0;
+      font: inherit;
     }
     .bs-card:hover { border-color: var(--wine-pale); box-shadow: 0 10px 40px rgba(107,26,42,.08); transform: translateY(-3px); }
     .bs-card-top {
@@ -148,6 +153,78 @@
     .bs-tag { font-family: var(--serif-c); font-size: .48rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; padding: .2rem .8rem; background: var(--wine-pale); color: var(--wine); border-radius: 100px; }
     .bs-dl { font-size: .65rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--wine); transition: letter-spacing .2s; }
     .bs-card:hover .bs-dl { letter-spacing: .15em; }
+
+    .study-modal-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(28,16,16,.72);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .study-modal-overlay.active { display: flex; }
+    .study-modal {
+      width: min(860px, 100%);
+      max-height: min(88vh, 920px);
+      overflow: auto;
+      background: linear-gradient(180deg, #fffdfb 0%, #f7f1ea 100%);
+      border-radius: 18px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.28);
+      position: relative;
+    }
+    .study-modal-top {
+      padding: 2rem 2rem 1.4rem;
+      background: radial-gradient(circle at top right, rgba(232,200,206,.9), transparent 40%), var(--wine);
+      color: var(--white);
+      position: sticky; top: 0; z-index: 2;
+    }
+    .study-modal-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      width: 2.4rem; height: 2.4rem; border: none; border-radius: 50%;
+      background: rgba(255,255,255,.14); color: var(--white); cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .study-modal-step { font-family: var(--serif-c); font-size: .58rem; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.58); margin-bottom: .7rem; }
+    .study-modal-title { font-family: var(--serif-d); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; margin-bottom: .5rem; max-width: 680px; }
+    .study-modal-ref { font-family: var(--serif-d); font-style: italic; font-size: .95rem; color: rgba(255,255,255,.72); }
+    .study-modal-body { padding: 2rem; display: grid; gap: 1rem; }
+    .study-panel {
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(107,26,42,.08);
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+    }
+    .study-panel-label {
+      font-family: var(--serif-c); font-size: .52rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--wine-lt);
+      margin-bottom: .7rem;
+    }
+    .study-panel p { color: var(--muted); font-size: .9rem; line-height: 1.85; }
+    .study-scripture { font-family: var(--serif-d); font-style: italic; color: var(--ink); font-size: 1rem; line-height: 1.75; }
+    .study-list { list-style: none; display: grid; gap: .8rem; }
+    .study-list li {
+      padding-left: 1.2rem; position: relative; color: var(--muted); font-size: .88rem; line-height: 1.75;
+    }
+    .study-list li::before { content: '•'; position: absolute; left: 0; color: var(--wine); }
+    .study-modal-actions {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0 2rem 2rem;
+      flex-wrap: wrap;
+    }
+    .study-nav-group { display: flex; gap: .8rem; flex-wrap: wrap; }
+    .study-btn {
+      border: none; cursor: pointer; font: inherit;
+      padding: .9rem 1.4rem; border-radius: 999px;
+      font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+      transition: transform .2s, background .2s, border-color .2s, color .2s;
+    }
+    .study-btn:hover { transform: translateY(-1px); }
+    .study-btn.primary { background: var(--wine); color: var(--white); }
+    .study-btn.primary:hover { background: var(--wine-mid); }
+    .study-btn.secondary { background: transparent; color: var(--wine); border: 1px solid rgba(107,26,42,.18); }
+    .study-btn.secondary:hover:not(:disabled) { background: rgba(107,26,42,.06); }
+    .study-btn.secondary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .study-progress { font-size: .8rem; color: var(--muted); }
 
     /* ── PRAYER GUIDES ── */
     .prayer-guides {
@@ -270,30 +347,59 @@
       gap: 1.5rem;
     }
     .vc-card {
-      border-radius: 6px; overflow: hidden;
-      position: relative;
-      min-height: 280px;
-      display: flex; flex-direction: column; justify-content: flex-end;
+      border-radius: 6px;
+      min-height: 0;
+      display: flex; flex-direction: column; justify-content: space-between;
       cursor: pointer;
-      transition: transform .3s;
+      transition: transform .3s, border-color .25s, box-shadow .25s, background .25s;
+      padding: 1px;
+      background: linear-gradient(145deg, rgba(232,200,206,.45) 0%, rgba(255,255,255,.08) 45%, rgba(176,80,104,.55) 100%);
+      border: 1px solid rgba(255,255,255,.08);
     }
-    .vc-card:hover { transform: translateY(-4px); }
-    .vc-bg { position: absolute; inset: 0; border-radius: 6px; }
-    .vc-bg-1 { background: linear-gradient(135deg, #2B0A12 0%, #6B1A2A 100%); }
-    .vc-bg-2 { background: linear-gradient(135deg, #1A0808 0%, #3D1520 100%); }
-    .vc-bg-3 { background: linear-gradient(135deg, #0F0508 0%, #4A1220 100%); }
-    .vc-bg-4 { background: linear-gradient(135deg, #250B0F 0%, #8C2438 100%); }
-    .vc-bg-5 { background: linear-gradient(135deg, #1C1010 0%, #6B1A2A 80%); }
-    .vc-bg-6 { background: linear-gradient(135deg, #2B0A12 0%, #5C1A28 100%); }
-    .vc-bg-7 { background: linear-gradient(135deg, #0F0508 0%, #6B1A2A 100%); }
-    .vc-bg-8 { background: linear-gradient(135deg, #1A0808 0%, #4A1220 100%); }
-    .vc-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.4) 0%, transparent 60%); }
-    .vc-content { position: relative; z-index: 1; padding: 1.8rem; }
-    .vc-ref { font-family: var(--serif-c); font-size: .5rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--wine-pale); margin-bottom: .6rem; display: block; }
-    .vc-text { font-family: var(--serif-d); font-style: italic; font-size: .95rem; line-height: 1.6; color: rgba(255,255,255,.88); }
+    .vc-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(232,200,206,.3);
+      box-shadow: 0 14px 40px rgba(0,0,0,.22);
+      background: linear-gradient(145deg, rgba(255,255,255,.2) 0%, rgba(176,80,104,.35) 100%);
+    }
+    .vc-content {
+      display: flex; flex-direction: column; height: 100%;
+      min-height: 320px;
+      padding: 1.6rem;
+      border-radius: 5px;
+      background:
+        radial-gradient(circle at top left, rgba(232,200,206,.12), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(22,10,12,.88) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .vc-content::before {
+      content: '';
+      position: absolute; top: 1rem; right: 1rem;
+      width: 4rem; height: 4rem; border-radius: 50%;
+      border: 1px solid rgba(232,200,206,.16);
+    }
+    .vc-content::after {
+      content: '';
+      position: absolute; bottom: 1.2rem; left: 1.2rem;
+      width: 3.2rem; height: 1px; background: rgba(232,200,206,.25);
+    }
+    .vc-topline {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      margin-bottom: 1.1rem; position: relative; z-index: 1;
+    }
+    .vc-ref { font-family: var(--serif-c); font-size: .5rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--wine-pale); display: block; }
+    .vc-season {
+      font-size: .48rem; letter-spacing: .16em; text-transform: uppercase;
+      color: rgba(255,255,255,.62); padding: .25rem .6rem;
+      border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
+      white-space: nowrap;
+    }
+    .vc-text { font-family: var(--serif-d); font-style: italic; font-size: 1.02rem; line-height: 1.65; color: rgba(255,255,255,.9); flex: 1; position: relative; z-index: 1; }
+    .vc-footer { margin-top: 1.3rem; position: relative; z-index: 1; }
     .vc-dl {
       display: inline-flex; align-items: center; gap: .4rem;
-      margin-top: 1rem; font-size: .58rem; font-weight: 500;
+      font-size: .58rem; font-weight: 500;
       letter-spacing: .12em; text-transform: uppercase;
       color: rgba(255,255,255,.4);
       border: 1px solid rgba(255,255,255,.15);
@@ -594,14 +700,54 @@
     <h2 class="sec-h2">Bible <em>Studies</em></h2>
     <p class="sec-sub">Structured guides for going deeper in the Word — whether you are studying alone, with a friend, or in a small group. Each study follows a season of the pressing.</p>
     <div class="bs-grid">
-      <div class="bs-card"><div class="bs-card-top" data-num="01"><div class="bs-week">Week 1 · Series: The Press</div><div class="bs-title">What Is God Doing in This Season?</div><div class="bs-ref">John 15:1–8 · Isaiah 43:18–19</div></div><div class="bs-body"><p class="bs-desc">An introductory study on understanding seasons of pressing — what they are, why God allows them, and how to posture your heart to receive what He is doing.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
-      <div class="bs-card"><div class="bs-card-top" data-num="02"><div class="bs-week">Week 2 · Series: The Press</div><div class="bs-title">Surrender: Letting Go of the Vine</div><div class="bs-ref">Psalm 51 · Romans 12:1–2</div></div><div class="bs-body"><p class="bs-desc">A study on full surrender — what it looks like to release control, lay down our plans, and trust the One who prunes with purpose and precision.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
-      <div class="bs-card"><div class="bs-card-top" data-num="03"><div class="bs-week">Week 3 · Series: The Press</div><div class="bs-title">Waiting Well: Faith in the In-Between</div><div class="bs-ref">Habakkuk 2:1–3 · Psalm 27:14</div></div><div class="bs-body"><p class="bs-desc">A deep dive into the theology of waiting — learning to hold on to God's promises in seasons where nothing seems to be moving and discouragement creeps in.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
-      <div class="bs-card"><div class="bs-card-top" data-num="04"><div class="bs-week">Week 4 · Series: The Press</div><div class="bs-title">Identity: Who Am I Outside of This?</div><div class="bs-ref">Ephesians 1:3–14 · 1 Peter 2:9</div></div><div class="bs-body"><p class="bs-desc">A study on rooting our identity firmly in Christ — not in our circumstances, our wounds, our failures, or what others say about us.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
-      <div class="bs-card"><div class="bs-card-top" data-num="05"><div class="bs-week">Week 5 · Series: The Press</div><div class="bs-title">Obedience When It Doesn't Make Sense</div><div class="bs-ref">Hosea 1–3 · James 1:22–25</div></div><div class="bs-body"><p class="bs-desc">Using Hosea's story, this study explores what it looks like to obey God when His instruction seems illogical — and the fruitfulness that always follows.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
-      <div class="bs-card"><div class="bs-card-top" data-num="06"><div class="bs-week">Week 6 · Series: The Press</div><div class="bs-title">From Pressing to Pouring: Wholeness</div><div class="bs-ref">Isaiah 61 · Revelation 21:5</div></div><div class="bs-body"><p class="bs-desc">The final study — reflecting on what God has poured out through the pressing, and how to carry the fruit of the season into the next chapter of your journey.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Download PDF →</span></div></div></div>
+      <button class="bs-card" type="button" onclick="openStudy(0)"><div class="bs-card-top" data-num="01"><div class="bs-week">Week 1 · Series: The Press</div><div class="bs-title">What Is God Doing in This Season?</div><div class="bs-ref">John 15:1–8 · Isaiah 43:18–19</div></div><div class="bs-body"><p class="bs-desc">An introductory study on understanding seasons of pressing — what they are, why God allows them, and how to posture your heart to receive what He is doing.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
+      <button class="bs-card" type="button" onclick="openStudy(1)"><div class="bs-card-top" data-num="02"><div class="bs-week">Week 2 · Series: The Press</div><div class="bs-title">Surrender: Letting Go of the Vine</div><div class="bs-ref">Psalm 51 · Romans 12:1–2</div></div><div class="bs-body"><p class="bs-desc">A study on full surrender — what it looks like to release control, lay down our plans, and trust the One who prunes with purpose and precision.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
+      <button class="bs-card" type="button" onclick="openStudy(2)"><div class="bs-card-top" data-num="03"><div class="bs-week">Week 3 · Series: The Press</div><div class="bs-title">Waiting Well: Faith in the In-Between</div><div class="bs-ref">Habakkuk 2:1–3 · Psalm 27:14</div></div><div class="bs-body"><p class="bs-desc">A deep dive into the theology of waiting — learning to hold on to God's promises in seasons where nothing seems to be moving and discouragement creeps in.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
+      <button class="bs-card" type="button" onclick="openStudy(3)"><div class="bs-card-top" data-num="04"><div class="bs-week">Week 4 · Series: The Press</div><div class="bs-title">Identity: Who Am I Outside of This?</div><div class="bs-ref">Ephesians 1:3–14 · 1 Peter 2:9</div></div><div class="bs-body"><p class="bs-desc">A study on rooting our identity firmly in Christ — not in our circumstances, our wounds, our failures, or what others say about us.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
+      <button class="bs-card" type="button" onclick="openStudy(4)"><div class="bs-card-top" data-num="05"><div class="bs-week">Week 5 · Series: The Press</div><div class="bs-title">Obedience When It Doesn't Make Sense</div><div class="bs-ref">Hosea 1–3 · James 1:22–25</div></div><div class="bs-body"><p class="bs-desc">Using Hosea's story, this study explores what it looks like to obey God when His instruction seems illogical — and the fruitfulness that always follows.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
+      <button class="bs-card" type="button" onclick="openStudy(5)"><div class="bs-card-top" data-num="06"><div class="bs-week">Week 6 · Series: The Press</div><div class="bs-title">From Pressing to Pouring: Wholeness</div><div class="bs-ref">Isaiah 61 · Revelation 21:5</div></div><div class="bs-body"><p class="bs-desc">The final study — reflecting on what God has poured out through the pressing, and how to carry the fruit of the season into the next chapter of your journey.</p><div class="bs-footer"><span class="bs-tag">Individual or Group</span><span class="bs-dl">Open Study →</span></div></div></button>
     </div>
   </section>
+
+  <div class="study-modal-overlay" id="studyModal" onclick="closeStudyOnOverlay(event)">
+    <div class="study-modal" role="dialog" aria-modal="true" aria-labelledby="studyModalTitle">
+      <div class="study-modal-top">
+        <button class="study-modal-close" type="button" onclick="closeStudy()">✕</button>
+        <div class="study-modal-step" id="studyModalStep">Week 1 · The Press</div>
+        <h3 class="study-modal-title" id="studyModalTitle">What Is God Doing in This Season?</h3>
+        <div class="study-modal-ref" id="studyModalRef">John 15:1–8 · Isaiah 43:18–19</div>
+      </div>
+      <div class="study-modal-body">
+        <div class="study-panel">
+          <div class="study-panel-label">Overview</div>
+          <p id="studyModalOverview"></p>
+        </div>
+        <div class="study-panel">
+          <div class="study-panel-label">Key Scripture</div>
+          <p class="study-scripture" id="studyModalScripture"></p>
+        </div>
+        <div class="study-panel">
+          <div class="study-panel-label">Reflection Questions</div>
+          <ul class="study-list" id="studyModalQuestions"></ul>
+        </div>
+        <div class="study-panel">
+          <div class="study-panel-label">Prayer Prompt</div>
+          <p id="studyModalPrayer"></p>
+        </div>
+        <div class="study-panel">
+          <div class="study-panel-label">Action Step</div>
+          <p id="studyModalAction"></p>
+        </div>
+      </div>
+      <div class="study-modal-actions">
+        <div class="study-progress" id="studyModalProgress">Study 1 of 6</div>
+        <div class="study-nav-group">
+          <button class="study-btn secondary" type="button" id="studyPrevBtn" onclick="changeStudy(-1)">Previous</button>
+          <button class="study-btn primary" type="button" id="studyNextBtn" onclick="changeStudy(1)">Next Study</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 02 PRAYER GUIDES -->
   <section class="prayer-guides" id="prayer-guides">
@@ -658,14 +804,14 @@
     <h2 class="sec-h2">Verse <em>Cards</em></h2>
     <p class="sec-sub">Scripture cards for the pressing seasons — designed to be saved, printed, or shared. Each one a promise to hold on to.</p>
     <div class="vc-grid">
-      <div class="vc-card"><div class="vc-bg vc-bg-1"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Jeremiah 29:11</span><p class="vc-text">"For I know the plans I have for you — plans to prosper you and not to harm you, plans to give you hope and a future."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-2"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Romans 8:28</span><p class="vc-text">"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-3"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Isaiah 43:2</span><p class="vc-text">"When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-4"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Psalm 34:18</span><p class="vc-text">"The Lord is close to the broken-hearted and saves those who are crushed in spirit."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-5"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Philippians 4:13</span><p class="vc-text">"I can do all this through him who gives me strength."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-6"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Lamentations 3:22–23</span><p class="vc-text">"Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-7"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">Psalm 126:5</span><p class="vc-text">"Those who sow with tears will reap with songs of joy."</p><span class="vc-dl">Save Card</span></div></div>
-      <div class="vc-card"><div class="vc-bg vc-bg-8"></div><div class="vc-overlay"></div><div class="vc-content"><span class="vc-ref">2 Corinthians 12:9</span><p class="vc-text">"My grace is sufficient for you, for my power is made perfect in weakness."</p><span class="vc-dl">Save Card</span></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Jeremiah 29:11</span><span class="vc-season">Hope</span></div><p class="vc-text">"For I know the plans I have for you — plans to prosper you and not to harm you, plans to give you hope and a future."</p><div class="vc-footer"><span class="vc-dl">Promise Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Romans 8:28</span><span class="vc-season">Purpose</span></div><p class="vc-text">"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."</p><div class="vc-footer"><span class="vc-dl">Steadfast Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Isaiah 43:2</span><span class="vc-season">Waters</span></div><p class="vc-text">"When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you."</p><div class="vc-footer"><span class="vc-dl">Presence Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Psalm 34:18</span><span class="vc-season">Healing</span></div><p class="vc-text">"The Lord is close to the broken-hearted and saves those who are crushed in spirit."</p><div class="vc-footer"><span class="vc-dl">Comfort Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Philippians 4:13</span><span class="vc-season">Strength</span></div><p class="vc-text">"I can do all this through him who gives me strength."</p><div class="vc-footer"><span class="vc-dl">Strength Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Lamentations 3:22–23</span><span class="vc-season">Mercy</span></div><p class="vc-text">"Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning."</p><div class="vc-footer"><span class="vc-dl">Mercy Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">Psalm 126:5</span><span class="vc-season">Joy</span></div><p class="vc-text">"Those who sow with tears will reap with songs of joy."</p><div class="vc-footer"><span class="vc-dl">Joy Card</span></div></div></div>
+      <div class="vc-card"><div class="vc-content"><div class="vc-topline"><span class="vc-ref">2 Corinthians 12:9</span><span class="vc-season">Grace</span></div><p class="vc-text">"My grace is sufficient for you, for my power is made perfect in weakness."</p><div class="vc-footer"><span class="vc-dl">Grace Card</span></div></div></div>
     </div>
   </section>
 
@@ -976,9 +1122,147 @@
   <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
   <script>
+    const studyData = [
+      {
+        step: 'Week 1 · The Press',
+        title: 'What Is God Doing in This Season?',
+        ref: 'John 15:1–8 · Isaiah 43:18–19',
+        overview: 'Some seasons feel confusing because they do not look fruitful on the surface. Jesus reminds us in John 15 that pruning is not punishment; it is preparation for deeper fruit. Isaiah 43 adds another layer: God often does a new thing before we fully perceive it. This study helps the reader shift from asking only why the season is hard to asking what God may be shaping through it.',
+        scripture: '"Every branch that does bear fruit he prunes so that it will be even more fruitful."',
+        questions: [
+          'What in your life currently feels like pruning, interruption, or stretching?',
+          'How might God be using this season to deepen your dependence on Him?',
+          'What new thing might be beginning, even if you cannot fully see it yet?'
+        ],
+        prayer: 'Lord, help me not to misread this season. Give me eyes to see Your care in the pruning and faith to trust that fruit can come from what feels hidden.',
+        action: 'Write down three words that describe your current season, then pray over each one and ask what God may be teaching you through it.'
+      },
+      {
+        step: 'Week 2 · The Press',
+        title: 'Surrender: Letting Go of the Vine',
+        ref: 'Psalm 51 · Romans 12:1–2',
+        overview: 'Surrender often begins quietly, through honesty rather than drama. This study explores releasing control, bringing the heart openly before God, and trusting that He can do more with a yielded life than we can do by force.',
+        scripture: '"Create in me a clean heart, O God, and renew a right spirit within me."',
+        questions: [
+          'Where are you trying to control the outcome instead of trusting God with it?',
+          'What would full surrender look like in one practical area this week?',
+          'How does the renewing of your mind change the way you interpret your circumstances?'
+        ],
+        prayer: 'Father, I give You what I have been gripping too tightly. Cleanse what is proud in me, steady what is fearful in me, and teach me to say yes to You wholeheartedly.',
+        action: 'Finish these two lines in prayer: "God, I release..." and "God, I trust You with..." Read them aloud each day this week.'
+      },
+      {
+        step: 'Week 3 · The Press',
+        title: 'Waiting Well: Faith in the In-Between',
+        ref: 'Habakkuk 2:1–3 · Psalm 27:14',
+        overview: 'Waiting exposes what instant answers often hide. This study teaches a posture of watchfulness instead of passivity and courage instead of collapse while the promise is still unfolding.',
+        scripture: '"Wait for the Lord; be strong and take heart and wait for the Lord."',
+        questions: [
+          'What makes this current waiting season difficult for you?',
+          'How can you remain spiritually attentive instead of emotionally shutting down?',
+          'What would courageous waiting look like in your daily life right now?'
+        ],
+        prayer: 'God, steady my heart while I wait. Keep me from drifting into fear or despair, and teach me to trust Your timing without losing hope.',
+        action: 'Choose one promise from Scripture and return to it every day this week. Ask, "What does faithfulness look like today while I wait?"'
+      },
+      {
+        step: 'Week 4 · The Press',
+        title: 'Identity: Who Am I Outside of This?',
+        ref: 'Ephesians 1:3–14 · 1 Peter 2:9',
+        overview: 'Hard seasons can distort identity. This study re-anchors the heart in what is eternally true: that believers are chosen, loved, and secure in Christ, even when circumstances feel unstable.',
+        scripture: '"But you are a chosen people, a royal priesthood, a holy nation, God\'s special possession."',
+        questions: [
+          'How has this season tempted you to describe yourself inaccurately?',
+          'Which truth from these passages do you most need to hear again today?',
+          'What would change if you related to this season as someone already secure in Christ?'
+        ],
+        prayer: 'Jesus, correct the lies I have believed about myself. Help me live from the security of being Yours, not from the instability of my circumstances.',
+        action: 'Make a list titled "Who I am in Christ" and fill it with five truths from these passages. Read them aloud each morning this week.'
+      },
+      {
+        step: 'Week 5 · The Press',
+        title: 'Obedience When It Doesn\'t Make Sense',
+        ref: 'Hosea 1–3 · James 1:22–25',
+        overview: 'Obedience often looks unreasonable before it looks fruitful. This study helps readers trust God\'s wisdom when His leading feels costly, confusing, or deeply uncomfortable.',
+        scripture: '"Do not merely listen to the word, and so deceive yourselves. Do what it says."',
+        questions: [
+          'Is there an instruction from God you have delayed because it feels hard or unclear?',
+          'What fear is most attached to obeying in that area?',
+          'How has God proven trustworthy to you in past acts of obedience?'
+        ],
+        prayer: 'Lord, give me courage to obey You beyond convenience. Help me trust that Your wisdom is better than my preferences and that Your commands always carry purpose.',
+        action: 'Name one act of obedience you have been postponing and take one concrete step toward it in the next 48 hours.'
+      },
+      {
+        step: 'Week 6 · The Press',
+        title: 'From Pressing to Pouring: Wholeness',
+        ref: 'Isaiah 61 · Revelation 21:5',
+        overview: 'God does not waste the pressing. This final study reflects on healing, restoration, and the fruit that comes when God turns pain into testimony and maturity into outpouring.',
+        scripture: '"He has sent me to bind up the brokenhearted... to bestow on them a crown of beauty instead of ashes."',
+        questions: [
+          'What fruit has God produced in you through this season?',
+          'Where do you sense Him bringing renewal, healing, or restoration?',
+          'How might your story become a source of hope for someone else?'
+        ],
+        prayer: 'God, thank You for not leaving me unchanged. Heal what is still tender, confirm what You have grown in me, and help me pour out to others what You have poured into me.',
+        action: 'Write a short testimony paragraph beginning with, "Through this season, God has shown me..." and keep it as a reminder of His faithfulness.'
+      }
+    ];
+
+    let activeStudyIndex = 0;
+
     window.addEventListener('scroll', () => {
       document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
     });
+
+    function renderStudy(index) {
+      const study = studyData[index];
+      activeStudyIndex = index;
+      document.getElementById('studyModalStep').textContent = study.step;
+      document.getElementById('studyModalTitle').textContent = study.title;
+      document.getElementById('studyModalRef').textContent = study.ref;
+      document.getElementById('studyModalOverview').textContent = study.overview;
+      document.getElementById('studyModalScripture').textContent = study.scripture;
+      document.getElementById('studyModalPrayer').textContent = study.prayer;
+      document.getElementById('studyModalAction').textContent = study.action;
+      document.getElementById('studyModalProgress').textContent = 'Study ' + (index + 1) + ' of ' + studyData.length;
+
+      const questions = document.getElementById('studyModalQuestions');
+      questions.innerHTML = '';
+      study.questions.forEach(question => {
+        const item = document.createElement('li');
+        item.textContent = question;
+        questions.appendChild(item);
+      });
+
+      document.getElementById('studyPrevBtn').disabled = index === 0;
+      document.getElementById('studyNextBtn').textContent = index === studyData.length - 1 ? 'Finish Series' : 'Next Study';
+    }
+
+    function openStudy(index) {
+      renderStudy(index);
+      document.getElementById('studyModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeStudy() {
+      document.getElementById('studyModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function closeStudyOnOverlay(event) {
+      if (event.target === document.getElementById('studyModal')) closeStudy();
+    }
+
+    function changeStudy(direction) {
+      const nextIndex = activeStudyIndex + direction;
+      if (nextIndex < 0) return;
+      if (nextIndex >= studyData.length) {
+        closeStudy();
+        return;
+      }
+      renderStudy(nextIndex);
+    }
 
     function openPlayer(track) {
       const embed = track.dataset.embed;
@@ -998,6 +1282,10 @@
       document.querySelectorAll('.wt-track').forEach(t => t.classList.remove('playing'));
       track.classList.add('playing');
     }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeStudy();
+    });
   </script>
 
 </body>
