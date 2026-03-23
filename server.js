@@ -500,7 +500,11 @@ async function handleApi(req, res) {
     const entry = {
       id: createId('prayer'),
       name: sanitizeText(payload.name, 120) || 'Anonymous',
+      email: sanitizeText(payload.email, 180),
+      phone: sanitizeText(payload.phone, 80),
       season: sanitizeText(payload.season, 160),
+      urgency: sanitizeText(payload.urgency, 40) || 'normal',
+      followUp: Boolean(payload.followUp),
       topics,
       request,
       addToWall,

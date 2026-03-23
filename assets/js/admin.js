@@ -48,7 +48,11 @@
     if (collection === 'prayerRequests') {
       return `
         <p><strong>Name:</strong> ${escapeHtml(item.name || 'Anonymous')}</p>
+        <p><strong>Email:</strong> ${escapeHtml(item.email || 'Not provided')}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(item.phone || 'Not provided')}</p>
         <p><strong>Season:</strong> ${escapeHtml(item.season || 'Not provided')}</p>
+        <p><strong>Urgency:</strong> ${escapeHtml(item.urgency || 'normal')}</p>
+        <p><strong>Follow-up Requested:</strong> ${item.followUp ? 'Yes' : 'No'}</p>
         <p><strong>Topics:</strong> ${escapeHtml((item.topics || []).join(', ') || 'Not specified')}</p>
         <p><strong>Prayer Wall:</strong> ${item.addToWall ? 'Yes' : 'No'}</p>
         <p><strong>Request:</strong> ${escapeHtml(item.request)}</p>

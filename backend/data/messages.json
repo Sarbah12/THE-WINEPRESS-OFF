@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "msg-1774281968799-e4ho53",
+    "name": "Backend Connection Test",
+    "city": "Accra",
+    "subject": "Website wiring",
+    "message": "This is a test submission from the public website flow.",
+    "createdAt": "2026-03-23T16:06:08.799Z"
+  }
+]

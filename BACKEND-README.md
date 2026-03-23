@@ -20,6 +20,8 @@ npm start
 
 Then open [http://localhost:3000](http://localhost:3000).
 
+If your website is running on a different port or host than the backend, set `window.WINEPRESS_API_BASE` in [assets/js/site-config.js](/Users/sarbahrichmond/Desktop/THE%20WINEPRESS%20OFF/assets/js/site-config.js) so public forms post to the backend explicitly.
+
 ## Data storage
 
 Submitted form data is stored in JSON files inside:

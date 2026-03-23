@@ -481,8 +481,40 @@
               <input type="text" id="p-name" placeholder="First name or nickname"/>
             </div>
             <div class="form-group">
+              <label for="p-email">Email Address (optional)</label>
+              <input type="email" id="p-email" placeholder="you@example.com"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="p-phone">Phone Number (optional)</label>
+              <input type="text" id="p-phone" placeholder="+233 ..."/>
+            </div>
+            <div class="form-group">
               <label for="p-season">Current Season (optional)</label>
               <input type="text" id="p-season" placeholder="Waiting, healing, grief, breakthrough..."/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="p-urgency">How urgent is this request?</label>
+              <select id="p-urgency">
+                <option value="">Select one</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="p-followup">Would you like follow-up prayer support?</label>
+              <select id="p-followup">
+                <option value="">Select one</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
             </div>
           </div>
 
@@ -808,7 +840,11 @@
         if (type === 'prayer') {
           const prayerPayload = {
             name: document.getElementById('p-name').value.trim(),
+            email: document.getElementById('p-email').value.trim(),
+            phone: document.getElementById('p-phone').value.trim(),
             season: document.getElementById('p-season').value.trim(),
+            urgency: document.getElementById('p-urgency').value.trim(),
+            followUp: document.getElementById('p-followup').value.trim() === 'yes',
             request: document.getElementById('p-request').value.trim(),
             addToWall: document.getElementById('p-wall').checked,
             topics: Array.from(document.querySelectorAll('#tab-prayer .prayer-chip.selected')).map(chip => chip.textContent.trim())
@@ -822,7 +858,11 @@
             fields: {
               form_type: 'Prayer Request',
               name: prayerPayload.name || 'Anonymous',
+              email: prayerPayload.email || 'Not provided',
+              phone: prayerPayload.phone || 'Not provided',
               season: prayerPayload.season || 'Not provided',
+              urgency: prayerPayload.urgency || 'Not specified',
+              follow_up: prayerPayload.followUp ? 'Yes' : 'No',
               topics: prayerPayload.topics.join(', ') || 'Not specified',
               prayer_wall: prayerPayload.addToWall ? 'Yes' : 'No',
               message: prayerPayload.request
@@ -888,12 +928,6 @@
       } finally {
         WinepressAPI.setSubmitting(form, false);
       }
-    }
-
-    /*  Pray button toggle  */
-    function togglePray(btn) {
-      const prayed = btn.classList.toggle('prayed');
-      btn.innerHTML = prayed ? 'Prayed!' : 'Pray';
     }
 
     /*  Check URL hash on load to open correct tab  */

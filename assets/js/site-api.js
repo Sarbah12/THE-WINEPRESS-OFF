@@ -1,10 +1,15 @@
 (function () {
   const STATUS_STYLE = 'margin-top:.8rem;font-size:.76rem;color:#6B1A2A;';
   const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+  const API_BASE = String(window.WINEPRESS_API_BASE || '').trim().replace(/\/$/, '');
   const WEB3FORMS_KEY = window.WINEPRESS_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_ACCESS_KEY';
 
+  function apiUrl(path) {
+    return API_BASE ? `${API_BASE}${path}` : path;
+  }
+
   async function request(url, payload) {
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl(url), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -75,6 +80,11 @@
     }
   }
 
+  function togglePray(btn) {
+    const prayed = btn.classList.toggle('prayed');
+    btn.textContent = prayed ? 'Prayed!' : 'Pray';
+  }
+
   function sourceFromPage() {
     const page = (window.location.pathname.split('/').pop() || 'index.html').replace('.html', '');
     return page || 'home';
@@ -126,7 +136,7 @@
     }
 
     try {
-      const response = await fetch('/api/prayer-wall');
+      const response = await fetch(apiUrl('/api/prayer-wall'));
       const data = await response.json();
       if (!response.ok || !Array.isArray(data.items)) {
         throw new Error('Unable to load prayer wall right now.');
@@ -159,12 +169,14 @@
 
   window.WinepressAPI = {
     request,
+    apiUrl,
     sendWeb3FormsEmail,
     attachSubscriptionForms,
     loadPrayerWall,
     setSubmitting,
     updateStatus
   };
+  window.togglePray = togglePray;
 
   document.addEventListener('DOMContentLoaded', function () {
     attachSubscriptionForms();
