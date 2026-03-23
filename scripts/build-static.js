@@ -2,7 +2,10 @@ const fs = require('fs/promises');
 const path = require('path');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
-const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const OUTPUT_DIRS = [
+  path.join(ROOT_DIR, 'public'),
+  path.join(ROOT_DIR, 'dist')
+];
 
 async function ensureCleanDir(dirPath) {
   await fs.rm(dirPath, { recursive: true, force: true });
@@ -27,7 +30,9 @@ async function copyIfExists(sourcePath, targetPath) {
 }
 
 async function build() {
-  await ensureCleanDir(DIST_DIR);
+  for (const dir of OUTPUT_DIRS) {
+    await ensureCleanDir(dir);
+  }
 
   const entries = await fs.readdir(ROOT_DIR, { withFileTypes: true });
   for (const entry of entries) {
@@ -39,13 +44,17 @@ async function build() {
       continue;
     }
 
-    await copyIfExists(
-      path.join(ROOT_DIR, entry.name),
-      path.join(DIST_DIR, entry.name)
-    );
+    for (const dir of OUTPUT_DIRS) {
+      await copyIfExists(
+        path.join(ROOT_DIR, entry.name),
+        path.join(dir, entry.name)
+      );
+    }
   }
 
-  await copyIfExists(path.join(ROOT_DIR, 'assets'), path.join(DIST_DIR, 'assets'));
+  for (const dir of OUTPUT_DIRS) {
+    await copyIfExists(path.join(ROOT_DIR, 'assets'), path.join(dir, 'assets'));
+  }
 }
 
 build().catch(error => {
