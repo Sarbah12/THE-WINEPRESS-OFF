@@ -6,6 +6,11 @@ const ROOT_DIR = __dirname;
 const DATA_DIR = path.join(ROOT_DIR, 'backend', 'data');
 const PUBLIC_INDEX = path.join(ROOT_DIR, 'index.html');
 const PORT = Number(process.env.PORT || 3000);
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'winepress-admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const SESSION_COOKIE = 'winepress_admin_session';
+const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
+const adminSessions = new Map();
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -95,6 +100,10 @@ function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function createSessionToken() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+}
+
 function sanitizeText(value, maxLength = 2000) {
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, maxLength);
 }
@@ -122,6 +131,50 @@ function relativeTime(isoString) {
 
   const weeks = Math.floor(days / 7);
   return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+}
+
+function parseCookies(req) {
+  const raw = req.headers.cookie || '';
+  return raw.split(';').reduce((acc, part) => {
+    const [key, ...rest] = part.trim().split('=');
+    if (!key) {
+      return acc;
+    }
+
+    acc[key] = decodeURIComponent(rest.join('=') || '');
+    return acc;
+  }, {});
+}
+
+function getActiveSession(req) {
+  const cookies = parseCookies(req);
+  const token = cookies[SESSION_COOKIE];
+  if (!token) {
+    return null;
+  }
+
+  const session = adminSessions.get(token);
+  if (!session) {
+    return null;
+  }
+
+  if (session.expiresAt < Date.now()) {
+    adminSessions.delete(token);
+    return null;
+  }
+
+  return { token, ...session };
+}
+
+function requiresAdminAuth(urlPath) {
+  return urlPath === '/admin.html'
+    || urlPath === '/admin-login.html'
+    || urlPath === '/assets/js/admin.js'
+    || urlPath.startsWith('/api/admin');
+}
+
+function sendUnauthorized(res) {
+  sendJson(res, 401, { error: 'Unauthorized' });
 }
 
 async function ensureDataFiles() {
@@ -212,6 +265,15 @@ async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
 
+  if (pathname === '/admin.html' || pathname === '/assets/js/admin.js') {
+    const session = getActiveSession(req);
+    if (!session) {
+      res.writeHead(302, { Location: '/admin-login.html' });
+      res.end();
+      return;
+    }
+  }
+
   if (pathname === '/') {
     pathname = '/index.html';
   }
@@ -256,12 +318,72 @@ async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const adminMatch = url.pathname.match(/^\/api\/admin\/([a-zA-Z-]+)(?:\/([^/]+))?$/);
 
+  if (req.method === 'POST' && url.pathname === '/api/admin/login') {
+    if (!ADMIN_PASSWORD) {
+      sendJson(res, 503, { error: 'Admin password is not configured on the server.' });
+      return true;
+    }
+
+    const payload = await readRequestBody(req);
+    const username = sanitizeText(payload.username, 120);
+    const password = String(payload.password || '');
+
+    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+      sendJson(res, 401, { error: 'Invalid admin credentials.' });
+      return true;
+    }
+
+    const token = createSessionToken();
+    adminSessions.set(token, {
+      username,
+      expiresAt: Date.now() + SESSION_TTL_MS
+    });
+
+    res.writeHead(200, {
+      ...JSON_HEADERS,
+      'Set-Cookie': `${SESSION_COOKIE}=${encodeURIComponent(token)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`
+    });
+    res.end(JSON.stringify({ ok: true, username }));
+    return true;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/admin/logout') {
+    const session = getActiveSession(req);
+    if (session) {
+      adminSessions.delete(session.token);
+    }
+
+    res.writeHead(200, {
+      ...JSON_HEADERS,
+      'Set-Cookie': `${SESSION_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`
+    });
+    res.end(JSON.stringify({ ok: true }));
+    return true;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/api/admin/session') {
+    const session = getActiveSession(req);
+    if (!session) {
+      sendUnauthorized(res);
+      return true;
+    }
+
+    sendJson(res, 200, { ok: true, username: session.username });
+    return true;
+  }
+
   if (req.method === 'GET' && url.pathname === '/api/health') {
     sendJson(res, 200, { ok: true, service: 'the-winepress-backend' });
     return true;
   }
 
   if (req.method === 'GET' && url.pathname === '/api/admin/overview') {
+    const session = getActiveSession(req);
+    if (!session) {
+      sendUnauthorized(res);
+      return true;
+    }
+
     const overview = {};
     for (const name of adminCollections) {
       overview[name] = (await readCollection(name)).length;
@@ -271,6 +393,12 @@ async function handleApi(req, res) {
   }
 
   if (adminMatch) {
+    const session = getActiveSession(req);
+    if (!session) {
+      sendUnauthorized(res);
+      return true;
+    }
+
     const collectionName = adminMatch[1];
     const entryId = adminMatch[2];
 

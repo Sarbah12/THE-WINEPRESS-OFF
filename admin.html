@@ -363,7 +363,10 @@
           <h1>Manage the work <em>behind the site.</em></h1>
           <p>This dashboard talks directly to your local backend. It is best for local use unless you add authentication before deploying it publicly.</p>
         </div>
-        <button class="hero-action" id="refreshAll">Refresh Data</button>
+        <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
+          <button class="hero-action" id="refreshAll">Refresh Data</button>
+          <button class="hero-action" id="logoutAdmin" style="background:rgba(255,255,255,.02);">Log Out</button>
+        </div>
       </section>
 
       <section class="metrics">
@@ -398,5 +401,14 @@
   </div>
 
   <script src="assets/js/admin.js"></script>
+  <script>
+    document.getElementById('logoutAdmin').addEventListener('click', async function () {
+      await fetch('/api/admin/logout', {
+        method: 'POST',
+        credentials: 'same-origin'
+      });
+      window.location.href = '/admin-login.html';
+    });
+  </script>
 </body>
 </html>
