@@ -50,7 +50,7 @@
       }
 
       if (isVercel) {
-        target.textContent = 'Backend is running, but storage is using temporary file mode. Add BLOB_READ_WRITE_TOKEN in Vercel so frontend submissions appear reliably in admin.';
+        target.textContent = 'Backend is running, but storage setup still needs attention.';
         return;
       }
 
