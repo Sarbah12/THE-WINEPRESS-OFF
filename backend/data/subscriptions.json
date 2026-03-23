@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "sub-1774283400895-9xbpxk",
+    "name": "Vercel Ready Test",
+    "source": "home",
+    "createdAt": "2026-03-23T16:30:00.895Z"
+  },
+  {
+    "id": "sub-1774282798837-mr2qyp",
+    "name": "Frontend Subscription Test",
+    "source": "home",
+    "createdAt": "2026-03-23T16:19:58.837Z"
+  }
+]
