@@ -9,6 +9,8 @@
   };
 
   let activeCollection = 'prayerRequests';
+  let loadedItems = [];
+  let filteredItems = [];
 
   async function loadBackendStatus() {
     const target = document.getElementById('backendStatus');
@@ -141,6 +143,139 @@
     `;
   }
 
+  function searchableText(item) {
+    return Object.values(item || {})
+      .flatMap(value => Array.isArray(value) ? value : [value])
+      .map(value => String(value || '').toLowerCase())
+      .join(' ');
+  }
+
+  function normalizeItems(items) {
+    const sortSelect = document.getElementById('sortEntries');
+    const searchInput = document.getElementById('entrySearch');
+    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+    const sortMode = sortSelect ? sortSelect.value : 'newest';
+
+    let nextItems = items.slice();
+
+    if (query) {
+      nextItems = nextItems.filter(item => searchableText(item).includes(query));
+    }
+
+    nextItems.sort((left, right) => {
+      const leftTime = new Date(left.createdAt || 0).getTime();
+      const rightTime = new Date(right.createdAt || 0).getTime();
+      return sortMode === 'oldest' ? leftTime - rightTime : rightTime - leftTime;
+    });
+
+    return nextItems;
+  }
+
+  function csvValue(value) {
+    return `"${String(value == null ? '' : value).replaceAll('"', '""')}"`;
+  }
+
+  function collectionExportRows(items) {
+    return items.map(item => {
+      const row = {};
+      Object.entries(item || {}).forEach(([key, value]) => {
+        row[key] = Array.isArray(value) ? value.join(', ') : value;
+      });
+      return row;
+    });
+  }
+
+  function downloadFile(filename, contents, type) {
+    const blob = new Blob([contents], { type });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function exportJson() {
+    const name = activeCollection || 'collection';
+    downloadFile(`${name}.json`, JSON.stringify(filteredItems, null, 2), 'application/json');
+  }
+
+  function exportCsv() {
+    const rows = collectionExportRows(filteredItems);
+    if (!rows.length) {
+      alert('There are no entries to export in this view yet.');
+      return;
+    }
+
+    const headers = Array.from(rows.reduce((set, row) => {
+      Object.keys(row).forEach(key => set.add(key));
+      return set;
+    }, new Set()));
+
+    const lines = [
+      headers.map(csvValue).join(','),
+      ...rows.map(row => headers.map(header => csvValue(row[header])).join(','))
+    ];
+
+    downloadFile(`${activeCollection}.csv`, lines.join('\n'), 'text/csv;charset=utf-8');
+  }
+
+  async function copyEntry(item) {
+    const lines = Object.entries(item || {}).map(([key, value]) => {
+      const printable = Array.isArray(value) ? value.join(', ') : value;
+      return `${key}: ${printable == null ? '' : printable}`;
+    });
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      alert('Entry copied.');
+    } catch {
+      alert('Could not copy this entry right now.');
+    }
+  }
+
+  function renderCollection(items) {
+    filteredItems = normalizeItems(items);
+
+    const list = document.getElementById('entryList');
+    const empty = document.getElementById('emptyState');
+    const status = document.getElementById('panelStatus');
+
+    list.innerHTML = '';
+    empty.style.display = 'none';
+
+    if (!items.length) {
+      empty.style.display = 'block';
+      status.textContent = 'No entries yet.';
+      return;
+    }
+
+    if (!filteredItems.length) {
+      empty.style.display = 'block';
+      status.textContent = 'No entries match your search.';
+      return;
+    }
+
+    list.innerHTML = filteredItems.map(item => `
+      <article class="entry-card">
+        <div class="entry-meta">
+          <span class="entry-id">${escapeHtml(item.id)}</span>
+          <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
+        </div>
+        <div class="entry-body">${entryBody(activeCollection, item)}</div>
+        <div class="entry-actions">
+          ${activeCollection === 'testimonies' ? testimonyActions(item) : ''}
+          <button class="entry-btn secondary" data-copy-id="${item.id}">Copy</button>
+          <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
+        </div>
+      </article>
+    `).join('');
+
+    status.textContent = `${filteredItems.length} of ${items.length} item${items.length === 1 ? '' : 's'} shown.`;
+    bindEntryActions();
+  }
+
   async function loadCollection(name) {
     activeCollection = name;
     document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -148,14 +283,10 @@
     });
 
     const title = document.getElementById('panelTitle');
-    const list = document.getElementById('entryList');
-    const empty = document.getElementById('emptyState');
     const status = document.getElementById('panelStatus');
 
     title.textContent = collectionLabels[name];
     status.textContent = 'Loading...';
-    list.innerHTML = '';
-    empty.style.display = 'none';
 
     try {
       const response = await fetch(`/api/admin/${name}`);
@@ -164,34 +295,24 @@
         throw new Error(data.error || 'Unable to load data.');
       }
 
-      if (!data.items.length) {
-        empty.style.display = 'block';
-        status.textContent = 'No entries yet.';
-        return;
-      }
-
-      list.innerHTML = data.items.map(item => `
-        <article class="entry-card">
-          <div class="entry-meta">
-            <span class="entry-id">${escapeHtml(item.id)}</span>
-            <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
-          </div>
-          <div class="entry-body">${entryBody(name, item)}</div>
-          <div class="entry-actions">
-            ${name === 'testimonies' ? testimonyActions(item) : ''}
-            <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
-          </div>
-        </article>
-      `).join('');
-
-      status.textContent = `${data.items.length} item${data.items.length === 1 ? '' : 's'} loaded.`;
-      bindEntryActions();
+      loadedItems = Array.isArray(data.items) ? data.items : [];
+      renderCollection(loadedItems);
     } catch (error) {
       status.textContent = error.message;
     }
   }
 
   function bindEntryActions() {
+    document.querySelectorAll('[data-copy-id]').forEach(button => {
+      button.addEventListener('click', async function () {
+        const entryId = button.dataset.copyId;
+        const item = filteredItems.find(entry => entry.id === entryId);
+        if (item) {
+          await copyEntry(item);
+        }
+      });
+    });
+
     document.querySelectorAll('[data-delete-id]').forEach(button => {
       button.addEventListener('click', async function () {
         const entryId = button.dataset.deleteId;
@@ -246,8 +367,36 @@
     });
   }
 
+  function bindWorkspaceTools() {
+    const searchInput = document.getElementById('entrySearch');
+    const sortSelect = document.getElementById('sortEntries');
+    const exportJsonButton = document.getElementById('exportJson');
+    const exportCsvButton = document.getElementById('exportCsv');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function () {
+        renderCollection(loadedItems);
+      });
+    }
+
+    if (exportJsonButton) {
+      exportJsonButton.addEventListener('click', exportJson);
+    }
+
+    if (exportCsvButton) {
+      exportCsvButton.addEventListener('click', exportCsv);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', async function () {
     bindTabs();
+    bindWorkspaceTools();
     const refreshButton = document.getElementById('refreshAll');
     if (refreshButton) {
       refreshButton.addEventListener('click', async function () {
