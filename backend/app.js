@@ -341,7 +341,7 @@ async function createPostgresStorage() {
   for (const [name, seed] of Object.entries(dataFiles)) {
     await sql`
       INSERT INTO winepress_collections (name, data)
-      VALUES (${name}, ${JSON.stringify(seed)}::jsonb)
+      VALUES (${name}, CAST(${JSON.stringify(seed)} AS jsonb))
       ON CONFLICT (name) DO NOTHING
     `;
   }
@@ -360,13 +360,27 @@ async function createPostgresStorage() {
       return seed;
     }
 
-    return Array.isArray(rows[0].data) ? rows[0].data : [];
+    const value = rows[0].data;
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
   }
 
   async function writeCollection(name, data) {
     await sql`
       INSERT INTO winepress_collections (name, data, updated_at)
-      VALUES (${name}, ${JSON.stringify(data)}::jsonb, NOW())
+      VALUES (${name}, CAST(${JSON.stringify(data)} AS jsonb), NOW())
       ON CONFLICT (name)
       DO UPDATE SET
         data = EXCLUDED.data,
