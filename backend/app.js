@@ -7,21 +7,46 @@ const DATA_DIR = path.join(ROOT_DIR, 'backend', 'data');
 const FALLBACK_DATA_DIR = process.env.VERCEL
   ? path.join('/tmp', 'the-winepress-data')
   : DATA_DIR;
-const POSTGRES_URL = process.env.DATABASE_URL
-  || process.env.POSTGRES_URL
-  || process.env.POSTGRES_PRISMA_URL
-  || process.env.NEON_DATABASE_URL
-  || process.env.STORAGE_DATABASE_URL_DATABASE_URL
-  || process.env.STORAGE_DATABASE_URL_POSTGRES_URL
-  || process.env.STORAGE_DATABASE_URL_POSTGRES_PRISMA_URL
-  || process.env.STORAGE_DATABASE_URL_DATABASE_URL_UNPOOLED
-  || process.env.STORAGE_DATABASE_URL_POSTGRES_URL_NON_POOLING
-  || process.env.STORAGE_DATABASE_URL
-  || process.env.STORAGE_POSTGRES_URL
-  || process.env.STORAGE_POSTGRES_PRISMA_URL
-  || process.env.STORAGE_NEON_DATABASE_URL
-  || process.env.STORAGE_URL
-  || '';
+function detectPostgresUrl() {
+  const directMatch = process.env.DATABASE_URL
+    || process.env.POSTGRES_URL
+    || process.env.POSTGRES_PRISMA_URL
+    || process.env.NEON_DATABASE_URL
+    || process.env.STORAGE_DATABASE_URL_DATABASE_URL
+    || process.env.STORAGE_DATABASE_URL_POSTGRES_URL
+    || process.env.STORAGE_DATABASE_URL_POSTGRES_PRISMA_URL
+    || process.env.STORAGE_DATABASE_URL_DATABASE_URL_UNPOOLED
+    || process.env.STORAGE_DATABASE_URL_POSTGRES_URL_NON_POOLING
+    || process.env.STORAGE_DATABASE_URL
+    || process.env.STORAGE_POSTGRES_URL
+    || process.env.STORAGE_POSTGRES_PRISMA_URL
+    || process.env.STORAGE_NEON_DATABASE_URL
+    || process.env.STORAGE_URL;
+
+  if (directMatch) {
+    return directMatch;
+  }
+
+  const candidates = Object.entries(process.env)
+    .filter(([key, value]) => {
+      if (!value || typeof value !== 'string') {
+        return false;
+      }
+
+      const normalizedKey = key.toUpperCase();
+      const looksLikeDatabaseKey = normalizedKey.includes('DATABASE_URL')
+        || normalizedKey.includes('POSTGRES_URL')
+        || normalizedKey.includes('PRISMA_URL')
+        || normalizedKey.includes('NEON_DATABASE_URL');
+
+      return looksLikeDatabaseKey && /^postgres(ql)?:\/\//i.test(value);
+    })
+    .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey));
+
+  return candidates.length ? candidates[0][1] : '';
+}
+
+const POSTGRES_URL = detectPostgresUrl();
 const SESSION_COOKIE = 'winepress_admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 const ADMIN_PIN = String(process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || '').trim();
