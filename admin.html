@@ -4,208 +4,214 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <base href="/"/>
-  <title>Backend Admin — The Winepress</title>
+  <title>The Winepress Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --wine: #6B1A2A;
       --wine-mid: #8C2438;
-      --wine-pale: #E8C8CE;
       --ink: #1C1010;
-      --off: #FAF8F5;
-      --cream: #F4EDE0;
-      --white: #FFFFFF;
       --muted: #7A6060;
-      --serif-d: 'DM Serif Display', Georgia, serif;
-      --serif-c: 'Cinzel', serif;
+      --off: #FAF8F5;
+      --white: #FFFFFF;
+      --line: rgba(107,26,42,.10);
+      --serif: 'DM Serif Display', Georgia, serif;
+      --caps: 'Cinzel', serif;
       --sans: 'DM Sans', sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: var(--sans);
+      background: linear-gradient(180deg, #fff 0%, #faf4f2 100%);
       color: var(--ink);
-      background:
-        radial-gradient(circle at top right, rgba(176,80,104,.18), transparent 32%),
-        linear-gradient(180deg, #fff 0%, #faf4f2 100%);
+      font-family: var(--sans);
       min-height: 100vh;
-      padding: 2rem;
+      padding: 1.25rem;
     }
 
     .shell {
-      max-width: 1400px;
+      max-width: 1320px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 290px 1fr;
-      gap: 1.5rem;
-      align-items: start;
+      grid-template-columns: 280px 1fr;
+      gap: 1.25rem;
     }
 
-    .panel,
-    .sidebar {
-      background: rgba(255,255,255,.9);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(107,26,42,.08);
+    .sidebar,
+    .panel {
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
       border-radius: 22px;
       box-shadow: 0 18px 60px rgba(107,26,42,.08);
     }
 
     .sidebar {
-      padding: 1.5rem;
+      padding: 1.4rem;
       position: sticky;
-      top: 2rem;
+      top: 1.25rem;
+      align-self: start;
     }
 
-    .brand-kicker {
-      font-family: var(--serif-c);
+    .kicker {
+      font-family: var(--caps);
       font-size: .58rem;
       letter-spacing: .28em;
       text-transform: uppercase;
       color: var(--wine-mid);
-      margin-bottom: 1rem;
+      margin-bottom: .9rem;
     }
 
-    .brand-title {
-      font-family: var(--serif-d);
-      font-size: 2.1rem;
+    .title {
+      font-family: var(--serif);
+      font-size: 2rem;
       line-height: 1.05;
-      margin-bottom: .8rem;
+      margin-bottom: .7rem;
     }
 
-    .brand-title em {
-      color: var(--wine);
-      font-style: italic;
+    .title em {
       display: block;
+      font-style: italic;
+      color: var(--wine);
     }
 
-    .brand-copy {
+    .copy {
       color: var(--muted);
       line-height: 1.8;
-      font-size: .92rem;
-      margin-bottom: 1.5rem;
+      font-size: .9rem;
+      margin-bottom: 1.25rem;
     }
 
-    .admin-tabs {
-      display: flex;
-      flex-direction: column;
+    .tabs {
+      display: grid;
       gap: .7rem;
     }
 
     .admin-tab {
-      border: 1px solid rgba(107,26,42,.09);
+      border: 1px solid var(--line);
       background: var(--off);
       color: var(--muted);
       border-radius: 16px;
-      padding: 1rem 1.1rem;
+      padding: .95rem 1rem;
       text-align: left;
       cursor: pointer;
-      transition: .2s ease;
-      font: 600 .76rem var(--sans);
+      font: 700 .72rem var(--sans);
       letter-spacing: .08em;
       text-transform: uppercase;
     }
 
-    .admin-tab:hover,
-    .admin-tab.active {
+    .admin-tab.active,
+    .admin-tab:hover {
       background: var(--wine);
       color: var(--white);
       border-color: var(--wine);
-      transform: translateX(3px);
     }
 
-    .quick-note {
-      margin-top: 1.5rem;
-      padding: 1rem 1.1rem;
-      background: linear-gradient(135deg, rgba(107,26,42,.08), rgba(176,80,104,.1));
+    .status-note {
+      margin-top: 1.2rem;
+      padding: 1rem;
       border-radius: 16px;
+      background: linear-gradient(135deg, rgba(107,26,42,.08), rgba(176,80,104,.12));
       color: var(--muted);
       line-height: 1.7;
       font-size: .84rem;
     }
 
     .panel {
-      padding: 1.5rem;
+      padding: 1.35rem;
     }
 
-    .hero-strip {
+    .hero {
       background: linear-gradient(135deg, #2a0b12 0%, #6B1A2A 64%, #8C2438 100%);
       color: var(--white);
       border-radius: 20px;
-      padding: 1.8rem;
+      padding: 1.5rem;
       display: flex;
       justify-content: space-between;
-      align-items: end;
       gap: 1rem;
-      margin-bottom: 1.2rem;
+      align-items: end;
+      margin-bottom: 1rem;
     }
 
-    .hero-strip h1 {
-      font-family: var(--serif-d);
+    .hero h1 {
+      font-family: var(--serif);
       font-size: clamp(2rem, 4vw, 3rem);
       font-weight: 400;
       line-height: 1;
-      margin-bottom: .6rem;
+      margin-bottom: .55rem;
     }
 
-    .hero-strip p {
-      color: rgba(255,255,255,.68);
-      max-width: 580px;
+    .hero p {
+      color: rgba(255,255,255,.72);
+      max-width: 600px;
       line-height: 1.8;
     }
 
-    .hero-action {
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      color: var(--white);
-      padding: .95rem 1.2rem;
+    .hero-actions {
+      display: flex;
+      gap: .7rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn,
+    .entry-btn,
+    .status-select {
       border-radius: 999px;
-      cursor: pointer;
-      font: 600 .74rem var(--sans);
+      padding: .8rem 1rem;
+      border: 1px solid var(--line);
+      font: 700 .72rem var(--sans);
       letter-spacing: .08em;
       text-transform: uppercase;
+    }
+
+    .hero-btn {
+      cursor: pointer;
+      background: rgba(255,255,255,.08);
+      color: var(--white);
+      border-color: rgba(255,255,255,.18);
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.2rem;
+      gap: .9rem;
+      margin-bottom: 1rem;
     }
 
     .metric {
       background: var(--white);
-      border: 1px solid rgba(107,26,42,.08);
+      border: 1px solid var(--line);
       border-radius: 18px;
-      padding: 1.2rem;
+      padding: 1rem 1.1rem;
     }
 
     .metric-label {
-      font-family: var(--serif-c);
-      font-size: .55rem;
-      letter-spacing: .2em;
+      font-family: var(--caps);
+      font-size: .54rem;
+      letter-spacing: .18em;
       text-transform: uppercase;
       color: var(--wine-mid);
-      margin-bottom: .5rem;
+      margin-bottom: .45rem;
     }
 
     .metric-value {
-      font-family: var(--serif-d);
-      font-size: 2rem;
-      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 1.9rem;
+      line-height: 1;
     }
 
     .workspace {
       background: var(--white);
-      border: 1px solid rgba(107,26,42,.08);
+      border: 1px solid var(--line);
       border-radius: 20px;
       overflow: hidden;
     }
 
     .workspace-head {
-      padding: 1.2rem 1.4rem;
-      border-bottom: 1px solid rgba(107,26,42,.08);
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
       display: flex;
       justify-content: space-between;
       gap: 1rem;
@@ -213,9 +219,9 @@
     }
 
     .workspace-head h2 {
-      font-family: var(--serif-d);
-      font-weight: 400;
+      font-family: var(--serif);
       font-size: 1.6rem;
+      font-weight: 400;
     }
 
     .workspace-status {
@@ -223,172 +229,37 @@
       font-size: .82rem;
     }
 
-    .workspace-tools {
-      display: flex;
-      gap: .7rem;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 1rem;
-    }
-
-    .workspace-input,
-    .workspace-select {
-      border: 1px solid rgba(107,26,42,.12);
-      background: var(--off);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: .8rem 1rem;
-      font: 500 .8rem var(--sans);
-      min-width: 210px;
-      outline: none;
-    }
-
-    .workspace-select {
-      min-width: 170px;
-      cursor: pointer;
-    }
-
-    .workspace-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: .9rem;
-      padding: 1rem 1.4rem;
-      border-bottom: 1px solid rgba(107,26,42,.08);
-      background: linear-gradient(180deg, rgba(250,248,245,.9), rgba(255,255,255,.95));
-    }
-
-    .workspace-summary-card {
-      border: 1px solid rgba(107,26,42,.08);
-      border-radius: 16px;
-      background: var(--white);
-      padding: .95rem 1rem;
-    }
-
-    .workspace-summary-label {
-      font-family: var(--serif-c);
-      font-size: .52rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--wine-mid);
-      margin-bottom: .45rem;
-    }
-
-    .workspace-summary-value {
-      font-size: .86rem;
-      line-height: 1.5;
-      color: var(--ink);
-    }
-
-    .json-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(28,16,16,.52);
-      backdrop-filter: blur(10px);
-      z-index: 1500;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.2rem;
-    }
-
-    .json-modal.is-open {
-      display: flex;
-    }
-
-    .json-sheet {
-      width: min(900px, 100%);
-      max-height: min(82vh, 900px);
-      overflow: auto;
-      background: linear-gradient(180deg, #fff 0%, #faf4f2 100%);
-      border-radius: 22px;
-      border: 1px solid rgba(107,26,42,.1);
-      box-shadow: 0 24px 70px rgba(28,16,16,.2);
-      padding: 1.2rem;
-    }
-
-    .json-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .json-head h3 {
-      font-family: var(--serif-d);
-      font-size: 1.7rem;
-      font-weight: 400;
-    }
-
-    .json-code {
-      border-radius: 18px;
-      background: #1f1313;
-      color: #f9f4f1;
-      padding: 1.2rem;
-      font: 500 .82rem/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-    }
-
-    .workspace-input:focus,
-    .workspace-select:focus {
-      border-color: var(--wine);
-      box-shadow: 0 0 0 3px rgba(107,26,42,.08);
-      background: var(--white);
-    }
-
     .entry-list {
-      padding: 1.2rem;
+      padding: 1.1rem;
       display: grid;
-      gap: 1rem;
+      gap: .9rem;
     }
 
     .entry-card {
-      border: 1px solid rgba(107,26,42,.08);
-      background: linear-gradient(180deg, #fff 0%, #fcf8f7 100%);
+      border: 1px solid var(--line);
       border-radius: 18px;
-      padding: 1.2rem;
+      padding: 1rem;
+      background: linear-gradient(180deg, #fff 0%, #fcf8f7 100%);
     }
 
     .entry-meta {
       display: flex;
       justify-content: space-between;
-      gap: 1rem;
+      gap: .75rem;
       flex-wrap: wrap;
-      margin-bottom: .9rem;
+      margin-bottom: .8rem;
       color: var(--muted);
       font-size: .74rem;
-      letter-spacing: .04em;
     }
 
     .entry-id {
-      font-family: var(--serif-c);
       color: var(--wine-mid);
-    }
-
-    .entry-card.is-selected {
-      border-color: rgba(107,26,42,.22);
-      box-shadow: 0 10px 30px rgba(107,26,42,.08);
-    }
-
-    .entry-select {
-      width: 1rem;
-      height: 1rem;
-      accent-color: var(--wine);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .entry-meta-primary {
-      display: flex;
-      gap: .7rem;
-      align-items: center;
+      font-family: var(--caps);
     }
 
     .entry-body {
       display: grid;
-      gap: .55rem;
+      gap: .5rem;
       line-height: 1.7;
       color: #3c2a2a;
       font-size: .92rem;
@@ -396,64 +267,46 @@
 
     .entry-body strong {
       color: var(--wine);
-      font-weight: 700;
     }
 
-    .entry-actions,
-    .entry-inline-actions {
+    .entry-actions {
       display: flex;
-      gap: .75rem;
+      gap: .7rem;
       flex-wrap: wrap;
+      margin-top: .9rem;
       align-items: center;
-      margin-top: 1rem;
-    }
-
-    .entry-btn,
-    .status-select {
-      border-radius: 999px;
-      padding: .72rem 1rem;
-      font: 600 .72rem var(--sans);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      border: 1px solid rgba(107,26,42,.12);
-      background: var(--off);
     }
 
     .entry-btn {
       cursor: pointer;
-    }
-
-    .entry-btn.danger {
-      background: #fff1f1;
-      border-color: rgba(140,36,56,.18);
-      color: #8C2438;
-    }
-
-    .entry-btn.muted {
-      background: var(--wine);
-      color: var(--white);
-      border-color: var(--wine);
+      background: var(--off);
+      color: var(--ink);
     }
 
     .entry-btn.secondary {
       background: var(--white);
       color: var(--wine);
-      border-color: rgba(107,26,42,.14);
+    }
+
+    .entry-btn.danger {
+      background: #fff1f1;
+      border-color: rgba(140,36,56,.16);
+      color: #8C2438;
     }
 
     .empty-state {
       display: none;
-      padding: 3rem 1.2rem 3.4rem;
       text-align: center;
+      padding: 3rem 1.25rem;
       color: var(--muted);
     }
 
     .empty-state h3 {
-      font-family: var(--serif-d);
-      font-size: 1.8rem;
+      font-family: var(--serif);
+      font-size: 1.7rem;
       font-weight: 400;
       color: var(--ink);
-      margin-bottom: .5rem;
+      margin-bottom: .4rem;
     }
 
     @media (max-width: 980px) {
@@ -469,13 +322,9 @@
         grid-template-columns: 1fr;
       }
 
-      .hero-strip {
+      .hero {
         flex-direction: column;
         align-items: start;
-      }
-
-      .workspace-summary {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -483,101 +332,56 @@
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand-kicker">The Winepress</div>
-      <h1 class="brand-title">Backend <em>Admin</em></h1>
-      <p class="brand-copy">A simple interface for the site data. Review submissions, manage testimonies, and clean up the prayer wall without touching raw JSON files.</p>
+      <div class="kicker">The Winepress</div>
+      <h1 class="title">Admin <em>Dashboard</em></h1>
+      <p class="copy">A simpler control panel for messages, subscribers, prayer requests, testimonies, and prayer wall entries.</p>
 
-      <div class="admin-tabs">
+      <div class="tabs">
         <button class="admin-tab active" data-collection="prayerRequests">Prayer Requests</button>
+        <button class="admin-tab" data-collection="subscriptions">Subscribers</button>
         <button class="admin-tab" data-collection="messages">Messages</button>
         <button class="admin-tab" data-collection="collaborations">Collaborations</button>
         <button class="admin-tab" data-collection="testimonies">Testimonies</button>
-        <button class="admin-tab" data-collection="subscriptions">Subscribers</button>
         <button class="admin-tab" data-collection="prayerWall">Prayer Wall</button>
       </div>
 
-      <div class="quick-note">
+      <div class="status-note">
         <strong style="display:block; margin-bottom:.35rem; color:#6B1A2A;">Backend Status</strong>
         <span id="backendStatus">Checking backend connection...</span>
       </div>
     </aside>
 
     <main class="panel">
-      <section class="hero-strip">
+      <section class="hero">
         <div>
           <h1>Manage the work <em>behind the site.</em></h1>
-          <p>This dashboard reads the same live backend your public forms submit to, so new entries should appear here after refresh.</p>
+          <p>This dashboard is focused on the essentials so it stays stable and easy to use.</p>
         </div>
-        <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
-          <button class="hero-action" id="refreshAll">Refresh Data</button>
-          <button class="hero-action" id="returnHome" style="background:rgba(255,255,255,.02);">Return Home</button>
+        <div class="hero-actions">
+          <button class="hero-btn" id="refreshAll">Refresh Data</button>
+          <button class="hero-btn" id="returnHome">Return Home</button>
         </div>
       </section>
 
       <section class="metrics">
-        <div class="metric" data-summary="prayerRequests">
+        <article class="metric" data-summary="prayerRequests">
           <div class="metric-label">Prayer Requests</div>
           <div class="metric-value">0</div>
-        </div>
-        <div class="metric" data-summary="messages">
+        </article>
+        <article class="metric" data-summary="subscriptions">
+          <div class="metric-label">Subscribers</div>
+          <div class="metric-value">0</div>
+        </article>
+        <article class="metric" data-summary="messages">
           <div class="metric-label">Messages</div>
           <div class="metric-value">0</div>
-        </div>
-        <div class="metric" data-summary="testimonies">
-          <div class="metric-label">Testimonies</div>
-          <div class="metric-value">0</div>
-        </div>
+        </article>
       </section>
 
       <section class="workspace">
         <div class="workspace-head">
-          <div>
-            <h2 id="panelTitle">Prayer Requests</h2>
-            <div class="workspace-tools">
-              <input
-                class="workspace-input"
-                id="entrySearch"
-                type="search"
-                placeholder="Search this collection"
-              />
-              <select class="workspace-select" id="sortEntries">
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-              </select>
-              <select class="workspace-select" id="dateFilter">
-                <option value="all">All time</option>
-                <option value="today">Today</option>
-                <option value="week">Last 7 days</option>
-                <option value="month">Last 30 days</option>
-              </select>
-              <select class="workspace-select" id="quickFilter">
-                <option value="all">All entries</option>
-              </select>
-              <button class="entry-btn secondary" id="exportJson">Export JSON</button>
-              <button class="entry-btn secondary" id="exportCsv">Export CSV</button>
-              <button class="entry-btn secondary" id="copyFiltered">Copy View</button>
-              <button class="entry-btn secondary" id="clearFilters">Clear Filters</button>
-              <button class="entry-btn secondary" id="printView">Print View</button>
-              <button class="entry-btn secondary" id="selectAllVisible">Select Visible</button>
-              <button class="entry-btn danger" id="deleteSelected">Delete Selected</button>
-            </div>
-          </div>
+          <h2 id="panelTitle">Prayer Requests</h2>
           <div class="workspace-status" id="panelStatus">Loading...</div>
-        </div>
-
-        <div class="workspace-summary">
-          <div class="workspace-summary-card">
-            <div class="workspace-summary-label">Visible Entries</div>
-            <div class="workspace-summary-value" id="visibleCount">0 entries</div>
-          </div>
-          <div class="workspace-summary-card">
-            <div class="workspace-summary-label">Selected Entries</div>
-            <div class="workspace-summary-value" id="selectedCount">0 selected</div>
-          </div>
-          <div class="workspace-summary-card">
-            <div class="workspace-summary-label">Latest Visible Entry</div>
-            <div class="workspace-summary-value" id="latestEntry">No entries yet</div>
-          </div>
         </div>
 
         <div class="entry-list" id="entryList"></div>
@@ -588,19 +392,6 @@
         </div>
       </section>
     </main>
-  </div>
-
-  <div class="json-modal" id="jsonModal">
-    <div class="json-sheet">
-      <div class="json-head">
-        <h3 id="jsonModalTitle">Entry JSON</h3>
-        <div class="entry-inline-actions">
-          <button class="entry-btn secondary" id="copyJsonModal">Copy JSON</button>
-          <button class="entry-btn danger" id="closeJsonModal">Close</button>
-        </div>
-      </div>
-      <pre class="json-code" id="jsonModalCode"></pre>
-    </div>
   </div>
 
   <script src="assets/js/admin.js"></script>

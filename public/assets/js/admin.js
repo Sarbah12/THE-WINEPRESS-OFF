@@ -9,10 +9,6 @@
   };
 
   let activeCollection = 'prayerRequests';
-  let loadedItems = [];
-  let filteredItems = [];
-  const selectedEntryIds = new Set();
-  let jsonModalValue = '';
 
   async function readJsonResponse(response, fallbackMessage) {
     const raw = await response.text();
@@ -23,9 +19,93 @@
       return {
         error: response.ok
           ? fallbackMessage
-          : 'The backend returned an unexpected response. Please refresh or redeploy and try again.'
+          : 'The backend returned an unexpected response. Please refresh and try again.'
       };
     }
+  }
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function formatDate(value) {
+    if (!value) {
+      return 'Unknown time';
+    }
+
+    return new Date(value).toLocaleString();
+  }
+
+  function entryBody(collection, item) {
+    if (collection === 'subscriptions') {
+      return `
+        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
+        <p><strong>Source:</strong> ${escapeHtml(item.source || 'website')}</p>
+      `;
+    }
+
+    if (collection === 'prayerRequests') {
+      return `
+        <p><strong>Name:</strong> ${escapeHtml(item.name || 'Anonymous')}</p>
+        <p><strong>Email:</strong> ${escapeHtml(item.email || 'Not provided')}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(item.phone || 'Not provided')}</p>
+        <p><strong>Urgency:</strong> ${escapeHtml(item.urgency || 'normal')}</p>
+        <p><strong>Request:</strong> ${escapeHtml(item.request || '')}</p>
+      `;
+    }
+
+    if (collection === 'messages') {
+      return `
+        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(item.subject || 'General enquiry')}</p>
+        <p><strong>Message:</strong> ${escapeHtml(item.message || '')}</p>
+      `;
+    }
+
+    if (collection === 'collaborations') {
+      return `
+        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
+        <p><strong>Organisation:</strong> ${escapeHtml(item.organisation || 'Not provided')}</p>
+        <p><strong>Platform:</strong> ${escapeHtml(item.platform || 'Not provided')}</p>
+        <p><strong>Idea:</strong> ${escapeHtml(item.idea || '')}</p>
+      `;
+    }
+
+    if (collection === 'testimonies') {
+      const displayName = item.anonymous
+        ? 'Anonymous'
+        : `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Not provided';
+
+      return `
+        <p><strong>Name:</strong> ${escapeHtml(displayName)}</p>
+        <p><strong>Headline:</strong> ${escapeHtml(item.headline || '')}</p>
+        <p><strong>Theme:</strong> ${escapeHtml(item.theme || 'Not specified')}</p>
+        <p><strong>Status:</strong> ${escapeHtml(item.status || 'pending-review')}</p>
+        <p><strong>Story:</strong> ${escapeHtml(item.story || '')}</p>
+      `;
+    }
+
+    return `
+      <p><strong>Category:</strong> ${escapeHtml(item.category || 'Prayer')}</p>
+      <p><strong>Text:</strong> ${escapeHtml(item.text || '')}</p>
+      <p><strong>Prayed:</strong> ${item.prayerCount || 0}</p>
+    `;
+  }
+
+  function testimonyActions(item) {
+    return `
+      <select class="status-select" data-status-id="${item.id}">
+        <option value="pending-review" ${item.status === 'pending-review' ? 'selected' : ''}>Pending Review</option>
+        <option value="approved" ${item.status === 'approved' ? 'selected' : ''}>Approved</option>
+        <option value="archived" ${item.status === 'archived' ? 'selected' : ''}>Archived</option>
+      </select>
+      <button class="entry-btn secondary" data-update-id="${item.id}">Update Status</button>
+    `;
   }
 
   async function loadBackendStatus() {
@@ -43,23 +123,12 @@
         throw new Error(data.error || 'Backend health check failed.');
       }
 
-      const isVercel = window.location.hostname.includes('vercel.app');
-      if (data.storage === 'postgres') {
-        target.textContent = 'Backend connected. Live submissions are saving correctly.';
+      if (data.storage === 'postgres' || data.storage === 'blob') {
+        target.textContent = 'Backend connected.';
         return;
       }
 
-      if (data.storage === 'blob') {
-        target.textContent = 'Backend connected. Live submissions are saving correctly.';
-        return;
-      }
-
-      if (isVercel) {
-        target.textContent = 'Backend is running, but storage setup still needs attention.';
-        return;
-      }
-
-      target.textContent = 'Backend connected. Local file storage is active for development.';
+      target.textContent = 'Backend is running.';
     } catch (error) {
       target.textContent = error.message || 'Unable to verify backend connection right now.';
     }
@@ -72,484 +141,30 @@
       throw new Error(data.error || 'Unable to load overview.');
     }
 
-    document.querySelectorAll('[data-summary]').forEach(card => {
+    document.querySelectorAll('[data-summary]').forEach(function (card) {
       const key = card.dataset.summary;
-      card.querySelector('.metric-value').textContent = data.collections[key] || 0;
+      const value = data.collections && typeof data.collections[key] === 'number'
+        ? data.collections[key]
+        : 0;
+      card.querySelector('.metric-value').textContent = value;
     });
-  }
-
-  function formatDate(value) {
-    if (!value) return 'Unknown time';
-    return new Date(value).toLocaleString();
-  }
-
-  function escapeHtml(value) {
-    return String(value || '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#39;');
-  }
-
-  function entryBody(collection, item) {
-    if (collection === 'subscriptions') {
-      return `
-        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
-        <p><strong>Source:</strong> ${escapeHtml(item.source)}</p>
-      `;
-    }
-
-    if (collection === 'prayerRequests') {
-      return `
-        <p><strong>Name:</strong> ${escapeHtml(item.name || 'Anonymous')}</p>
-        <p><strong>Email:</strong> ${escapeHtml(item.email || 'Not provided')}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(item.phone || 'Not provided')}</p>
-        <p><strong>Season:</strong> ${escapeHtml(item.season || 'Not provided')}</p>
-        <p><strong>Urgency:</strong> ${escapeHtml(item.urgency || 'normal')}</p>
-        <p><strong>Follow-up Requested:</strong> ${item.followUp ? 'Yes' : 'No'}</p>
-        <p><strong>Topics:</strong> ${escapeHtml((item.topics || []).join(', ') || 'Not specified')}</p>
-        <p><strong>Prayer Wall:</strong> ${item.addToWall ? 'Yes' : 'No'}</p>
-        <p><strong>Request:</strong> ${escapeHtml(item.request)}</p>
-      `;
-    }
-
-    if (collection === 'messages') {
-      return `
-        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
-        <p><strong>Location:</strong> ${escapeHtml(item.city || 'Not provided')}</p>
-        <p><strong>Subject:</strong> ${escapeHtml(item.subject || 'Not specified')}</p>
-        <p><strong>Message:</strong> ${escapeHtml(item.message)}</p>
-      `;
-    }
-
-    if (collection === 'collaborations') {
-      return `
-        <p><strong>Name:</strong> ${escapeHtml(item.name)}</p>
-        <p><strong>Organisation:</strong> ${escapeHtml(item.organisation || 'Not provided')}</p>
-        <p><strong>Platform:</strong> ${escapeHtml(item.platform || 'Not provided')}</p>
-        <p><strong>Type:</strong> ${escapeHtml(item.type || 'Not specified')}</p>
-        <p><strong>Idea:</strong> ${escapeHtml(item.idea)}</p>
-      `;
-    }
-
-    if (collection === 'testimonies') {
-      return `
-        <p><strong>Name:</strong> ${item.anonymous ? 'Anonymous' : escapeHtml(`${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Not provided')}</p>
-        <p><strong>Origin:</strong> ${escapeHtml(item.origin || 'Not provided')}</p>
-        <p><strong>Theme:</strong> ${escapeHtml(item.theme || 'Not specified')}</p>
-        <p><strong>Headline:</strong> ${escapeHtml(item.headline)}</p>
-        <p><strong>Verse:</strong> ${escapeHtml(item.verse || 'Not provided')}</p>
-        <p><strong>Story:</strong> ${escapeHtml(item.story)}</p>
-      `;
-    }
-
-    return `
-      <p><strong>Category:</strong> ${escapeHtml(item.category || 'Prayer')}</p>
-      <p><strong>Text:</strong> ${escapeHtml(item.text)}</p>
-      <p><strong>Prayed:</strong> ${item.prayerCount || 0}</p>
-    `;
-  }
-
-  function testimonyActions(item) {
-    return `
-      <div class="entry-inline-actions">
-        <select class="status-select" data-status-id="${item.id}">
-          <option value="pending-review" ${item.status === 'pending-review' ? 'selected' : ''}>Pending Review</option>
-          <option value="approved" ${item.status === 'approved' ? 'selected' : ''}>Approved</option>
-          <option value="archived" ${item.status === 'archived' ? 'selected' : ''}>Archived</option>
-        </select>
-        <button class="entry-btn muted" data-update-id="${item.id}">Update Status</button>
-      </div>
-    `;
-  }
-
-  function searchableText(item) {
-    return Object.values(item || {})
-      .flatMap(value => Array.isArray(value) ? value : [value])
-      .map(value => String(value || '').toLowerCase())
-      .join(' ');
-  }
-
-  function normalizeItems(items) {
-    const sortSelect = document.getElementById('sortEntries');
-    const searchInput = document.getElementById('entrySearch');
-    const dateFilter = document.getElementById('dateFilter');
-    const quickFilter = document.getElementById('quickFilter');
-    const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
-    const sortMode = sortSelect ? sortSelect.value : 'newest';
-    const dateMode = dateFilter ? dateFilter.value : 'all';
-    const quickMode = quickFilter ? quickFilter.value : 'all';
-    const now = Date.now();
-
-    let nextItems = items.slice();
-
-    if (query) {
-      nextItems = nextItems.filter(item => searchableText(item).includes(query));
-    }
-
-    if (dateMode !== 'all') {
-      const thresholds = {
-        today: 1000 * 60 * 60 * 24,
-        week: 1000 * 60 * 60 * 24 * 7,
-        month: 1000 * 60 * 60 * 24 * 30
-      };
-      const limit = thresholds[dateMode];
-      if (limit) {
-        nextItems = nextItems.filter(item => {
-          const createdAt = new Date(item.createdAt || 0).getTime();
-          return createdAt && (now - createdAt) <= limit;
-        });
-      }
-    }
-
-    if (quickMode !== 'all') {
-      nextItems = nextItems.filter(function (item) {
-        if (quickMode === 'urgent') return String(item.urgency || '').toLowerCase() === 'urgent';
-        if (quickMode === 'follow-up') return Boolean(item.followUp);
-        if (quickMode === 'wall') return Boolean(item.addToWall);
-        if (quickMode === 'pending-review') return item.status === 'pending-review';
-        if (quickMode === 'approved') return item.status === 'approved';
-        if (quickMode === 'archived') return item.status === 'archived';
-        if (quickMode === 'anonymous') return Boolean(item.anonymous);
-        if (quickMode === 'general-enquiry') return String(item.subject || '').toLowerCase() === 'general enquiry';
-        if (quickMode === 'with-organisation') return Boolean(String(item.organisation || '').trim());
-        return true;
-      });
-    }
-
-    nextItems.sort((left, right) => {
-      const leftTime = new Date(left.createdAt || 0).getTime();
-      const rightTime = new Date(right.createdAt || 0).getTime();
-      return sortMode === 'oldest' ? leftTime - rightTime : rightTime - leftTime;
-    });
-
-    return nextItems;
-  }
-
-  function csvValue(value) {
-    return `"${String(value == null ? '' : value).replaceAll('"', '""')}"`;
-  }
-
-  function collectionExportRows(items) {
-    return items.map(item => {
-      const row = {};
-      Object.entries(item || {}).forEach(([key, value]) => {
-        row[key] = Array.isArray(value) ? value.join(', ') : value;
-      });
-      return row;
-    });
-  }
-
-  function downloadFile(filename, contents, type) {
-    const blob = new Blob([contents], { type });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(link.href);
-  }
-
-  function exportJson() {
-    const name = activeCollection || 'collection';
-    downloadFile(`${name}.json`, JSON.stringify(filteredItems, null, 2), 'application/json');
-  }
-
-  function exportCsv() {
-    const rows = collectionExportRows(filteredItems);
-    if (!rows.length) {
-      alert('There are no entries to export in this view yet.');
-      return;
-    }
-
-    const headers = Array.from(rows.reduce((set, row) => {
-      Object.keys(row).forEach(key => set.add(key));
-      return set;
-    }, new Set()));
-
-    const lines = [
-      headers.map(csvValue).join(','),
-      ...rows.map(row => headers.map(header => csvValue(row[header])).join(','))
-    ];
-
-    downloadFile(`${activeCollection}.csv`, lines.join('\n'), 'text/csv;charset=utf-8');
-  }
-
-  async function copyEntry(item) {
-    const lines = Object.entries(item || {}).map(([key, value]) => {
-      const printable = Array.isArray(value) ? value.join(', ') : value;
-      return `${key}: ${printable == null ? '' : printable}`;
-    });
-
-    try {
-      await navigator.clipboard.writeText(lines.join('\n'));
-      alert('Entry copied.');
-    } catch {
-      alert('Could not copy this entry right now.');
-    }
-  }
-
-  function quickFilterOptions(collection) {
-    const defaults = [{ value: 'all', label: 'All entries' }];
-    if (collection === 'prayerRequests') {
-      return defaults.concat([
-        { value: 'urgent', label: 'Urgent only' },
-        { value: 'follow-up', label: 'Follow-up requested' },
-        { value: 'wall', label: 'Prayer wall entries' }
-      ]);
-    }
-
-    if (collection === 'testimonies') {
-      return defaults.concat([
-        { value: 'pending-review', label: 'Pending review' },
-        { value: 'approved', label: 'Approved' },
-        { value: 'archived', label: 'Archived' },
-        { value: 'anonymous', label: 'Anonymous only' }
-      ]);
-    }
-
-    if (collection === 'messages') {
-      return defaults.concat([
-        { value: 'general-enquiry', label: 'General enquiries' }
-      ]);
-    }
-
-    if (collection === 'collaborations') {
-      return defaults.concat([
-        { value: 'with-organisation', label: 'With organisation' }
-      ]);
-    }
-
-    return defaults;
-  }
-
-  function syncQuickFilterOptions() {
-    const quickFilter = document.getElementById('quickFilter');
-    if (!quickFilter) {
-      return;
-    }
-
-    const previous = quickFilter.value || 'all';
-    const options = quickFilterOptions(activeCollection);
-    quickFilter.innerHTML = options.map(option => `
-      <option value="${option.value}">${option.label}</option>
-    `).join('');
-
-    quickFilter.value = options.some(option => option.value === previous) ? previous : 'all';
-  }
-
-  function openJsonModal(item) {
-    const modal = document.getElementById('jsonModal');
-    const title = document.getElementById('jsonModalTitle');
-    const code = document.getElementById('jsonModalCode');
-    if (!modal || !title || !code) {
-      return;
-    }
-
-    jsonModalValue = JSON.stringify(item, null, 2);
-    title.textContent = `${collectionLabels[activeCollection]} JSON`;
-    code.textContent = jsonModalValue;
-    modal.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeJsonModal() {
-    const modal = document.getElementById('jsonModal');
-    if (!modal) {
-      return;
-    }
-
-    modal.classList.remove('is-open');
-    document.body.style.overflow = '';
-  }
-
-  async function copyJsonModalValue() {
-    if (!jsonModalValue) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(jsonModalValue);
-      alert('JSON copied.');
-    } catch {
-      alert('Could not copy JSON right now.');
-    }
-  }
-
-  async function copyFilteredView() {
-    if (!filteredItems.length) {
-      alert('There are no visible entries to copy right now.');
-      return;
-    }
-
-    const payload = filteredItems.map(item => {
-      const lines = Object.entries(item || {}).map(([key, value]) => {
-        const printable = Array.isArray(value) ? value.join(', ') : value;
-        return `${key}: ${printable == null ? '' : printable}`;
-      });
-      return lines.join('\n');
-    }).join('\n\n---\n\n');
-
-    try {
-      await navigator.clipboard.writeText(payload);
-      alert('Current view copied.');
-    } catch {
-      alert('Could not copy the current view right now.');
-    }
-  }
-
-  function updateSummary(items) {
-    const visibleCount = document.getElementById('visibleCount');
-    const selectedCount = document.getElementById('selectedCount');
-    const latestEntry = document.getElementById('latestEntry');
-
-    if (visibleCount) {
-      visibleCount.textContent = `${items.length} entr${items.length === 1 ? 'y' : 'ies'}`;
-    }
-
-    if (selectedCount) {
-      selectedCount.textContent = `${selectedEntryIds.size} selected`;
-    }
-
-    if (latestEntry) {
-      const item = items[0];
-      latestEntry.textContent = item
-        ? `${formatDate(item.createdAt)}${item.name ? ` • ${item.name}` : ''}`
-        : 'No entries yet';
-    }
-  }
-
-  function clearAllFilters() {
-    const searchInput = document.getElementById('entrySearch');
-    const sortSelect = document.getElementById('sortEntries');
-    const dateFilter = document.getElementById('dateFilter');
-    const quickFilter = document.getElementById('quickFilter');
-
-    if (searchInput) searchInput.value = '';
-    if (sortSelect) sortSelect.value = 'newest';
-    if (dateFilter) dateFilter.value = 'all';
-    if (quickFilter) quickFilter.value = 'all';
-
-    selectedEntryIds.clear();
-    renderCollection(loadedItems);
-  }
-
-  function printCurrentView() {
-    window.print();
-  }
-
-  function syncSelectionState() {
-    document.querySelectorAll('[data-select-id]').forEach(input => {
-      const checked = selectedEntryIds.has(input.dataset.selectId);
-      input.checked = checked;
-      const card = input.closest('.entry-card');
-      if (card) {
-        card.classList.toggle('is-selected', checked);
-      }
-    });
-    updateSummary(filteredItems);
-  }
-
-  async function deleteSelectedEntries() {
-    const ids = Array.from(selectedEntryIds);
-    if (!ids.length) {
-      alert('Select one or more entries first.');
-      return;
-    }
-
-    if (!window.confirm(`Delete ${ids.length} selected entr${ids.length === 1 ? 'y' : 'ies'}?`)) {
-      return;
-    }
-
-    for (const entryId of ids) {
-      const response = await fetch(`/api/admin/${activeCollection}/${entryId}`, {
-        method: 'DELETE'
-      });
-      const data = await readJsonResponse(response, `Delete failed for ${entryId}.`);
-      if (!response.ok) {
-        alert(data.error || `Delete failed for ${entryId}.`);
-        return;
-      }
-    }
-
-    selectedEntryIds.clear();
-    await loadOverview();
-    await loadCollection(activeCollection);
-  }
-
-  function toggleSelectAllVisible() {
-    const allVisibleSelected = filteredItems.length > 0 && filteredItems.every(item => selectedEntryIds.has(item.id));
-    filteredItems.forEach(item => {
-      if (allVisibleSelected) {
-        selectedEntryIds.delete(item.id);
-      } else {
-        selectedEntryIds.add(item.id);
-      }
-    });
-    syncSelectionState();
-  }
-
-  function renderCollection(items) {
-    filteredItems = normalizeItems(items);
-
-    const list = document.getElementById('entryList');
-    const empty = document.getElementById('emptyState');
-    const status = document.getElementById('panelStatus');
-
-    list.innerHTML = '';
-    empty.style.display = 'none';
-
-    if (!items.length) {
-      empty.style.display = 'block';
-      status.textContent = 'No entries yet.';
-      return;
-    }
-
-    if (!filteredItems.length) {
-      empty.style.display = 'block';
-      status.textContent = 'No entries match your search.';
-      return;
-    }
-
-    list.innerHTML = filteredItems.map(item => `
-      <article class="entry-card">
-        <div class="entry-meta">
-          <div class="entry-meta-primary">
-            <input class="entry-select" type="checkbox" data-select-id="${item.id}" ${selectedEntryIds.has(item.id) ? 'checked' : ''}/>
-            <span class="entry-id">${escapeHtml(item.id)}</span>
-          </div>
-          <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
-        </div>
-        <div class="entry-body">${entryBody(activeCollection, item)}</div>
-        <div class="entry-actions">
-          ${activeCollection === 'testimonies' ? testimonyActions(item) : ''}
-          <button class="entry-btn secondary" data-json-id="${item.id}">View JSON</button>
-          <button class="entry-btn secondary" data-copy-id="${item.id}">Copy</button>
-          <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
-        </div>
-      </article>
-    `).join('');
-
-    status.textContent = `${filteredItems.length} of ${items.length} item${items.length === 1 ? '' : 's'} shown.`;
-    bindEntryActions();
-    syncSelectionState();
   }
 
   async function loadCollection(name) {
     activeCollection = name;
-    selectedEntryIds.clear();
-    syncQuickFilterOptions();
-    document.querySelectorAll('.admin-tab').forEach(tab => {
+    document.querySelectorAll('.admin-tab').forEach(function (tab) {
       tab.classList.toggle('active', tab.dataset.collection === name);
     });
 
     const title = document.getElementById('panelTitle');
     const status = document.getElementById('panelStatus');
+    const list = document.getElementById('entryList');
+    const empty = document.getElementById('emptyState');
 
     title.textContent = collectionLabels[name];
     status.textContent = 'Loading...';
+    list.innerHTML = '';
+    empty.style.display = 'none';
 
     try {
       const response = await fetch(`/api/admin/${name}`);
@@ -558,46 +173,38 @@
         throw new Error(data.error || 'Unable to load data.');
       }
 
-      loadedItems = Array.isArray(data.items) ? data.items : [];
-      renderCollection(loadedItems);
+      const items = Array.isArray(data.items) ? data.items : [];
+      if (!items.length) {
+        empty.style.display = 'block';
+        status.textContent = 'No entries yet.';
+        return;
+      }
+
+      list.innerHTML = items.map(function (item) {
+        return `
+          <article class="entry-card">
+            <div class="entry-meta">
+              <span class="entry-id">${escapeHtml(item.id)}</span>
+              <span class="entry-date">${escapeHtml(formatDate(item.createdAt))}</span>
+            </div>
+            <div class="entry-body">${entryBody(name, item)}</div>
+            <div class="entry-actions">
+              ${name === 'testimonies' ? testimonyActions(item) : ''}
+              <button class="entry-btn danger" data-delete-id="${item.id}">Delete</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      status.textContent = `${items.length} item${items.length === 1 ? '' : 's'} loaded.`;
+      bindEntryActions();
     } catch (error) {
-      status.textContent = error.message;
+      status.textContent = error.message || 'Unable to load data.';
     }
   }
 
   function bindEntryActions() {
-    document.querySelectorAll('[data-json-id]').forEach(button => {
-      button.addEventListener('click', function () {
-        const entryId = button.dataset.jsonId;
-        const item = filteredItems.find(entry => entry.id === entryId);
-        if (item) {
-          openJsonModal(item);
-        }
-      });
-    });
-
-    document.querySelectorAll('[data-select-id]').forEach(input => {
-      input.addEventListener('change', function () {
-        if (input.checked) {
-          selectedEntryIds.add(input.dataset.selectId);
-        } else {
-          selectedEntryIds.delete(input.dataset.selectId);
-        }
-        syncSelectionState();
-      });
-    });
-
-    document.querySelectorAll('[data-copy-id]').forEach(button => {
-      button.addEventListener('click', async function () {
-        const entryId = button.dataset.copyId;
-        const item = filteredItems.find(entry => entry.id === entryId);
-        if (item) {
-          await copyEntry(item);
-        }
-      });
-    });
-
-    document.querySelectorAll('[data-delete-id]').forEach(button => {
+    document.querySelectorAll('[data-delete-id]').forEach(function (button) {
       button.addEventListener('click', async function () {
         const entryId = button.dataset.deleteId;
         if (!window.confirm('Delete this entry?')) {
@@ -618,18 +225,18 @@
       });
     });
 
-    document.querySelectorAll('[data-update-id]').forEach(button => {
+    document.querySelectorAll('[data-update-id]').forEach(function (button) {
       button.addEventListener('click', async function () {
         const entryId = button.dataset.updateId;
         const select = document.querySelector(`[data-status-id="${entryId}"]`);
-        const status = select ? select.value : '';
+        const nextStatus = select ? select.value : '';
 
         const response = await fetch(`/api/admin/testimonies/${entryId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ status })
+          body: JSON.stringify({ status: nextStatus })
         });
 
         const data = await readJsonResponse(response, 'Update failed.');
@@ -644,110 +251,16 @@
   }
 
   function bindTabs() {
-    document.querySelectorAll('.admin-tab').forEach(tab => {
+    document.querySelectorAll('.admin-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
         loadCollection(tab.dataset.collection);
       });
     });
   }
 
-  function bindWorkspaceTools() {
-    const searchInput = document.getElementById('entrySearch');
-    const sortSelect = document.getElementById('sortEntries');
-    const dateFilter = document.getElementById('dateFilter');
-    const quickFilter = document.getElementById('quickFilter');
-    const exportJsonButton = document.getElementById('exportJson');
-    const exportCsvButton = document.getElementById('exportCsv');
-    const copyFilteredButton = document.getElementById('copyFiltered');
-    const clearFiltersButton = document.getElementById('clearFilters');
-    const printViewButton = document.getElementById('printView');
-    const selectAllVisibleButton = document.getElementById('selectAllVisible');
-    const deleteSelectedButton = document.getElementById('deleteSelected');
-    const closeJsonModalButton = document.getElementById('closeJsonModal');
-    const copyJsonModalButton = document.getElementById('copyJsonModal');
-    const jsonModal = document.getElementById('jsonModal');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', function () {
-        renderCollection(loadedItems);
-      });
-    }
-
-    if (sortSelect) {
-      sortSelect.addEventListener('change', function () {
-        selectedEntryIds.clear();
-        renderCollection(loadedItems);
-      });
-    }
-
-    if (dateFilter) {
-      dateFilter.addEventListener('change', function () {
-        selectedEntryIds.clear();
-        renderCollection(loadedItems);
-      });
-    }
-
-    if (quickFilter) {
-      quickFilter.addEventListener('change', function () {
-        selectedEntryIds.clear();
-        renderCollection(loadedItems);
-      });
-    }
-
-    if (exportJsonButton) {
-      exportJsonButton.addEventListener('click', exportJson);
-    }
-
-    if (exportCsvButton) {
-      exportCsvButton.addEventListener('click', exportCsv);
-    }
-
-    if (copyFilteredButton) {
-      copyFilteredButton.addEventListener('click', copyFilteredView);
-    }
-
-    if (clearFiltersButton) {
-      clearFiltersButton.addEventListener('click', clearAllFilters);
-    }
-
-    if (printViewButton) {
-      printViewButton.addEventListener('click', printCurrentView);
-    }
-
-    if (selectAllVisibleButton) {
-      selectAllVisibleButton.addEventListener('click', toggleSelectAllVisible);
-    }
-
-    if (deleteSelectedButton) {
-      deleteSelectedButton.addEventListener('click', deleteSelectedEntries);
-    }
-
-    if (closeJsonModalButton) {
-      closeJsonModalButton.addEventListener('click', closeJsonModal);
-    }
-
-    if (copyJsonModalButton) {
-      copyJsonModalButton.addEventListener('click', copyJsonModalValue);
-    }
-
-    if (jsonModal) {
-      jsonModal.addEventListener('click', function (event) {
-        if (event.target === jsonModal) {
-          closeJsonModal();
-        }
-      });
-    }
-
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') {
-        closeJsonModal();
-      }
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', async function () {
     bindTabs();
-    bindWorkspaceTools();
+
     const refreshButton = document.getElementById('refreshAll');
     if (refreshButton) {
       refreshButton.addEventListener('click', async function () {
