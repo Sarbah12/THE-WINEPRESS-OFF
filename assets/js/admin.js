@@ -44,8 +44,13 @@
       }
 
       const isVercel = window.location.hostname.includes('vercel.app');
+      if (data.storage === 'postgres') {
+        target.textContent = 'Backend connected. Live submissions are saving correctly.';
+        return;
+      }
+
       if (data.storage === 'blob') {
-        target.textContent = 'Backend connected. Live submissions are saving to Vercel Blob.';
+        target.textContent = 'Backend connected. Live submissions are saving correctly.';
         return;
       }
 

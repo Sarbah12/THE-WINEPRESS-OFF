@@ -4,6 +4,7 @@
   "private": true,
   "description": "The Winepress website with a lightweight Node backend.",
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
     "@vercel/blob": "^2.3.0"
   },
   "scripts": {

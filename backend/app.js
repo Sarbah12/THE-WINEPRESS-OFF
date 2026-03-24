@@ -7,6 +7,11 @@ const DATA_DIR = path.join(ROOT_DIR, 'backend', 'data');
 const FALLBACK_DATA_DIR = process.env.VERCEL
   ? path.join('/tmp', 'the-winepress-data')
   : DATA_DIR;
+const POSTGRES_URL = process.env.DATABASE_URL
+  || process.env.POSTGRES_URL
+  || process.env.POSTGRES_PRISMA_URL
+  || process.env.NEON_DATABASE_URL
+  || '';
 const SESSION_COOKIE = 'winepress_admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 const ADMIN_PIN = String(process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || '').trim();
@@ -286,9 +291,73 @@ async function createBlobStorage() {
   };
 }
 
+async function createPostgresStorage() {
+  const { neon } = require('@neondatabase/serverless');
+  const sql = neon(POSTGRES_URL);
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS winepress_collections (
+      name TEXT PRIMARY KEY,
+      data JSONB NOT NULL DEFAULT '[]'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  for (const [name, seed] of Object.entries(dataFiles)) {
+    await sql`
+      INSERT INTO winepress_collections (name, data)
+      VALUES (${name}, ${JSON.stringify(seed)}::jsonb)
+      ON CONFLICT (name) DO NOTHING
+    `;
+  }
+
+  async function readCollection(name) {
+    const rows = await sql`
+      SELECT data
+      FROM winepress_collections
+      WHERE name = ${name}
+      LIMIT 1
+    `;
+
+    if (!rows.length) {
+      const seed = dataFiles[name] || [];
+      await writeCollection(name, seed);
+      return seed;
+    }
+
+    return Array.isArray(rows[0].data) ? rows[0].data : [];
+  }
+
+  async function writeCollection(name, data) {
+    await sql`
+      INSERT INTO winepress_collections (name, data, updated_at)
+      VALUES (${name}, ${JSON.stringify(data)}::jsonb, NOW())
+      ON CONFLICT (name)
+      DO UPDATE SET
+        data = EXCLUDED.data,
+        updated_at = NOW()
+    `;
+  }
+
+  return {
+    type: 'postgres',
+    readCollection,
+    writeCollection
+  };
+}
+
 async function getStorage() {
   if (cachedStorage) {
     return cachedStorage;
+  }
+
+  if (POSTGRES_URL) {
+    try {
+      cachedStorage = await createPostgresStorage();
+      return cachedStorage;
+    } catch (error) {
+      console.error('Postgres storage unavailable, trying other storage.', error);
+    }
   }
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
