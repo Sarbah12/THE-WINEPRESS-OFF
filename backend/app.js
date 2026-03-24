@@ -331,61 +331,59 @@ async function createPostgresStorage() {
   const sql = neon(POSTGRES_URL);
 
   await sql`
-    CREATE TABLE IF NOT EXISTS winepress_collections (
-      name TEXT PRIMARY KEY,
-      data JSONB NOT NULL DEFAULT '[]'::jsonb,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    CREATE TABLE IF NOT EXISTS winepress_entries (
+      collection_name TEXT NOT NULL,
+      entry_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      payload JSONB NOT NULL,
+      PRIMARY KEY (collection_name, entry_id)
     )
   `;
 
-  for (const [name, seed] of Object.entries(dataFiles)) {
-    await sql`
-      INSERT INTO winepress_collections (name, data)
-      VALUES (${name}, CAST(${JSON.stringify(seed)} AS jsonb))
-      ON CONFLICT (name) DO NOTHING
-    `;
-  }
-
   async function readCollection(name) {
     const rows = await sql`
-      SELECT data
-      FROM winepress_collections
-      WHERE name = ${name}
-      LIMIT 1
+      SELECT payload
+      FROM winepress_entries
+      WHERE collection_name = ${name}
+      ORDER BY created_at DESC, entry_id DESC
     `;
 
-    if (!rows.length) {
-      const seed = dataFiles[name] || [];
-      await writeCollection(name, seed);
-      return seed;
-    }
-
-    const value = rows[0].data;
-    if (Array.isArray(value)) {
-      return value;
-    }
-
-    if (typeof value === 'string') {
-      try {
-        const parsed = JSON.parse(value);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
+    return rows.map(row => {
+      const value = row.payload;
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return value;
       }
-    }
 
-    return [];
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+        } catch {
+          return null;
+        }
+      }
+
+      return null;
+    }).filter(Boolean);
   }
 
   async function writeCollection(name, data) {
-    await sql`
-      INSERT INTO winepress_collections (name, data, updated_at)
-      VALUES (${name}, CAST(${JSON.stringify(data)} AS jsonb), NOW())
-      ON CONFLICT (name)
-      DO UPDATE SET
-        data = EXCLUDED.data,
-        updated_at = NOW()
-    `;
+    await sql`DELETE FROM winepress_entries WHERE collection_name = ${name}`;
+
+    for (const entry of data) {
+      const entryId = String(entry && entry.id ? entry.id : createId(name));
+      const createdAt = entry && entry.createdAt ? new Date(entry.createdAt) : new Date();
+
+      await sql`
+        INSERT INTO winepress_entries (collection_name, entry_id, created_at, payload)
+        VALUES (
+          ${name},
+          ${entryId},
+          ${createdAt.toISOString()},
+          CAST(${JSON.stringify({ ...entry, id: entryId, createdAt: entry.createdAt || createdAt.toISOString() })} AS jsonb)
+        )
+      `;
+    }
   }
 
   return {
