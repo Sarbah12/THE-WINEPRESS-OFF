@@ -11,6 +11,11 @@ const POSTGRES_URL = process.env.DATABASE_URL
   || process.env.POSTGRES_URL
   || process.env.POSTGRES_PRISMA_URL
   || process.env.NEON_DATABASE_URL
+  || process.env.STORAGE_DATABASE_URL
+  || process.env.STORAGE_POSTGRES_URL
+  || process.env.STORAGE_POSTGRES_PRISMA_URL
+  || process.env.STORAGE_NEON_DATABASE_URL
+  || process.env.STORAGE_URL
   || '';
 const SESSION_COOKIE = 'winepress_admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
