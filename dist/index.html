@@ -390,6 +390,85 @@
     .dv-read { font-size: .62rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--wine); transition: letter-spacing .2s; }
     .dv-small:hover .dv-read { letter-spacing: .12em; }
 
+    /*
+       ALIGNMENT MARATHON
+     */
+    .alignment-home {
+      background:
+        radial-gradient(circle at top left, rgba(176,80,104,.14), transparent 34%),
+        linear-gradient(135deg, #fff7f4 0%, #f7efe8 100%);
+      padding: 8rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .alignment-home::after {
+      content: 'ALIGNMENT';
+      position: absolute; top: 1rem; right: 2rem;
+      font-family: var(--serif-c); font-size: 7rem; font-weight: 900;
+      color: rgba(107,26,42,.05); letter-spacing: .08em;
+      pointer-events: none;
+    }
+    .alignment-wrap { display: grid; grid-template-columns: 1.2fr .95fr; gap: 2rem; position: relative; z-index: 1; align-items: stretch; }
+    .alignment-main {
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(107,26,42,.08);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: 0 20px 70px rgba(107,26,42,.08);
+    }
+    .alignment-kicker {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-family: var(--serif-c); font-size: .56rem; font-weight: 600;
+      letter-spacing: .24em; text-transform: uppercase; color: var(--wine);
+      margin-bottom: 1.2rem;
+    }
+    .alignment-kicker::before { content: ''; width: 2rem; height: 1px; background: var(--wine); }
+    .alignment-title {
+      font-family: var(--serif-d); font-size: clamp(2.4rem, 4.7vw, 4.4rem);
+      font-weight: 400; line-height: 1.02; color: var(--ink); margin-bottom: 1rem;
+    }
+    .alignment-title em { font-style: italic; color: var(--wine); }
+    .alignment-copy { font-size: .95rem; color: var(--muted); line-height: 1.95; max-width: 650px; margin-bottom: 1rem; }
+    .alignment-meta { display: flex; flex-wrap: wrap; gap: .8rem; margin: 1.8rem 0 2.2rem; }
+    .alignment-pill {
+      display: inline-flex; align-items: center; padding: .55rem 1rem; border-radius: 999px;
+      background: rgba(107,26,42,.08); border: 1px solid rgba(107,26,42,.1); color: var(--wine);
+      font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .alignment-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+    .alignment-note { border-top: 1px solid var(--wine-pale); padding-top: 1.2rem; font-size: .82rem; color: var(--muted); line-height: 1.8; }
+    .alignment-note strong { color: var(--ink); }
+    .alignment-side { display: grid; gap: 1rem; }
+    .alignment-card {
+      background: var(--wine); color: var(--white); border-radius: 24px; padding: 2rem; min-height: 220px; position: relative; overflow: hidden;
+    }
+    .alignment-card::after {
+      content: ''; position: absolute; inset: auto -3rem -4rem auto; width: 14rem; height: 14rem;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,.12);
+    }
+    .alignment-card-label {
+      font-family: var(--serif-c); font-size: .54rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,255,255,.55); margin-bottom: 1rem; display: block; position: relative; z-index: 1;
+    }
+    .alignment-card h3 {
+      font-family: var(--serif-d); font-size: 1.8rem; font-weight: 400; line-height: 1.15; margin-bottom: .8rem; position: relative; z-index: 1;
+    }
+    .alignment-card p { font-size: .86rem; color: rgba(255,255,255,.72); line-height: 1.8; position: relative; z-index: 1; }
+    .alignment-days {
+      background: var(--white); border: 1px solid rgba(107,26,42,.08); border-radius: 24px; padding: 2rem;
+      box-shadow: 0 18px 60px rgba(107,26,42,.06);
+    }
+    .alignment-days h3 { font-family: var(--serif-d); font-size: 1.5rem; font-weight: 400; margin-bottom: 1rem; color: var(--ink); }
+    .alignment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; }
+    .alignment-day-link {
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .95rem 1rem;
+      border-radius: 16px; border: 1px solid rgba(107,26,42,.08); background: var(--off);
+      transition: transform .2s, border-color .2s, background .2s;
+    }
+    .alignment-day-link:hover { transform: translateY(-2px); border-color: rgba(107,26,42,.18); background: #fff; }
+    .alignment-day-link strong { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--wine); }
+    .alignment-day-link span { font-size: .78rem; color: var(--muted); }
+
     /* 
        TESTIMONIES
      */
@@ -577,13 +656,16 @@
       .hero-content { padding: 0 2.5rem 6rem; max-width: 580px; }
       .hero-scroll { right: 2.5rem; }
       .about, .devs, .testi, .res, .sub { padding-left: 2.5rem; padding-right: 2.5rem; }
+      .alignment-home { padding-left: 2.5rem; padding-right: 2.5rem; }
       footer { padding-left: 2.5rem; padding-right: 2.5rem; }
       .about { grid-template-columns: 1fr; gap: 4rem; padding-top: 6rem; }
+      .alignment-wrap, .testi-top { grid-template-columns: 1fr; }
+      .alignment-grid { grid-template-columns: repeat(3, 1fr); }
       .about-photos { height: 400px; }
       .dv-featured-home { grid-template-columns: 1fr; }
       .dv-feat-img-wrap img { min-height: 280px; }
       .devs-grid { grid-template-columns: repeat(3, 1fr); }
-      .testi-top { grid-template-columns: 1fr; gap: 2rem; }
+      .testi-top { gap: 2rem; }
       .testi-grid { grid-template-columns: 1fr 1fr; }
       .res-grid { grid-template-columns: 1fr 1fr; }
       .foot-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
@@ -596,12 +678,16 @@
       .hero-content { padding: 0 1.5rem 7rem; }
       .hero-scroll { display: none; }
       .about, .devs, .testi, .res, .sub { padding-left: 1.5rem; padding-right: 1.5rem; padding-top: 5rem; padding-bottom: 5rem; }
+      .alignment-home { padding: 5rem 1.5rem; }
       footer { padding: 4rem 1.5rem 2rem; }
+      .alignment-main, .alignment-card, .alignment-days { padding: 1.6rem; }
       .about-photos { height: 360px; }
       .about-verse-chip { display: none; }
       .testi-grid { grid-template-columns: 1fr; }
       .res-grid { grid-template-columns: 1fr; }
       .devs-grid { grid-template-columns: 1fr 1fr; }
+      .alignment-grid { grid-template-columns: 1fr; }
+      .alignment-actions { flex-direction: column; align-items: flex-start; }
       .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .foot-bottom { flex-direction: column; gap: .6rem; text-align: center; }
       .strip { grid-template-columns: 1fr; height: 300px; }
@@ -710,6 +796,54 @@
         <div><span class="stat-num">100+</span><span class="stat-lbl">Lives Touched</span></div>
       </div>
       <a href="about.html" class="btn-wine">Read Our Story</a>
+    </div>
+  </section>
+
+  <section class="alignment-home" id="alignment">
+    <div class="alignment-wrap">
+      <div class="alignment-main">
+        <div class="alignment-kicker">April Devotional Marathon</div>
+        <h2 class="alignment-title">Alignment: <em>14 Days of Corporate Fasting, Prayer and Devotion</em></h2>
+        <p class="alignment-copy">This April, The Winepress is entering a 14-day devotional marathon called <strong>Alignment</strong> — a focused journey of corporate fasting, prayer, and daily devotion to help us realign our hearts with the voice, will, and presence of God.</p>
+        <p class="alignment-copy">This space is ready for the full experience: each daily devotional, the prayer focus for the day, and the meeting link you will send later can all live here in one clear flow.</p>
+        <div class="alignment-meta">
+          <span class="alignment-pill">14 Days</span>
+          <span class="alignment-pill">Corporate Fast</span>
+          <span class="alignment-pill">Prayer Journey</span>
+          <span class="alignment-pill">April Gathering</span>
+        </div>
+        <div class="alignment-actions">
+          <a href="alignment.html" class="btn-wine">Enter Alignment</a>
+          <a href="alignment-day-01.html" class="btn-ghost-white" style="border-color:rgba(107,26,42,.2);color:var(--wine);">Start Day 1</a>
+        </div>
+        <p class="alignment-note"><strong>Ready for updates:</strong> once you send the daily devotionals and your meeting link, I can place them directly into the Alignment pages without changing the structure again.</p>
+      </div>
+      <div class="alignment-side">
+        <div class="alignment-card">
+          <span class="alignment-card-label">What This Is</span>
+          <h3>A prayerful season of realignment.</h3>
+          <p>Designed for believers who want to seek God intentionally through Scripture, fasting, reflection, and daily corporate agreement.</p>
+        </div>
+        <div class="alignment-days">
+          <h3>Daily Devotionals</h3>
+          <div class="alignment-grid">
+            <a href="alignment-day-01.html" class="alignment-day-link"><strong>Day 01</strong><span>Open</span></a>
+            <a href="alignment-day-02.html" class="alignment-day-link"><strong>Day 02</strong><span>Open</span></a>
+            <a href="alignment-day-03.html" class="alignment-day-link"><strong>Day 03</strong><span>Open</span></a>
+            <a href="alignment-day-04.html" class="alignment-day-link"><strong>Day 04</strong><span>Open</span></a>
+            <a href="alignment-day-05.html" class="alignment-day-link"><strong>Day 05</strong><span>Open</span></a>
+            <a href="alignment-day-06.html" class="alignment-day-link"><strong>Day 06</strong><span>Open</span></a>
+            <a href="alignment-day-07.html" class="alignment-day-link"><strong>Day 07</strong><span>Open</span></a>
+            <a href="alignment-day-08.html" class="alignment-day-link"><strong>Day 08</strong><span>Open</span></a>
+            <a href="alignment-day-09.html" class="alignment-day-link"><strong>Day 09</strong><span>Open</span></a>
+            <a href="alignment-day-10.html" class="alignment-day-link"><strong>Day 10</strong><span>Open</span></a>
+            <a href="alignment-day-11.html" class="alignment-day-link"><strong>Day 11</strong><span>Open</span></a>
+            <a href="alignment-day-12.html" class="alignment-day-link"><strong>Day 12</strong><span>Open</span></a>
+            <a href="alignment-day-13.html" class="alignment-day-link"><strong>Day 13</strong><span>Open</span></a>
+            <a href="alignment-day-14.html" class="alignment-day-link"><strong>Day 14</strong><span>Open</span></a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

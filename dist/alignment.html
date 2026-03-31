@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <base href="/"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Join Alignment, a 14-day corporate fasting and prayer devotional marathon from The Winepress, created to help believers realign with God through Scripture, prayer, and daily reflection."/>
+  <meta name="robots" content="index, follow, max-image-preview:large"/>
+  <title>Alignment | 14 Days of Fasting, Prayer and Devotion</title>
+  <script>
+    window.WINEPRESS_SEO = {
+      siteUrl: 'https://thewinepressofficial.com',
+      title: 'Alignment | 14 Days of Fasting, Prayer and Devotion',
+      description: 'Join Alignment, a 14-day corporate fasting and prayer devotional marathon from The Winepress, created to help believers realign with God through Scripture, prayer, and daily reflection.',
+      path: '/alignment/',
+      pageType: 'CollectionPage',
+      author: 'Afua',
+      keywords: ['Alignment devotional marathon', '14 day fasting and prayer', 'The Winepress Alignment', 'corporate fasting devotional', 'Christian prayer journey'],
+      about: ['corporate fasting', 'prayer journey', 'daily devotionals', 'spiritual alignment', 'The Winepress']
+    };
+  </script>
+  <script src="assets/js/seo.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cinzel:wght@400;600;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --wine:#6B1A2A; --wine-lt:#B05068; --white:#FFF; --off:#FAF8F5; --ink:#1C1010; --muted:#7A6060; --serif-d:'DM Serif Display', Georgia, serif; --serif-c:'Cinzel', serif; --sans:'DM Sans', sans-serif; }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:var(--sans); background:var(--off); color:var(--ink); line-height:1.8; }
+    a { color:inherit; text-decoration:none; }
+    nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 5rem; background:rgba(255,255,255,.95); border-bottom:1px solid rgba(107,26,42,.08); }
+    .nav-logo { font-family:var(--serif-c); font-size:.92rem; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--wine); }
+    .nav-links { display:flex; gap:1.8rem; list-style:none; }
+    .nav-links a { font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-links a:hover, .nav-links a.active { color:var(--wine); }
+    .hero { padding:8rem 5rem 4rem; background:linear-gradient(135deg, rgba(107,26,42,.95), rgba(140,36,56,.88)); color:var(--white); position:relative; overflow:hidden; }
+    .hero::after { content:'ALIGNMENT'; position:absolute; right:2rem; bottom:-1rem; font-family:var(--serif-c); font-size:10rem; font-weight:900; color:rgba(255,255,255,.05); letter-spacing:.08em; }
+    .eyebrow { font-family:var(--serif-c); font-size:.58rem; font-weight:600; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.58); margin-bottom:1rem; position:relative; z-index:1; }
+    h1 { font-family:var(--serif-d); font-size:clamp(3rem,6vw,5.4rem); font-weight:400; line-height:1.02; margin-bottom:1rem; position:relative; z-index:1; }
+    h1 em { font-style:italic; color:#E8C8CE; }
+    .hero p { max-width:720px; color:rgba(255,255,255,.78); position:relative; z-index:1; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:1rem; margin-top:2rem; position:relative; z-index:1; }
+    .btn-light,.btn-outline { display:inline-block; padding:.9rem 1.5rem; border-radius:999px; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; }
+    .btn-light { background:var(--white); color:var(--wine); }
+    .btn-outline { border:1px solid rgba(255,255,255,.28); color:rgba(255,255,255,.9); }
+    .page { padding:4rem 5rem 6rem; display:grid; grid-template-columns:1.15fr .9fr; gap:2rem; }
+    .card { background:var(--white); border:1px solid rgba(107,26,42,.08); border-radius:24px; padding:2rem; box-shadow:0 18px 60px rgba(107,26,42,.06); }
+    .label { font-family:var(--serif-c); font-size:.56rem; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:var(--wine-lt); margin-bottom:1rem; }
+    .card h2, .card h3 { font-family:var(--serif-d); font-weight:400; line-height:1.1; margin-bottom:1rem; }
+    .card p { color:var(--muted); }
+    .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1.8rem; }
+    .info-box { padding:1.1rem; border-radius:18px; background:var(--off); border:1px solid rgba(107,26,42,.06); }
+    .info-box strong { display:block; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--wine); margin-bottom:.35rem; }
+    .side-stack { display:grid; gap:1rem; }
+    .days-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; perspective:1200px; }
+    .day-link {
+      display:block; padding:1rem; border-radius:16px; background:var(--off); border:1px solid rgba(107,26,42,.08);
+      position:relative; overflow:hidden; transform:translateY(26px) rotateX(12deg); opacity:0;
+      transition: transform .45s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+    }
+    .day-link::before {
+      content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(176,80,104,.16), transparent 58%);
+      opacity:0; transition:opacity .25s ease;
+    }
+    .day-link::after {
+      content:''; position:absolute; left:-30%; top:-80%; width:60%; height:240%;
+      background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.45), rgba(255,255,255,0));
+      transform:rotate(24deg); opacity:0; transition:transform .7s ease, opacity .35s ease;
+    }
+    .day-link strong, .day-link span { position:relative; z-index:1; }
+    .day-link strong { display:block; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--wine); margin-bottom:.2rem; }
+    .day-link span { font-size:.82rem; color:var(--muted); }
+    .meeting-link { display:inline-block; margin-top:1rem; color:var(--wine); font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+    .day-link.is-visible { animation: dayReveal .7s cubic-bezier(.22,1,.36,1) forwards; }
+    .day-link:hover {
+      transform:translateY(-4px) scale(1.02); border-color:rgba(107,26,42,.18); background:#fff;
+      box-shadow:0 18px 35px rgba(107,26,42,.09);
+    }
+    .day-link:hover::before { opacity:1; }
+    .day-link:hover::after { opacity:1; transform:translateX(230%) rotate(24deg); }
+    .day-link:nth-child(odd) { transform-origin:center left; }
+    .day-link:nth-child(even) { transform-origin:center right; }
+    .day-link:nth-child(3n) { background:linear-gradient(180deg, #fff, var(--off)); }
+    .day-link:nth-child(4n) strong { color:var(--wine-lt); }
+    .day-link .day-dot {
+      position:absolute; top:.95rem; right:.95rem; width:.42rem; height:.42rem; border-radius:50%;
+      background:rgba(107,26,42,.18); z-index:1;
+    }
+    @keyframes dayReveal {
+      from { opacity:0; transform:translateY(26px) rotateX(12deg) scale(.97); }
+      to { opacity:1; transform:translateY(0) rotateX(0) scale(1); }
+    }
+    footer { padding:2rem 5rem 3rem; background:var(--ink); color:rgba(255,255,255,.38); font-size:.78rem; }
+    @media (max-width:980px){ nav,.hero,.page,footer{padding-left:2rem;padding-right:2rem;} .page{grid-template-columns:1fr;} .info-grid,.days-grid{grid-template-columns:1fr 1fr;} }
+    @media (max-width:720px){ nav{padding:1rem 1.25rem;} .nav-links{display:none;} .hero,.page,footer{padding-left:1.25rem;padding-right:1.25rem;} .info-grid,.days-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">The Winepress</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="alignment.html" class="active">Alignment</a></li>
+      <li><a href="devotionals.html">Devotionals</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+  <section class="hero">
+    <div class="eyebrow">April Devotional Marathon</div>
+    <h1>Alignment: <em>14 Days of Fasting, Prayer and Devotion</em></h1>
+    <p>A dedicated space for your April journey of corporate fasting and prayer. Each day already has its own devotional page, ready for the full text, prayer points, and the live meeting link for your community gatherings.</p>
+    <div class="hero-actions">
+      <a href="alignment-day-01.html" class="btn-light">Open Day 1</a>
+      <a href="#days" class="btn-outline">View All Days</a>
+    </div>
+  </section>
+  <section class="page">
+    <div class="card">
+      <div class="label">What To Expect</div>
+      <h2>A structured home for the whole journey.</h2>
+      <p>Alignment is set up as a 14-day corporate fasting and prayer journey through The Winepress. This page serves as the main hub, while each day has a separate devotional page so your marathon can grow day by day without becoming cluttered.</p>
+      <p>When you send the devotionals, I can place each one into its matching day page. The live gathering details are now added here and will also appear in each daily page.</p>
+      <div class="info-grid">
+        <div class="info-box"><strong>Schedule</strong><span>Wednesday, April 1 at 5:00 through Tuesday, April 14 at 6:00</span></div>
+        <div class="info-box"><strong>Focus</strong><span>Corporate fasting, prayer, reflection</span></div>
+        <div class="info-box"><strong>Status</strong><span>Meeting link added, waiting for devotional content</span></div>
+      </div>
+    </div>
+    <div class="side-stack">
+      <div class="card" id="days">
+        <div class="label">Daily Pages</div>
+        <h3>Open each day</h3>
+        <div class="days-grid">
+          <a href="alignment-day-01.html" class="day-link"><span class="day-dot"></span><strong>Day 01</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-02.html" class="day-link"><span class="day-dot"></span><strong>Day 02</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-03.html" class="day-link"><span class="day-dot"></span><strong>Day 03</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-04.html" class="day-link"><span class="day-dot"></span><strong>Day 04</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-05.html" class="day-link"><span class="day-dot"></span><strong>Day 05</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-06.html" class="day-link"><span class="day-dot"></span><strong>Day 06</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-07.html" class="day-link"><span class="day-dot"></span><strong>Day 07</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-08.html" class="day-link"><span class="day-dot"></span><strong>Day 08</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-09.html" class="day-link"><span class="day-dot"></span><strong>Day 09</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-10.html" class="day-link"><span class="day-dot"></span><strong>Day 10</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-11.html" class="day-link"><span class="day-dot"></span><strong>Day 11</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-12.html" class="day-link"><span class="day-dot"></span><strong>Day 12</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-13.html" class="day-link"><span class="day-dot"></span><strong>Day 13</strong><span>Placeholder ready</span></a>
+          <a href="alignment-day-14.html" class="day-link"><span class="day-dot"></span><strong>Day 14</strong><span>Placeholder ready</span></a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Meeting Link</div>
+        <h3>Join the live Alignment gathering.</h3>
+        <p>Wednesday, April 1 at 5:00 through Tuesday, April 14 at 6:00</p>
+        <a class="meeting-link" href="https://meet.google.com/aio-fger-gdz" target="_blank" rel="noopener">Open Google Meet</a>
+      </div>
+    </div>
+  </section>
+  <footer><p>Alignment by The Winepress. Ready for your April fasting and prayer journey.</p></footer>
+  <script>
+    const dayLinks = Array.from(document.querySelectorAll('.day-link'));
+    const revealDays = () => {
+      dayLinks.forEach((link, index) => {
+        window.setTimeout(() => {
+          link.classList.add('is-visible');
+        }, index * 85);
+      });
+    };
+
+    const daysSection = document.querySelector('#days');
+    if ('IntersectionObserver' in window && daysSection) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            revealDays();
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.22 });
+      observer.observe(daysSection);
+    } else {
+      revealDays();
+    }
+  </script>
+</body>
+</html>
