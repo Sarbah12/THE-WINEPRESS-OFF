@@ -1,6 +1,6 @@
 (function () {
   const defaults = {
-    siteName: 'The Winepress',
+    siteName: 'The Winepress Official',
     siteUrl: 'https://thewinepressofficial.com',
     locale: 'en_GH',
     type: 'website',
@@ -23,7 +23,7 @@
     ],
     author: 'Afua',
     organization: {
-      name: 'The Winepress',
+      name: 'The Winepress Official',
       alternateName: ['The Winepress Official', 'The Winepress by Afua'],
       description: 'A Christ-centred space where faith and psychology intersect through biblical reflections, honest conversations, mental well-being support, and stories of wholeness.',
       sameAs: [
@@ -117,6 +117,10 @@
       url: getSiteUrl(),
       logo: imageUrl,
       sameAs: defaults.organization.sameAs,
+      brand: {
+        '@type': 'Brand',
+        name: defaults.organization.name
+      },
       founder: {
         '@type': 'Person',
         name: 'Afua',

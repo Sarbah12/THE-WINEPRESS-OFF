@@ -24,12 +24,22 @@ function toAbsoluteUrl(pathname) {
 }
 
 function buildSitemap(entries) {
+  const lastmod = new Date().toISOString().slice(0, 10);
   const urls = entries
     .filter(entry => entry.endsWith('.html'))
     .filter(entry => !EXCLUDED_FROM_INDEXING.has(entry))
+    .sort((a, b) => {
+      if (a === 'index.html') {
+        return -1;
+      }
+      if (b === 'index.html') {
+        return 1;
+      }
+      return a.localeCompare(b);
+    })
     .map(entry => {
       const pathname = normalizePath(entry);
-      return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n  </url>`;
+      return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
     })
     .join('\n');
 
