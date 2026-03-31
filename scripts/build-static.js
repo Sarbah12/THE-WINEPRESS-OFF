@@ -6,7 +6,7 @@ const OUTPUT_DIRS = [
   path.join(ROOT_DIR, 'public'),
   path.join(ROOT_DIR, 'dist')
 ];
-const SITE_URL = (process.env.SITE_URL || '').replace(/\/+$/, '');
+const SITE_URL = (process.env.SITE_URL || 'https://thewinepressofficial.com').replace(/\/+$/, '');
 const EXCLUDED_FROM_INDEXING = new Set(['admin.html']);
 
 function normalizePath(entryName) {

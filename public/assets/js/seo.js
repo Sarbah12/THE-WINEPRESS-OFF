@@ -1,6 +1,7 @@
 (function () {
   const defaults = {
     siteName: 'The Winepress',
+    siteUrl: 'https://thewinepressofficial.com',
     locale: 'en_GH',
     type: 'website',
     pageType: 'WebPage',
@@ -16,11 +17,14 @@
       'wholeness journey',
       'faith encouragement',
       'Christian testimonies',
-      'The Winepress'
+      'The Winepress',
+      'The Winepress official',
+      'thewinepressofficial.com'
     ],
     author: 'Afua',
     organization: {
       name: 'The Winepress',
+      alternateName: ['The Winepress Official', 'The Winepress by Afua'],
       description: 'A Christ-centred space where faith and psychology intersect through biblical reflections, honest conversations, mental well-being support, and stories of wholeness.',
       sameAs: [
         'https://www.instagram.com/thewinepress_?igsh=NG5tdWk3bGJpdXEw',
@@ -108,6 +112,7 @@
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: defaults.organization.name,
+      alternateName: defaults.organization.alternateName,
       description: defaults.organization.description,
       url: getSiteUrl(),
       logo: imageUrl,
@@ -123,7 +128,12 @@
       '@type': 'WebSite',
       name: config.siteName || defaults.siteName,
       url: getSiteUrl(),
-      inLanguage: 'en'
+      inLanguage: 'en',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${getSiteUrl()}/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string'
+      }
     },
     {
       '@context': 'https://schema.org',
