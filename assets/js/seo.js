@@ -84,6 +84,7 @@
   const title = config.title || document.title || defaults.siteName;
   const description = config.description || defaults.organization.description;
   const robots = config.index === false ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
+  const siteName = config.siteName || defaults.siteName;
 
   document.title = title;
 
@@ -99,11 +100,13 @@
   upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
   upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
   upsertMeta('meta[property="og:image"]', { property: 'og:image', content: imageUrl });
+  upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${siteName} cover image` });
 
   upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
   upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
   upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: imageUrl });
+  upsertMeta('meta[name="twitter:url"]', { name: 'twitter:url', content: canonicalUrl });
 
   upsertLink('canonical', canonicalUrl);
 
@@ -130,7 +133,7 @@
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: config.siteName || defaults.siteName,
+      name: siteName,
       url: getSiteUrl(),
       inLanguage: 'en',
       potentialAction: {
@@ -147,11 +150,24 @@
       url: canonicalUrl,
       isPartOf: {
         '@type': 'WebSite',
-        name: config.siteName || defaults.siteName,
+        name: siteName,
         url: getSiteUrl()
       },
+      author: {
+        '@type': 'Person',
+        name: config.author || defaults.author
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: defaults.organization.name,
+        logo: {
+          '@type': 'ImageObject',
+          url: imageUrl
+        }
+      },
       about: config.about || ['Christian growth', 'Bible study', 'faith encouragement'],
-      image: imageUrl
+      image: imageUrl,
+      primaryImageOfPage: imageUrl
     }
   ];
 
@@ -181,6 +197,50 @@
         availableLanguage: ['English']
       }
     ];
+  }
+
+  if (Array.isArray(config.breadcrumbs) && config.breadcrumbs.length > 0) {
+    schemaNodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: config.breadcrumbs.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: buildUrl(item.path)
+      }))
+    });
+  }
+
+  if (Array.isArray(config.faqs) && config.faqs.length > 0) {
+    schemaNodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: config.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer
+        }
+      }))
+    });
+  }
+
+  if (config.person) {
+    schemaNodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: config.person.name || defaults.author,
+      description: config.person.description,
+      jobTitle: config.person.jobTitle,
+      worksFor: {
+        '@type': 'Organization',
+        name: defaults.organization.name,
+        url: getSiteUrl()
+      },
+      sameAs: config.person.sameAs || []
+    });
   }
 
   let schemaScript = document.getElementById('winepress-seo-schema');

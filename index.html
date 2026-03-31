@@ -4,20 +4,37 @@
   <meta charset="UTF-8"/>
   <base href="/"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="The Winepress is a Christ-centred space where faith and psychology meet through biblical reflections, candid Christian conversations, mental well-being support, and stories of wholeness."/>
+  <meta name="description" content="The Winepress Official is a Christ-centred platform where faith and psychology meet through biblical reflections, Christian devotionals, mental well-being support, honest conversations, and stories of wholeness."/>
   <meta name="robots" content="index, follow, max-image-preview:large"/>
   <title>The Winepress Official | Faith, Psychology, Wholeness and Christian Growth</title>
   <script>
     window.WINEPRESS_SEO = {
       siteUrl: 'https://thewinepressofficial.com',
       title: 'The Winepress Official | Faith, Psychology, Wholeness and Christian Growth',
-      description: 'The Winepress is a Christ-centred space where faith and psychology meet through biblical reflections, candid Christian conversations, mental well-being support, and stories of wholeness.',
+      description: 'The Winepress Official is a Christ-centred platform where faith and psychology meet through biblical reflections, Christian devotionals, mental well-being support, honest conversations, and stories of wholeness.',
       path: '/',
-      pageType: 'WebSite',
+      pageType: 'WebPage',
       siteName: 'The Winepress Official',
       author: 'Afua',
-      keywords: ['The Winepress', 'The Winepress Official', 'faith and psychology', 'Christian mental well-being', 'biblical reflections', 'Christ-centred life', 'Christian conversations', 'wholeness journey'],
-      about: ['faith and psychology', 'Christian mental well-being', 'biblical reflections', 'Christ-centred life', 'wholeness journey', 'Christian community']
+      keywords: ['The Winepress', 'The Winepress Official', 'thewinepressofficial.com', 'Christian devotionals', 'faith and psychology', 'Christian mental well-being', 'biblical reflections', 'Christ-centred life', 'Christian conversations', 'wholeness journey'],
+      about: ['The Winepress Official', 'Christian devotionals', 'faith and psychology', 'Christian mental well-being', 'biblical reflections', 'Christ-centred life', 'wholeness journey', 'Christian community'],
+      breadcrumbs: [
+        { name: 'Home', path: '/' }
+      ],
+      faqs: [
+        {
+          question: 'What is The Winepress Official?',
+          answer: 'The Winepress Official is a Christ-centred platform by Afua where faith and psychology meet through biblical reflections, Christian devotionals, mental well-being conversations, and stories of wholeness.'
+        },
+        {
+          question: 'Who is behind The Winepress Official?',
+          answer: 'The Winepress Official is led by Afua, a follower of Christ who is passionate about the intersection of faith, psychology, healing, and biblical growth.'
+        },
+        {
+          question: 'What can I find on The Winepress Official?',
+          answer: 'Visitors can find Christian devotionals, biblical reflections, testimonies, resources for spiritual growth, and honest conversations about faith and mental well-being.'
+        }
+      ]
     };
   </script>
   <script src="assets/js/seo.js" defer></script>
@@ -263,6 +280,81 @@
       line-height: 1.55; color: var(--ink);
     }
     .intro-text em { font-style: italic; color: var(--wine); }
+    .intro-links {
+      margin-top: 1.8rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+    .intro-links a {
+      padding: .65rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(107,26,42,.12);
+      background: rgba(255,255,255,.65);
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--wine);
+    }
+    .seo-band {
+      background: var(--white);
+      padding: 0 5rem 5rem;
+    }
+    .seo-band-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      border: 1px solid rgba(107,26,42,.08);
+      border-radius: 28px;
+      background: linear-gradient(180deg, #fff, var(--off));
+      box-shadow: 0 18px 60px rgba(107,26,42,.06);
+      padding: 2rem;
+    }
+    .seo-band-eyebrow {
+      font-family: var(--serif-c);
+      font-size: .58rem;
+      font-weight: 600;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--wine-lt);
+      margin-bottom: .9rem;
+    }
+    .seo-band h2 {
+      font-family: var(--serif-d);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+    .seo-band h2 em { font-style: italic; color: var(--wine); }
+    .seo-band-copy {
+      color: var(--muted);
+      max-width: 820px;
+      margin-bottom: 1.4rem;
+    }
+    .seo-band-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .seo-band-card {
+      padding: 1.25rem;
+      border-radius: 18px;
+      background: var(--white);
+      border: 1px solid rgba(107,26,42,.08);
+    }
+    .seo-band-card h3 {
+      font-family: var(--serif-d);
+      font-size: 1.35rem;
+      font-weight: 400;
+      margin-bottom: .7rem;
+    }
+    .seo-band-card p {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.8;
+    }
 
     /* 
        ABOUT
@@ -678,7 +770,7 @@
       nav { padding: 1rem 1.5rem; }
       .hero-content { padding: 0 1.5rem 7rem; }
       .hero-scroll { display: none; }
-      .about, .devs, .testi, .res, .sub { padding-left: 1.5rem; padding-right: 1.5rem; padding-top: 5rem; padding-bottom: 5rem; }
+      .about, .devs, .testi, .res, .sub, .seo-band { padding-left: 1.5rem; padding-right: 1.5rem; padding-top: 5rem; padding-bottom: 5rem; }
       .alignment-home { padding: 5rem 1.5rem; }
       footer { padding: 4rem 1.5rem 2rem; }
       .alignment-main, .alignment-card, .alignment-days { padding: 1.6rem; }
@@ -687,6 +779,7 @@
       .testi-grid { grid-template-columns: 1fr; }
       .res-grid { grid-template-columns: 1fr; }
       .devs-grid { grid-template-columns: 1fr 1fr; }
+      .seo-band-grid { grid-template-columns: 1fr; }
       .alignment-grid { grid-template-columns: 1fr; }
       .alignment-actions { flex-direction: column; align-items: flex-start; }
       .foot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -727,7 +820,7 @@
       </div>
       <h1 class="hero-h1">The Winepress Official</h1>
       <span class="hero-h1-em">in the Pressing.</span>
-      <p style="max-width:560px;color:rgba(255,255,255,.82);margin:0 0 2rem;font-size:1rem;">A Christ-centred home for biblical reflections, Christian devotionals, mental well-being, and honest conversations on faith, healing, and wholeness.</p>
+      <p style="max-width:560px;color:rgba(255,255,255,.82);margin:0 0 2rem;font-size:1rem;">The Winepress Official is a Christ-centred home for biblical reflections, Christian devotionals, mental well-being, and honest conversations on faith, healing, and wholeness.</p>
       <blockquote class="hero-verse">
         "He cuts off every branch in me that bears no fruit, while every branch that does bear fruit he prunes so that it will be even more fruitful."
         <cite>— John 15:2</cite>
@@ -773,8 +866,36 @@
         Whether you are in the <em>crushing</em>, the <em>waiting</em>, or the <em>pouring out</em> —
         you are not alone. The Winepress Official is a place of Scripture, testimony, Christ-centred reflection, and deep-rooted hope.
       </p>
+      <div class="intro-links">
+        <a href="about.html">About The Winepress Official</a>
+        <a href="devotionals.html">Christian Devotionals</a>
+        <a href="testimonies.html">Read Testimonies</a>
+        <a href="resources.html">Faith Resources</a>
+      </div>
     </div>
   </div>
+
+  <section class="seo-band">
+    <div class="seo-band-inner">
+      <div class="seo-band-eyebrow">Why The Winepress Official</div>
+      <h2>A clear home for <em>faith, healing, and wholeness.</em></h2>
+      <p class="seo-band-copy">The Winepress Official exists to help believers grow through biblical reflections, Christian devotionals, testimonies, and honest conversations about faith and psychology. If someone searches for The Winepress Official, this homepage should clearly explain the brand, the mission, and the kind of Christ-centred content people can expect.</p>
+      <div class="seo-band-grid">
+        <article class="seo-band-card">
+          <h3>Biblical Reflections</h3>
+          <p>The Winepress Official shares Scripture-rooted encouragement for real life, real questions, and real growth in Christ.</p>
+        </article>
+        <article class="seo-band-card">
+          <h3>Faith and Psychology</h3>
+          <p>This platform explores the meeting point between Christian faith, the human mind, healing, mental well-being, and spiritual wholeness.</p>
+        </article>
+        <article class="seo-band-card">
+          <h3>Community and Testimony</h3>
+          <p>The Winepress Official also creates space for honest Christian stories, testimony, prayer, and encouragement for believers walking through pressing seasons.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- ABOUT -->
   <section class="about">

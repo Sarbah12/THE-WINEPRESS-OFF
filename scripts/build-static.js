@@ -23,6 +23,19 @@ function toAbsoluteUrl(pathname) {
   return new URL(pathname, `${SITE_URL}/`).toString();
 }
 
+function sitemapMetaForEntry(entryName) {
+  if (entryName === 'index.html') {
+    return { changefreq: 'daily', priority: '1.0' };
+  }
+  if (entryName === 'about.html' || entryName === 'devotionals.html' || entryName === 'blog.html') {
+    return { changefreq: 'weekly', priority: '0.9' };
+  }
+  if (entryName.startsWith('alignment')) {
+    return { changefreq: 'daily', priority: '0.8' };
+  }
+  return { changefreq: 'weekly', priority: '0.7' };
+}
+
 function buildSitemap(entries) {
   const lastmod = new Date().toISOString().slice(0, 10);
   const urls = entries
@@ -39,7 +52,8 @@ function buildSitemap(entries) {
     })
     .map(entry => {
       const pathname = normalizePath(entry);
-      return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
+      const meta = sitemapMetaForEntry(entry);
+      return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${meta.changefreq}</changefreq>\n    <priority>${meta.priority}</priority>\n  </url>`;
     })
     .join('\n');
 
