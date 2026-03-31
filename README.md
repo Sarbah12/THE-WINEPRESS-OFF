@@ -11,6 +11,14 @@ npm start
 
 Then open `http://127.0.0.1:3000`.
 
+## SEO build note
+
+To generate absolute canonical URLs and a production-ready sitemap, run the build with your live domain:
+
+```bash
+SITE_URL=https://your-domain.com npm run build
+```
+
 ## Vercel deployment
 
 - Static pages live at the project root

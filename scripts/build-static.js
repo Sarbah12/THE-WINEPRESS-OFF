@@ -6,6 +6,40 @@ const OUTPUT_DIRS = [
   path.join(ROOT_DIR, 'public'),
   path.join(ROOT_DIR, 'dist')
 ];
+const SITE_URL = (process.env.SITE_URL || '').replace(/\/+$/, '');
+const EXCLUDED_FROM_INDEXING = new Set(['admin.html']);
+
+function normalizePath(entryName) {
+  if (entryName === 'index.html') {
+    return '/';
+  }
+  return `/${entryName.replace(/\.html$/, '')}/`;
+}
+
+function toAbsoluteUrl(pathname) {
+  if (!SITE_URL) {
+    return pathname;
+  }
+  return new URL(pathname, `${SITE_URL}/`).toString();
+}
+
+function buildSitemap(entries) {
+  const urls = entries
+    .filter(entry => entry.endsWith('.html'))
+    .filter(entry => !EXCLUDED_FROM_INDEXING.has(entry))
+    .map(entry => {
+      const pathname = normalizePath(entry);
+      return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n  </url>`;
+    })
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+function buildRobotsTxt() {
+  const sitemapLine = SITE_URL ? `Sitemap: ${new URL('/sitemap.xml', `${SITE_URL}/`).toString()}\n` : '';
+  return `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /admin.html\n\n${sitemapLine}`;
+}
 
 async function ensureCleanDir(dirPath) {
   await fs.rm(dirPath, { recursive: true, force: true });
@@ -53,6 +87,7 @@ async function build() {
   }
 
   const entries = await fs.readdir(ROOT_DIR, { withFileTypes: true });
+  const htmlAndXmlEntries = [];
   for (const entry of entries) {
     if (!entry.isFile()) {
       continue;
@@ -60,6 +95,10 @@ async function build() {
 
     if (!entry.name.endsWith('.html') && !entry.name.endsWith('.xml')) {
       continue;
+    }
+
+    if (entry.name !== 'sitemap.xml') {
+      htmlAndXmlEntries.push(entry.name);
     }
 
     for (const dir of OUTPUT_DIRS) {
@@ -86,6 +125,17 @@ async function build() {
 
   for (const dir of OUTPUT_DIRS) {
     await copyIfExists(path.join(ROOT_DIR, 'assets'), path.join(dir, 'assets'));
+  }
+
+  const sitemap = buildSitemap(htmlAndXmlEntries);
+  const robotsTxt = buildRobotsTxt();
+
+  await fs.writeFile(path.join(ROOT_DIR, 'sitemap.xml'), sitemap);
+  await fs.writeFile(path.join(ROOT_DIR, 'robots.txt'), robotsTxt);
+
+  for (const dir of OUTPUT_DIRS) {
+    await fs.writeFile(path.join(dir, 'sitemap.xml'), sitemap);
+    await fs.writeFile(path.join(dir, 'robots.txt'), robotsTxt);
   }
 }
 
