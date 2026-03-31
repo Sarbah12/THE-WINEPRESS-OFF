@@ -126,14 +126,14 @@
   <section class="hero">
     <div class="eyebrow">April Devotional Marathon</div>
     <h1>Alignment: <em>14 Days of Fasting, Prayer and Devotion</em></h1>
-    <p>A dedicated space for your April journey of corporate fasting and prayer. Each day already has its own devotional page, ready for the full text, prayer points, and the live meeting link for your community gatherings.</p>
+    <p>A dedicated space for your Alignment journey of corporate fasting and prayer, beginning on Tuesday, March 31, 2026 at 12:00 PM. Each day already has its own devotional page, ready for the full text, prayer points, and the live meeting link for your community gatherings.</p>
     <div class="countdown-wrap" id="alignment-countdown">
       <div class="countdown-box"><span class="countdown-value" data-unit="days">14</span><span class="countdown-label">Days</span></div>
       <div class="countdown-box"><span class="countdown-value" data-unit="hours">00</span><span class="countdown-label">Hours</span></div>
       <div class="countdown-box"><span class="countdown-value" data-unit="minutes">00</span><span class="countdown-label">Minutes</span></div>
       <div class="countdown-box"><span class="countdown-value" data-unit="seconds">00</span><span class="countdown-label">Seconds</span></div>
     </div>
-    <p class="countdown-note">Countdown to the end of the 14-day Alignment journey.</p>
+    <p class="countdown-note" id="countdown-note">Countdown to the start of Alignment on Tuesday, March 31, 2026 at 12:00 PM.</p>
     <div class="hero-actions">
       <a href="alignment-day-01.html" class="btn-light">Open Day 1</a>
       <a href="#days" class="btn-outline">View All Days</a>
@@ -146,9 +146,9 @@
       <p>Alignment is set up as a 14-day corporate fasting and prayer journey through The Winepress. This page serves as the main hub, while each day has a separate devotional page so your marathon can grow day by day without becoming cluttered.</p>
       <p>When you send the devotionals, I can place each one into its matching day page. The live gathering details are now added here and will also appear in each daily page.</p>
       <div class="info-grid">
-        <div class="info-box"><strong>Schedule</strong><span>Wednesday, April 1 at 5:00 through Tuesday, April 14 at 6:00</span></div>
+        <div class="info-box"><strong>Schedule</strong><span>Tuesday, March 31 at 12:00 PM through Tuesday, April 14 at 6:00 AM</span></div>
         <div class="info-box"><strong>Focus</strong><span>Corporate fasting, prayer, reflection</span></div>
-        <div class="info-box"><strong>Status</strong><span>Meeting link added, waiting for devotional content</span></div>
+        <div class="info-box"><strong>Status</strong><span>Meeting link added, daily devotionals coming soon</span></div>
       </div>
     </div>
     <div class="side-stack">
@@ -175,24 +175,35 @@
       <div class="card">
         <div class="label">Meeting Link</div>
         <h3>Join the live Alignment gathering.</h3>
-        <p>Wednesday, April 1 at 5:00 through Tuesday, April 14 at 6:00</p>
+        <p>Tuesday, March 31 at 12:00 PM through Tuesday, April 14 at 6:00 AM</p>
         <a class="meeting-link" href="https://meet.google.com/aio-fger-gdz" target="_blank" rel="noopener">Open Google Meet</a>
       </div>
     </div>
   </section>
   <footer><p>Alignment by The Winepress. Ready for your April fasting and prayer journey.</p></footer>
   <script>
-    const alignmentEnd = new Date('2026-04-14T06:00:00');
+    const alignmentStart = new Date('2026-03-31T12:00:00Z');
     const countdownEls = {
       days: document.querySelector('[data-unit="days"]'),
       hours: document.querySelector('[data-unit="hours"]'),
       minutes: document.querySelector('[data-unit="minutes"]'),
       seconds: document.querySelector('[data-unit="seconds"]')
     };
+    const countdownNote = document.getElementById('countdown-note');
 
     const renderCountdown = () => {
       const now = new Date();
-      const diff = Math.max(0, alignmentEnd.getTime() - now.getTime());
+      const diff = alignmentStart.getTime() - now.getTime();
+      if (diff <= 0) {
+        countdownEls.days.textContent = '00';
+        countdownEls.hours.textContent = '00';
+        countdownEls.minutes.textContent = '00';
+        countdownEls.seconds.textContent = '00';
+        if (countdownNote) {
+          countdownNote.textContent = 'Alignment started on Tuesday, March 31, 2026 at 12:00 PM.';
+        }
+        return;
+      }
       const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -203,6 +214,9 @@
       countdownEls.hours.textContent = String(hours).padStart(2, '0');
       countdownEls.minutes.textContent = String(minutes).padStart(2, '0');
       countdownEls.seconds.textContent = String(seconds).padStart(2, '0');
+      if (countdownNote) {
+        countdownNote.textContent = 'Countdown to the start of Alignment on Tuesday, March 31, 2026 at 12:00 PM.';
+      }
     };
 
     renderCountdown();
