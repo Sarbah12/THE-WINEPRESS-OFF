@@ -31,6 +31,18 @@ async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
 
+  if (pathname.endsWith('.html')) {
+    const query = url.search || '';
+    const cleanPath = pathname === '/index.html'
+      ? '/'
+      : `${pathname.replace(/\.html$/, '')}/`;
+    res.writeHead(308, {
+      Location: `${cleanPath}${query}`
+    });
+    res.end();
+    return;
+  }
+
   if (pathname === '/') {
     pathname = '/index.html';
   }
