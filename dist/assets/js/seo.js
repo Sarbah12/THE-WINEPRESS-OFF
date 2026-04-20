@@ -56,6 +56,16 @@
     return new URL(normalizedPath, siteUrl).toString();
   }
 
+  function inferPageType(pageType, pathname) {
+    if (pageType) {
+      return pageType;
+    }
+    if (pathname === '/') {
+      return 'WebPage';
+    }
+    return defaults.pageType;
+  }
+
   function upsertMeta(selector, attributes) {
     let node = document.head.querySelector(selector);
     if (!node) {
@@ -85,13 +95,18 @@
   const description = config.description || defaults.organization.description;
   const robots = config.index === false ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
   const siteName = config.siteName || defaults.siteName;
+  const pageType = inferPageType(config.pageType, normalizePath(config.path || window.location.pathname));
+  const imageAlt = config.imageAlt || `${title} | ${siteName}`;
+  const keywords = config.keywords || defaults.keywords;
 
   document.title = title;
 
   upsertMeta('meta[name="description"]', { name: 'description', content: description });
-  upsertMeta('meta[name="keywords"]', { name: 'keywords', content: (config.keywords || defaults.keywords).join(', ') });
+  upsertMeta('meta[name="keywords"]', { name: 'keywords', content: keywords.join(', ') });
   upsertMeta('meta[name="author"]', { name: 'author', content: config.author || defaults.author });
   upsertMeta('meta[name="robots"]', { name: 'robots', content: robots });
+  upsertMeta('meta[name="googlebot"]', { name: 'googlebot', content: robots });
+  upsertMeta('meta[name="theme-color"]', { name: 'theme-color', content: '#6B1A2A' });
 
   upsertMeta('meta[property="og:type"]', { property: 'og:type', content: config.type || defaults.type });
   upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: config.siteName || defaults.siteName });
@@ -100,103 +115,150 @@
   upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
   upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
   upsertMeta('meta[property="og:image"]', { property: 'og:image', content: imageUrl });
-  upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${siteName} cover image` });
+  upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: imageAlt });
+  upsertMeta('meta[property="og:image:width"]', { property: 'og:image:width', content: String(config.imageWidth || 1200) });
+  upsertMeta('meta[property="og:image:height"]', { property: 'og:image:height', content: String(config.imageHeight || 630) });
 
   upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
   upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
   upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: imageUrl });
+  upsertMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: imageAlt });
   upsertMeta('meta[name="twitter:url"]', { name: 'twitter:url', content: canonicalUrl });
 
   upsertLink('canonical', canonicalUrl);
 
-  const schemaNodes = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      name: defaults.organization.name,
-      alternateName: defaults.organization.alternateName,
-      description: defaults.organization.description,
-      url: getSiteUrl(),
-      logo: imageUrl,
-      sameAs: defaults.organization.sameAs,
-      brand: {
-        '@type': 'Brand',
-        name: defaults.organization.name
-      },
-      founder: {
-        '@type': 'Person',
-        name: 'Afua',
-        jobTitle: 'Founder'
-      }
+  const organizationNode = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${getSiteUrl()}/#organization`,
+    name: defaults.organization.name,
+    alternateName: defaults.organization.alternateName,
+    description: defaults.organization.description,
+    url: getSiteUrl(),
+    logo: {
+      '@type': 'ImageObject',
+      url: imageUrl
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: siteName,
-      url: getSiteUrl(),
-      inLanguage: 'en',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${getSiteUrl()}/?q={search_term_string}`,
-        'query-input': 'required name=search_term_string'
-      }
+    image: imageUrl,
+    sameAs: defaults.organization.sameAs,
+    brand: {
+      '@type': 'Brand',
+      name: defaults.organization.name
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': config.pageType || defaults.pageType,
-      name: title,
-      description: description,
-      url: canonicalUrl,
-      isPartOf: {
-        '@type': 'WebSite',
-        name: siteName,
-        url: getSiteUrl()
-      },
-      author: {
-        '@type': 'Person',
-        name: config.author || defaults.author
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: defaults.organization.name,
-        logo: {
-          '@type': 'ImageObject',
-          url: imageUrl
-        }
-      },
-      about: config.about || ['Christian growth', 'Bible study', 'faith encouragement'],
-      image: imageUrl,
-      primaryImageOfPage: imageUrl
+    founder: {
+      '@type': 'Person',
+      name: 'Afua',
+      jobTitle: 'Founder'
     }
-  ];
+  };
 
-  if (config.pageType === 'Article') {
-    schemaNodes[2].headline = title;
-    schemaNodes[2].author = {
+  const websiteNode = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${getSiteUrl()}/#website`,
+    name: siteName,
+    url: getSiteUrl(),
+    description: defaults.organization.description,
+    inLanguage: 'en',
+    publisher: {
+      '@id': `${getSiteUrl()}/#organization`
+    }
+  };
+
+  const pageNode = {
+    '@context': 'https://schema.org',
+    '@type': pageType,
+    '@id': `${canonicalUrl}#webpage`,
+    name: title,
+    headline: title,
+    description: description,
+    url: canonicalUrl,
+    isPartOf: {
+      '@id': `${getSiteUrl()}/#website`
+    },
+    about: config.about || ['Christian growth', 'Bible study', 'faith encouragement'],
+    keywords: keywords,
+    inLanguage: 'en',
+    image: {
+      '@type': 'ImageObject',
+      url: imageUrl
+    },
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      url: imageUrl
+    },
+    author: {
+      '@type': 'Person',
+      name: config.author || defaults.author
+    },
+    publisher: {
+      '@id': `${getSiteUrl()}/#organization`
+    }
+  };
+
+  const schemaNodes = [organizationNode, websiteNode, pageNode];
+
+  if (pageType === 'Article') {
+    pageNode.author = {
       '@type': 'Organization',
       name: defaults.organization.name
     };
-    schemaNodes[2].publisher = {
-      '@type': 'Organization',
-      name: defaults.organization.name,
-      logo: {
-        '@type': 'ImageObject',
-        url: imageUrl
-      }
+    pageNode.publisher = {
+      '@id': `${getSiteUrl()}/#organization`
     };
-    schemaNodes[2].mainEntityOfPage = canonicalUrl;
-    schemaNodes[2].articleSection = config.articleSection || 'Bible Study';
+    pageNode.mainEntityOfPage = canonicalUrl;
+    pageNode.articleSection = config.articleSection || 'Bible Study';
+    if (config.datePublished) {
+      pageNode.datePublished = config.datePublished;
+      upsertMeta('meta[property="article:published_time"]', { property: 'article:published_time', content: config.datePublished });
+    }
+    if (config.dateModified) {
+      pageNode.dateModified = config.dateModified;
+      upsertMeta('meta[property="article:modified_time"]', { property: 'article:modified_time', content: config.dateModified });
+    }
+    if (Array.isArray(config.tags) && config.tags.length > 0) {
+      pageNode.articleBody = config.articleSummary;
+      config.tags.forEach((tag, index) => {
+        upsertMeta(`meta[property="article:tag"][data-seo-tag="${index}"]`, {
+          property: 'article:tag',
+          content: tag,
+          'data-seo-tag': String(index)
+        });
+      });
+    }
   }
 
-  if (config.pageType === 'ContactPage') {
-    schemaNodes[2].contactPoint = [
+  if (pageType === 'ContactPage') {
+    pageNode.contactPoint = [
       {
         '@type': 'ContactPoint',
-        contactType: 'customer support',
+        contactType: 'Prayer requests and general enquiries',
         availableLanguage: ['English']
       }
     ];
+  }
+
+  if (pageType === 'CollectionPage' && Array.isArray(config.itemList) && config.itemList.length > 0) {
+    pageNode.mainEntity = {
+      '@type': 'ItemList',
+      itemListElement: config.itemList.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        url: buildUrl(item.path)
+      }))
+    };
+  }
+
+  if (pageType === 'Blog') {
+    pageNode.blogPost = Array.isArray(config.itemList)
+      ? config.itemList.map((item) => ({
+          '@type': 'BlogPosting',
+          headline: item.name,
+          url: buildUrl(item.path)
+        }))
+      : undefined;
   }
 
   if (Array.isArray(config.breadcrumbs) && config.breadcrumbs.length > 0) {
@@ -231,13 +293,12 @@
     schemaNodes.push({
       '@context': 'https://schema.org',
       '@type': 'Person',
+      '@id': `${getSiteUrl()}/#person-afua`,
       name: config.person.name || defaults.author,
       description: config.person.description,
       jobTitle: config.person.jobTitle,
       worksFor: {
-        '@type': 'Organization',
-        name: defaults.organization.name,
-        url: getSiteUrl()
+        '@id': `${getSiteUrl()}/#organization`
       },
       sameAs: config.person.sameAs || []
     });

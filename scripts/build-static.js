@@ -37,22 +37,22 @@ function sitemapMetaForEntry(entryName) {
 }
 
 function buildSitemap(entries) {
-  const lastmod = new Date().toISOString().slice(0, 10);
   const urls = entries
-    .filter(entry => entry.endsWith('.html'))
-    .filter(entry => !EXCLUDED_FROM_INDEXING.has(entry))
+    .filter(entry => entry.name.endsWith('.html'))
+    .filter(entry => !EXCLUDED_FROM_INDEXING.has(entry.name))
     .sort((a, b) => {
-      if (a === 'index.html') {
+      if (a.name === 'index.html') {
         return -1;
       }
-      if (b === 'index.html') {
+      if (b.name === 'index.html') {
         return 1;
       }
-      return a.localeCompare(b);
+      return a.name.localeCompare(b.name);
     })
     .map(entry => {
-      const pathname = normalizePath(entry);
-      const meta = sitemapMetaForEntry(entry);
+      const pathname = normalizePath(entry.name);
+      const meta = sitemapMetaForEntry(entry.name);
+      const lastmod = new Date(entry.mtimeMs).toISOString().slice(0, 10);
       return `  <url>\n    <loc>${toAbsoluteUrl(pathname)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${meta.changefreq}</changefreq>\n    <priority>${meta.priority}</priority>\n  </url>`;
     })
     .join('\n');
@@ -122,7 +122,12 @@ async function build() {
     }
 
     if (entry.name !== 'sitemap.xml') {
-      htmlAndXmlEntries.push(entry.name);
+      const sourcePath = path.join(ROOT_DIR, entry.name);
+      const stats = await fs.stat(sourcePath);
+      htmlAndXmlEntries.push({
+        name: entry.name,
+        mtimeMs: stats.mtimeMs
+      });
     }
 
     for (const dir of OUTPUT_DIRS) {
