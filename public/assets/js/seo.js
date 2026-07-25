@@ -27,8 +27,7 @@
       alternateName: ['The Winepress Official', 'The Winepress by Afua'],
       description: 'A Christ-centred space where faith and psychology intersect through biblical reflections, honest conversations, mental well-being support, and stories of wholeness.',
       sameAs: [
-        'https://www.instagram.com/thewinepress_?igsh=NG5tdWk3bGJpdXEw',
-        'https://www.whatsapp.com/channel/0029Vb6NqD27z4kZwHc2Mh3B'
+        'https://www.instagram.com/thewinepress_?igsh=NG5tdWk3bGJpdXEw'
       ]
     }
   };
