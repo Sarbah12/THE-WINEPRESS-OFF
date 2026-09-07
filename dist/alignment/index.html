@@ -90,7 +90,7 @@
     .day-link:hover { border-color:rgba(107,26,42,.18); background:#fff; }
     footer { padding:2rem 5rem 3rem; background:var(--ink); color:rgba(255,255,255,.38); font-size:.78rem; }
     @media (max-width:980px){ nav,.hero,.page,footer{padding-left:2rem;padding-right:2rem;} .page{grid-template-columns:1fr;} .info-grid,.days-grid{grid-template-columns:1fr 1fr;} }
-    @media (max-width:720px){ nav{padding:1rem 1.25rem;} .nav-links{display:none;} .hero,.page,footer{padding-left:1.25rem;padding-right:1.25rem;} .info-grid,.days-grid{grid-template-columns:1fr;} }
+    @media (max-width:720px){ nav{padding:1rem 1.25rem;flex-wrap:wrap;row-gap:.55rem;} .nav-links{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;width:100%;} .nav-links a{font-size:.62rem;} .hero,.page,footer{padding-left:1.25rem;padding-right:1.25rem;} .info-grid,.days-grid{grid-template-columns:1fr;} }
   </style>
 </head>
 <body>
