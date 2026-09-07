@@ -5,7 +5,7 @@
     locale: 'en_GH',
     type: 'website',
     pageType: 'WebPage',
-    image: '/assets/images/background.png',
+    image: '/assets/images/background.jpg',
     keywords: [
       'Christian blog',
       'Bible study',
